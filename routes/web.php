@@ -3,6 +3,7 @@
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PPDBController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// AUTH ROUTES
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
 // PUBLIC ROUTES
 Route::get('/', [PublicController::class, 'index'])->name('home');
 Route::get('/ppdb', [PublicController::class, 'ppdb'])->name('ppdb');
@@ -26,6 +32,15 @@ Route::get('/profil', [PublicController::class, 'profil'])->name('profil');
 Route::get('/kontak', [PublicController::class, 'kontak'])->name('kontak');
 Route::post('/kontak', [PublicController::class, 'sendContact'])->name('kontak.send');
 Route::get('/faq', [PublicController::class, 'faq'])->name('faq');
+
+// DEMO ROUTES - Remove these before production (for testing without authentication)
+Route::get('/admin/demo-dashboard', [AdminController::class, 'dashboard'])->name('admin-demo.dashboard');
+Route::get('/admin/demo-ppdb', [AdminController::class, 'ppdbIndex'])->name('admin-demo.ppdb.index');
+Route::get('/admin/demo-program', [AdminController::class, 'programIndex'])->name('admin-demo.program.index');
+Route::get('/admin/demo-activity', [AdminController::class, 'activityIndex'])->name('admin-demo.activity.index');
+Route::get('/admin/demo-gallery', [AdminController::class, 'galleryIndex'])->name('admin-demo.gallery.index');
+Route::get('/admin/demo-announcement', [AdminController::class, 'announcementIndex'])->name('admin-demo.announcement.index');
+Route::get('/admin/demo-faq', [AdminController::class, 'faqIndex'])->name('admin-demo.faq.index');
 
 // ADMIN ROUTES
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
