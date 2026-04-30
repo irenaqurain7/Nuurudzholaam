@@ -12,9 +12,14 @@ use Illuminate\Http\Request;
 
 class PublicController extends Controller
 {
+    protected function schoolInfo(): SchoolInfo
+    {
+        return SchoolInfo::first() ?? new SchoolInfo();
+    }
+
     public function index()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         $announcements = Announcement::where('status', 'aktif')->orderBy('tanggal_mulai', 'desc')->take(3)->get();
         $activities = Activity::where('visibility', 'publik')->orderBy('tanggal', 'desc')->take(6)->get();
         $programs = Program::all();
@@ -25,7 +30,7 @@ class PublicController extends Controller
 
     public function ppdb()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         $programs = Program::all();
         $announcements = Announcement::where('status', 'aktif')->where('tipe', 'ppdb')->first();
         
@@ -34,7 +39,7 @@ class PublicController extends Controller
 
     public function kegiatan()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         $activities = Activity::where('visibility', 'publik')->orderBy('tanggal', 'desc')->paginate(9);
         
         return view('kegiatan', compact('school', 'activities'));
@@ -42,7 +47,7 @@ class PublicController extends Controller
 
     public function program()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         $programs = Program::all();
         
         return view('program', compact('school', 'programs'));
@@ -50,7 +55,7 @@ class PublicController extends Controller
 
     public function profil()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         $galleries = Gallery::orderBy('tanggal', 'desc')->take(12)->get();
         
         return view('profil', compact('school', 'galleries'));
@@ -58,14 +63,14 @@ class PublicController extends Controller
 
     public function kontak()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         
         return view('kontak', compact('school'));
     }
 
     public function faq()
     {
-        $school = SchoolInfo::first();
+        $school = $this->schoolInfo();
         $faqs = FAQ::orderBy('urutan')->get();
         
         return view('faq', compact('school', 'faqs'));
