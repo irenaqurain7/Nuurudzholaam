@@ -475,12 +475,12 @@
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-map-marker-alt"></i> Alamat</h3>
-                <p id="footer-alamat">Jl. Pendidikan No. 123, Kota, Indonesia</p>
+                <p id="footer-alamat">Kp, Jl. Sindangreret, Dangdeur, Kec. Bungursari, Kabupaten Purwakarta, Jawa Barat 41181</p>
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-phone"></i> Hubungi Kami</h3>
-                <p><a href="tel:0812345678">0812-345-678</a></p>
-                <p><a href="mailto:info@sekolah.com">info@sekolah.com</a></p>
+                <p><a href="tel:085714673916(Dede ali)">081958159264(Wiwi suherti)</a></p>
+                <p><a href="mailto:Nuurudz@gmail.com">Nuurudz@gmail.com</a></p>
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-share-alt"></i> Media Sosial</h3>
