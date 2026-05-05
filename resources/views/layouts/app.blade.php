@@ -445,8 +445,8 @@
     <nav class="navbar">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
             <a href="{{ route('home') }}" class="navbar-brand">
-                <i class="fas fa-mosque"></i>
-                <span>Nuurudzholaam</span>
+                <img src="/images/logo-nuzo.png" alt="Logo Nuzo" style="height: 55px; width: auto; margin-right: 4px;">
+                <span>Nuurudzholaam (Nuzo)</span>
             </a>
             <button class="navbar-toggle" id="navbar-toggle">
                 <i class="fas fa-bars"></i>
@@ -479,16 +479,17 @@
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-phone"></i> Hubungi Kami</h3>
-                <p><a href="tel:085714673916(Dede ali)">081958159264(Wiwi suherti)</a></p>
-                <p><a href="mailto:Nuurudz@gmail.com">Nuurudz@gmail.com</a></p>
+                <p style="margin-bottom: 5px;"><a href="tel:085714673916">085714673916 (Dede ali)</a></p>
+                <p style="margin-bottom: 5px;"><a href="tel:081958159264">081958159264 (Wiwi suherti)</a></p>
+                <p style="margin-bottom: 0;"><a href="mailto:Nuurudz@gmail.com">Nuurudz@gmail.com</a></p>
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-share-alt"></i> Media Sosial</h3>
-                <div style="display: flex; gap: 15px; font-size: 20px;">
-                    <a href="#" style="color: var(--emas); transition: all 0.3s;"><i class="fab fa-facebook"></i></a>
-                    <a href="#" style="color: var(--emas); transition: all 0.3s;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="color: var(--emas); transition: all 0.3s;"><i class="fab fa-youtube"></i></a>
-                    <a href="#" style="color: var(--emas); transition: all 0.3s;"><i class="fab fa-whatsapp"></i></a>
+                <div style="display: flex; flex-direction: column; gap: 2px; font-size: 18px;">
+                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-facebook"></i> Ponpes Nuurudzholaam</a>
+                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-instagram"></i> ponpes_nuurudzholaam</a>
+                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-youtube"></i> Nuzo TV</a>
+                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-tiktok"></i> Nuzo TV</a>
                 </div>
             </div>
         </div>
