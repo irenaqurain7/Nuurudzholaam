@@ -8,15 +8,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --hijau-islam: #1f7f5f;
-            --hijau-islam-light: #2d8659;
-            --hijau-islam-lighter: #4a9d7d;
+            --hijau-islam: #1a5c42;
+            --hijau-islam-light: #1f7f5f;
+            --hijau-islam-lighter: #2d9968;
             --putih: #ffffff;
-            --emas: #d4af37;
-            --emas-light: #ffc107;
+            --emas: #d4a574;
+            --emas-light: #e8c99e;
             --text-dark: #1a202c;
-            --text-light: #4a5568;
-            --bg-light: #f7fafc;
+            --text-light: #5a6c7d;
+            --bg-light: #f8f9fa;
         }
 
         * {
