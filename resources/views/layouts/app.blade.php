@@ -80,6 +80,88 @@
             border-radius: 3px;
         }
 
+        /* Dropdown Menu Styles */
+        .nav-item-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--putih);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+        }
+
+        .nav-dropdown-toggle:hover {
+            color: var(--emas);
+        }
+
+        .nav-dropdown-toggle i {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-dropdown-toggle.active i {
+            transform: rotate(180deg);
+        }
+
+        .nav-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+            margin-top: 12px;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .nav-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--hijau-islam);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-dropdown-menu a:hover {
+            background-color: var(--emas-light);
+            border-left-color: var(--hijau-islam);
+            padding-left: 25px;
+        }
+
+        .nav-dropdown-menu a i {
+            font-size: 15px;
+            color: var(--emas);
+            width: 20px;
+            text-align: center;
+        }
+
         .hero {
             background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
             color: var(--putih);
@@ -502,6 +584,17 @@
                 <li><a href="{{ route('ppdb') }}" class="@if(Route::current()->getName() === 'ppdb') active @endif">PPDB</a></li>
                 <li><a href="{{ route('program') }}" class="@if(Route::current()->getName() === 'program') active @endif">Program</a></li>
                 <li><a href="{{ route('kegiatan') }}" class="@if(Route::current()->getName() === 'kegiatan') active @endif">Kegiatan</a></li>
+                <li class="nav-item-dropdown">
+                    <button class="nav-dropdown-toggle" id="informasi-toggle">
+                        <i class="fas fa-circle-info"></i> Informasi <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="nav-dropdown-menu" id="informasi-menu">
+                        <a href="{{ route('informasi') }}"><i class="fas fa-newspaper"></i> Berita</a>
+                        <a href="{{ route('informasi.tipe', 'penting') }}"><i class="fas fa-exclamation-circle"></i> Pengumuman Penting</a>
+                        <a href="{{ route('informasi.tipe', 'ppdb') }}"><i class="fas fa-graduation-cap"></i> PPDB</a>
+                        <a href="{{ route('informasi.tipe', 'libur') }}"><i class="fas fa-calendar-days"></i> Libur</a>
+                    </div>
+                </li>
                 <li><a href="{{ route('profil') }}" class="@if(Route::current()->getName() === 'profil') active @endif">Profil</a></li>
                 <li><a href="{{ route('faq') }}" class="@if(Route::current()->getName() === 'faq') active @endif">FAQ</a></li>
                 <li><a href="{{ route('kontak') }}" class="@if(Route::current()->getName() === 'kontak') active @endif">Kontak</a></li>
@@ -578,6 +671,34 @@
                 document.getElementById('navbar-menu').classList.remove('active');
             });
         });
+
+        // Dropdown Menu Toggle
+        const informasiToggle = document.getElementById('informasi-toggle');
+        const informasiMenu = document.getElementById('informasi-menu');
+
+        if (informasiToggle && informasiMenu) {
+            informasiToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                informasiMenu.classList.toggle('show');
+                informasiToggle.classList.toggle('active');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.nav-item-dropdown')) {
+                    informasiMenu.classList.remove('show');
+                    informasiToggle.classList.remove('active');
+                }
+            });
+
+            // Close dropdown when a link is clicked
+            document.querySelectorAll('#informasi-menu a').forEach(link => {
+                link.addEventListener('click', function() {
+                    informasiMenu.classList.remove('show');
+                    informasiToggle.classList.remove('active');
+                });
+            });
+        }
     </script>
 
     @stack('scripts')

@@ -76,6 +76,37 @@ class PublicController extends Controller
         return view('faq', compact('school', 'faqs'));
     }
 
+    public function informasi()
+    {
+        $school = $this->schoolInfo();
+        $berita = Announcement::where('status', 'aktif')
+            ->where('tipe', 'umum')
+            ->orderBy('tanggal_mulai', 'desc')
+            ->paginate(10);
+        
+        return view('informasi', compact('school', 'berita'));
+    }
+
+    public function getInformasi($tipe)
+    {
+        $validTypes = ['umum', 'ppdb', 'libur', 'penting'];
+        
+        if (!in_array($tipe, $validTypes)) {
+            abort(404);
+        }
+
+        $announcements = Announcement::where('status', 'aktif')
+            ->where('tipe', $tipe)
+            ->orderBy('tanggal_mulai', 'desc')
+            ->paginate(10);
+        
+        return view('informasi', [
+            'school' => $this->schoolInfo(),
+            'berita' => $announcements,
+            'activeTipe' => $tipe
+        ]);
+    }
+
     public function sendContact(Request $request)
     {
         $validated = $request->validate([

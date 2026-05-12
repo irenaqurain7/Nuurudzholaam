@@ -34,6 +34,8 @@ Route::get('/profil', [PublicController::class, 'profil'])->name('profil');
 Route::get('/kontak', [PublicController::class, 'kontak'])->name('kontak');
 Route::post('/kontak', [PublicController::class, 'sendContact'])->name('kontak.send');
 Route::get('/faq', [PublicController::class, 'faq'])->name('faq');
+Route::get('/informasi', [PublicController::class, 'informasi'])->name('informasi');
+Route::get('/informasi/{tipe}', [PublicController::class, 'getInformasi'])->name('informasi.tipe');
 
 // DEMO ROUTES - Remove these before production (for testing without authentication)
 Route::get('/admin/demo-dashboard', [AdminController::class, 'dashboard'])->name('admin-demo.dashboard');
