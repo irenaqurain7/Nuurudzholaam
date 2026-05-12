@@ -8,15 +8,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --hijau-islam: #1a5c42;
-            --hijau-islam-light: #1f7f5f;
-            --hijau-islam-lighter: #2d9968;
+            --hijau-islam: #2D4438;
+            --hijau-islam-light: #486E5A;
+            --hijau-islam-lighter: #5B8572;
             --putih: #ffffff;
-            --emas: #d4a574;
-            --emas-light: #e8c99e;
-            --text-dark: #1a202c;
-            --text-light: #5a6c7d;
-            --bg-light: #f8f9fa;
+            --emas: #709D88;
+            --emas-light: #E2ECE8;
+            --text-dark: #1C2D25;
+            --text-light: #5A7E6B;
+            --bg-light: #F4F7F5;
         }
 
         * {
@@ -158,6 +158,52 @@
         .btn-secondary:hover {
             background-color: var(--emas);
             color: var(--hijau-islam);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            border: 2px solid var(--emas);
+            background: transparent;
+            color: var(--emas);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            background: var(--emas);
+            color: var(--hijau-islam);
+        }
+
+        .nav-btn.solid {
+            background: var(--emas);
+            color: var(--hijau-islam);
+            border-color: var(--emas);
+        }
+
+        .nav-btn.solid:hover {
+            background: var(--emas-light);
+            border-color: var(--emas-light);
+        }
+
+        .nav-btn.logout {
+            border-color: rgba(255, 255, 255, 0.65);
+            color: var(--putih);
+        }
+
+        .nav-btn.logout:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--putih);
+        }
+
+        .nav-form {
+            display: inline;
         }
 
         .section-title {
@@ -459,6 +505,27 @@
                 <li><a href="{{ route('profil') }}" class="@if(Route::current()->getName() === 'profil') active @endif">Profil</a></li>
                 <li><a href="{{ route('faq') }}" class="@if(Route::current()->getName() === 'faq') active @endif">FAQ</a></li>
                 <li><a href="{{ route('kontak') }}" class="@if(Route::current()->getName() === 'kontak') active @endif">Kontak</a></li>
+                @guest
+                    <li><a href="{{ route('login') }}" class="nav-btn solid"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                @endguest
+                @auth
+                    @if(!auth()->user()->isAdmin())
+                        <li>
+                            <a
+                                href="{{ auth()->user()->isStudent() ? route('student.dashboard') : route('teacher.dashboard') }}"
+                                class="nav-btn solid"
+                            >
+                                <i class="fas fa-gauge"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST" class="nav-form">
+                                @csrf
+                                <button type="submit" class="nav-btn logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                            </form>
+                        </li>
+                    @endif
+                @endauth
             </ul>
         </div>
     </nav>

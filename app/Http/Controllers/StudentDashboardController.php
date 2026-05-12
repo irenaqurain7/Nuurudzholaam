@@ -1,0 +1,157 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use App\Models\Student;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+class StudentDashboardController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            if (Auth::user()->role !== 'student') {
+                return redirect('/');
+            }
+            return $next($request);
+        });
+    }
+
+    /**
+     * Show student dashboard
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        return view('student.dashboard', [
+            'user' => $user,
+            'student' => $student,
+        ]);
+    }
+
+    /**
+     * Show student schedule
+     */
+    public function schedule()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+        $schedules = $student->schedule()->orderBy('day')->get();
+
+        return view('student.schedule', [
+            'schedules' => $schedules,
+        ]);
+    }
+
+    /**
+     * Show student grades
+     */
+    public function grades()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+        $grades = $student->grades()->with('teacher.user')->get();
+
+        return view('student.grades', [
+            'grades' => $grades,
+        ]);
+    }
+
+    /**
+     * Show student profile
+     */
+    public function profile()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        return view('student.profile', [
+            'user' => $user,
+            'student' => $student,
+        ]);
+    }
+
+    /**
+     * Update student profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'bio' => 'nullable|string|max:1000',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('student.profile')->with('success', 'Profil berhasil diperbarui');
+    }
+
+    /**
+     * Show change password form
+     */
+    public function showChangePassword()
+    {
+        return view('student.change-password');
+    }
+
+    /**
+     * Update password
+     */
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|confirmed|min:8|different:current_password',
+        ]);
+
+        Auth::user()->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return redirect()->route('student.profile')->with('success', 'Password berhasil diubah');
+    }
+
+    /**
+     * Show upload profile photo form
+     */
+    public function showUploadPhoto()
+    {
+        return view('student.upload-photo');
+    }
+
+    /**
+     * Upload profile photo
+     */
+    public function uploadPhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old photo if exists
+        if ($user->profile_photo && Storage::exists('public/' . $user->profile_photo)) {
+            Storage::delete('public/' . $user->profile_photo);
+        }
+
+        // Store new photo
+        $path = $request->file('photo')->store('profile-photos', 'public');
+
+        $user->update([
+            'profile_photo' => $path,
+        ]);
+
+        return redirect()->route('student.profile')->with('success', 'Foto profil berhasil diubah');
+    }
+}

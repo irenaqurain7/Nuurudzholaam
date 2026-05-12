@@ -4,6 +4,8 @@ use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PPDBController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StudentDashboardController;
+use App\Http\Controllers\TeacherDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -103,4 +105,70 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // School Info Management
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');
+
+    // User Management
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [AdminController::class, 'usersIndex'])->name('index');
+        Route::get('/create', [AdminController::class, 'usersCreate'])->name('create');
+        Route::post('/', [AdminController::class, 'usersStore'])->name('store');
+        Route::get('/{id}/edit', [AdminController::class, 'usersEdit'])->name('edit');
+        Route::put('/{id}', [AdminController::class, 'usersUpdate'])->name('update');
+        Route::delete('/{id}', [AdminController::class, 'usersDelete'])->name('delete');
+        Route::post('/{id}/reset-password', [AdminController::class, 'usersResetPassword'])->name('reset-password');
+    });
+});
+
+// STUDENT ROUTES
+Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
+
+    // Schedule
+    Route::get('/schedule', [StudentDashboardController::class, 'schedule'])->name('schedule');
+
+    // Grades
+    Route::get('/grades', [StudentDashboardController::class, 'grades'])->name('grades');
+
+    // Profile
+    Route::get('/profile', [StudentDashboardController::class, 'profile'])->name('profile');
+    Route::put('/profile', [StudentDashboardController::class, 'updateProfile'])->name('profile.update');
+
+    // Password
+    Route::get('/change-password', [StudentDashboardController::class, 'showChangePassword'])->name('change-password');
+    Route::put('/change-password', [StudentDashboardController::class, 'updatePassword'])->name('change-password.update');
+
+    // Photo
+    Route::get('/upload-photo', [StudentDashboardController::class, 'showUploadPhoto'])->name('upload-photo');
+    Route::post('/upload-photo', [StudentDashboardController::class, 'uploadPhoto'])->name('upload-photo.store');
+});
+
+// TEACHER ROUTES
+Route::middleware(['auth'])->prefix('teacher')->name('teacher.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [TeacherDashboardController::class, 'index'])->name('dashboard');
+
+    // Schedule
+    Route::get('/schedule', [TeacherDashboardController::class, 'schedule'])->name('schedule');
+
+    // Students
+    Route::get('/students', [TeacherDashboardController::class, 'students'])->name('students');
+
+    // Grades
+    Route::get('/grades', [TeacherDashboardController::class, 'grades'])->name('grades');
+    Route::get('/grades/edit/{id?}', [TeacherDashboardController::class, 'editGrade'])->name('grades.edit');
+    Route::post('/grades', [TeacherDashboardController::class, 'storeGrade'])->name('grades.store');
+    Route::put('/grades/{id}', [TeacherDashboardController::class, 'storeGrade'])->name('grades.update');
+    Route::delete('/grades/{id}', [TeacherDashboardController::class, 'deleteGrade'])->name('grades.delete');
+
+    // Profile
+    Route::get('/profile', [TeacherDashboardController::class, 'profile'])->name('profile');
+    Route::put('/profile', [TeacherDashboardController::class, 'updateProfile'])->name('profile.update');
+
+    // Password
+    Route::get('/change-password', [TeacherDashboardController::class, 'showChangePassword'])->name('change-password');
+    Route::put('/change-password', [TeacherDashboardController::class, 'updatePassword'])->name('change-password.update');
+
+    // Photo
+    Route::get('/upload-photo', [TeacherDashboardController::class, 'showUploadPhoto'])->name('upload-photo');
+    Route::post('/upload-photo', [TeacherDashboardController::class, 'uploadPhoto'])->name('upload-photo.store');
 });

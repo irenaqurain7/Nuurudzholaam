@@ -8,7 +8,7 @@
     <!-- Background Pattern -->
     <div style="position: absolute; top: -50%; right: -10%; width: 600px; height: 600px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; z-index: 0;"></div>
     <div style="position: absolute; bottom: -30%; left: 0; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; z-index: 0;"></div>
-    
+
     <div class="container" style="text-align: center; z-index: 10; position: relative;">
         <div style="display: inline-block; background: rgba(212, 175, 55, 0.2); padding: 8px 20px; border-radius: 20px; margin-bottom: 30px;">
             <span style="color: var(--emas); font-weight: 600; font-size: 14px;">PENDAFTARAN PESERTA DIDIK BARU 2024/2025</span>
@@ -56,7 +56,7 @@
     <div class="container">
         <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Pilar Pendidikan Utama</h2>
         <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Kami mengintegrasikan empat pilar fundamental untuk menciptakan pendidikan yang seimbang dan holistik.</p>
-        
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
             <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
@@ -122,7 +122,7 @@
     <div class="container">
         <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Program Pendidikan Unggulan</h2>
         <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px;">Membentuk generasi Qur'ani yang berakhlak mulia, cerdas, dan tangguh melalui perpadian kurikulum nasional dengan nilai-nilai Islam yang komprehensif.</p>
-        
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
             @foreach($programs->take(3) as $program)
             <div class="card" style="overflow: hidden; transition: all 0.3s;">
@@ -143,7 +143,7 @@
             </div>
             @endforeach
         </div>
-        
+
         <div style="text-align: center; margin-top: 40px;">
             <a href="{{ route('program') }}" style="background-color: var(--hijau-islam); color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;">Lihat Semua Program →</a>
         </div>
@@ -157,7 +157,7 @@
     <div class="container">
         <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Galeri Kegiatan Siswa</h2>
         <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Potret keseharian siswa dalam menuntut ilmu dan beraktivitas</p>
-        
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             @foreach($galleries->take(6) as $photo)
             <div style="position: relative; overflow: hidden; border-radius: 12px; height: 280px; cursor: pointer;">
@@ -176,7 +176,7 @@
     .photo-overlay:hover {
         opacity: 1 !important;
     }
-    
+
     .section > .container > div[style*="grid"] > div:hover img {
         transform: scale(1.05);
     }

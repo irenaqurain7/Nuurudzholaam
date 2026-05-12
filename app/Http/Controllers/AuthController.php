@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +14,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->to($this->redirectByRole(Auth::user()));
         }
         return view('auth.login');
     }
@@ -24,17 +25,37 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'login' => 'required|string',
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $user = User::where('email', $credentials['login'])
+            ->orWhere('nisn', $credentials['login'])
+            ->orWhere('nip', $credentials['login'])
+            ->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'login' => 'Akun tidak ditemukan.',
+            ]);
+        }
+
+        if (Auth::attempt(['email' => $user->email, 'password' => $credentials['password']], $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'));
+            $user = Auth::user();
+
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'login' => 'Akun Anda telah dinonaktifkan. Hubungi admin sekolah.',
+                ]);
+            }
+
+            return redirect()->intended($this->redirectByRole($user));
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password tidak sesuai.',
+            'login' => 'Username/NISN/NIP atau password tidak sesuai.',
         ]);
     }
 
@@ -47,5 +68,20 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    /**
+     * Redirect user based on role
+     */
+    private function redirectByRole($user)
+    {
+        if ($user->isStudent()) {
+            return route('student.dashboard');
+        } elseif ($user->isTeacher()) {
+            return route('teacher.dashboard');
+        } elseif ($user->isAdmin()) {
+            return route('admin.dashboard');
+        }
+        return route('login');
     }
 }

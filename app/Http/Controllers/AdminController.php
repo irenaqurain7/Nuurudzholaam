@@ -9,7 +9,11 @@ use App\Models\Gallery;
 use App\Models\PPDBRegistration;
 use App\Models\Program;
 use App\Models\SchoolInfo;
+use App\Models\User;
+use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -359,5 +363,154 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('success', 'Informasi sekolah berhasil diperbarui.');
+    }
+
+    // USER MANAGEMENT
+    public function usersIndex()
+    {
+        $users = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(15);
+        return view('admin.users.index', compact('users'));
+    }
+
+    public function usersCreate()
+    {
+        return view('admin.users.create');
+    }
+
+    public function usersStore(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed',
+            'role' => 'required|in:student,teacher',
+            'nisn' => 'required_if:role,student|nullable|unique:users',
+            'class' => 'required_if:role,student|nullable|string',
+            'nip' => 'required_if:role,teacher|nullable|unique:users',
+            'specialization' => 'required_if:role,teacher|nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+
+        $user = User::create($validated);
+
+        // Create related records
+        if ($user->role === 'student') {
+            Student::create([
+                'user_id' => $user->id,
+                'nisn' => $validated['nisn'],
+                'class' => $validated['class'],
+            ]);
+        } elseif ($user->role === 'teacher') {
+            Teacher::create([
+                'user_id' => $user->id,
+                'nip' => $validated['nip'],
+                'specialization' => $validated['specialization'],
+            ]);
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat.');
+    }
+
+    public function usersEdit($id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->role === 'admin') {
+            abort(403);
+        }
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function usersUpdate(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'admin') {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|in:student,teacher',
+            'nisn' => 'required_if:role,student|nullable|unique:users,nisn,' . $user->id,
+            'class' => 'required_if:role,student|nullable|string',
+            'nip' => 'required_if:role,teacher|nullable|unique:users,nip,' . $user->id,
+            'specialization' => 'required_if:role,teacher|nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active');
+        $user->update($validated);
+
+        if ($validated['role'] === 'student') {
+            if ($user->teacher) {
+                $user->teacher()->delete();
+            }
+
+            if ($user->student) {
+                $user->student->update([
+                    'nisn' => $validated['nisn'],
+                    'class' => $validated['class'],
+                ]);
+            } else {
+                Student::create([
+                    'user_id' => $user->id,
+                    'nisn' => $validated['nisn'],
+                    'class' => $validated['class'],
+                ]);
+            }
+        } else {
+            if ($user->student) {
+                $user->student()->delete();
+            }
+
+            if ($user->teacher) {
+                $user->teacher->update([
+                    'nip' => $validated['nip'],
+                    'specialization' => $validated['specialization'],
+                ]);
+            } else {
+                Teacher::create([
+                    'user_id' => $user->id,
+                    'nip' => $validated['nip'],
+                    'specialization' => $validated['specialization'],
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
+    }
+
+    public function usersDelete($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'admin') {
+            abort(403);
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
+    }
+
+    public function usersResetPassword($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->role === 'admin') {
+            abort(403);
+        }
+
+        // Generate temporary password
+        $tempPassword = 'Sekolah@' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+        $user->update(['password' => Hash::make($tempPassword)]);
+
+        return redirect()->back()->with('success', 'Password telah direset ke: ' . $tempPassword . ' (harap segera ubah password saat login pertama)');
     }
 }

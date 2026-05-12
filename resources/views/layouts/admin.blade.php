@@ -8,19 +8,19 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --hijau-islam: #1f7f5f;
-            --hijau-islam-light: #2d8659;
-            --hijau-islam-lighter: #4a9d7d;
-            --hijau-dark: #0f5038;
+            --hijau-islam: #2D4438;
+            --hijau-islam-light: #486E5A;
+            --hijau-islam-lighter: #5B8572;
+            --hijau-dark: #1C2D25;
             --putih: #ffffff;
-            --emas: #d4af37;
-            --emas-light: #ffc107;
-            --text-dark: #0f172a;
-            --text-light: #475569;
-            --text-muted: #64748b;
-            --bg-light: #f1f5f9;
+            --emas: #709D88;
+            --emas-light: #E2ECE8;
+            --text-dark: #1C2D25;
+            --text-light: #5A7E6B;
+            --text-muted: #6C8B7C;
+            --bg-light: #F4F7F5;
             --bg-white: #ffffff;
-            --border-color: #e2e8f0;
+            --border-color: #E2ECE8;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -536,14 +536,22 @@
         <nav>
             <ul class="admin-sidebar-nav">
                 <li><a href="{{ route('admin.dashboard') }}" class="@if(Route::current()->getName() === 'admin.dashboard') active @endif"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li class="nav-label">Data PPDB</li>
-                <li><a href="{{ route('admin.ppdb.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.ppdb')) active @endif"><i class="fas fa-users"></i> Pendaftar PPDB</a></li>
-                <li class="nav-label">Manajemen Konten</li>
+
+                <li class="nav-label">Manajemen Akun</li>
+                <li><a href="{{ route('admin.users.create') }}" class="@if(Route::current()->getName() === 'admin.users.create') active @endif"><i class="fas fa-user-plus"></i> Tambah Siswa & Guru</a></li>
+                <li><a href="{{ route('admin.users.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.users')) active @endif"><i class="fas fa-users"></i> Data Siswa & Guru</a></li>
+                <li><a href="{{ route('admin.users.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.users')) active @endif"><i class="fas fa-key"></i> Username & Password</a></li>
+
+                <li class="nav-label">PPDB</li>
+                <li><a href="{{ route('admin.ppdb.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.ppdb')) active @endif"><i class="fas fa-users"></i> Formulir PPDB</a></li>
+
+                <li class="nav-label">Berita & Informasi</li>
+                <li><a href="{{ route('admin.announcement.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.announcement')) active @endif"><i class="fas fa-bullhorn"></i> Pengumuman</a></li>
+
+                <li class="nav-label">Pantau Website</li>
+                <li><a href="{{ route('admin.program.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.program')) active @endif"><i class="fas fa-book"></i> Program</a></li>
                 <li><a href="{{ route('admin.activity.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.activity')) active @endif"><i class="fas fa-calendar-alt"></i> Kegiatan</a></li>
                 <li><a href="{{ route('admin.gallery.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.gallery')) active @endif"><i class="fas fa-image"></i> Galeri</a></li>
-                <li><a href="{{ route('admin.announcement.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.announcement')) active @endif"><i class="fas fa-bell"></i> Pengumuman</a></li>
-                <li class="nav-label">Pengaturan</li>
-                <li><a href="{{ route('admin.program.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.program')) active @endif"><i class="fas fa-book"></i> Program</a></li>
                 <li><a href="{{ route('admin.faq.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.faq')) active @endif"><i class="fas fa-question-circle"></i> FAQ</a></li>
                 <li><a href="{{ route('admin.school-info.edit') }}" class="@if(str_contains(Route::current()->getName(), 'admin.school-info')) active @endif"><i class="fas fa-sliders-h"></i> Info Sekolah</a></li>
             </ul>
