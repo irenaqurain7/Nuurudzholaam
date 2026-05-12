@@ -48,45 +48,50 @@
 
         /* ===== SIDEBAR ===== */
         .admin-sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, var(--hijau-islam) 0%, var(--hijau-dark) 100%);
-            color: white;
-            padding: 30px 0;
+            width: 250px;
+            background: #ffffff;
+            color: #1C2D25;
+            padding: 20px 0;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            box-shadow: 8px 0 24px rgba(0, 0, 0, 0.12);
+            border-right: 1px solid #f1f5f9;
             z-index: 1000;
         }
 
         .admin-sidebar-header {
-            padding: 0 25px 30px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-            margin-bottom: 30px;
+            padding: 0 25px 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .admin-sidebar-title {
             font-size: 20px;
             font-weight: 700;
-            color: var(--emas);
+            color: #1C2D25;
             display: flex;
             align-items: center;
             gap: 12px;
             letter-spacing: 0.3px;
         }
+        
+        .admin-sidebar-title i {
+            color: var(--emas);
+        }
 
         .admin-sidebar-nav {
             list-style: none;
+            padding: 0 15px;
         }
 
         .admin-sidebar-nav li {
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .admin-sidebar-nav .nav-label {
-            margin-top: 25px;
-            padding: 12px 25px;
-            color: rgba(255, 255, 255, 0.4);
+            margin-top: 20px;
+            padding: 10px 15px;
+            color: var(--text-muted);
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -97,63 +102,65 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 13px 25px;
-            color: rgba(255, 255, 255, 0.75);
+            padding: 12px 15px;
+            color: #1C2D25;
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             font-size: 14px;
             font-weight: 500;
-            position: relative;
+            border-radius: 8px;
         }
 
         .admin-sidebar-nav a:hover {
-            background-color: rgba(212, 175, 55, 0.08);
-            color: white;
+            background-color: var(--bg-light);
         }
 
         .admin-sidebar-nav a.active {
-            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.05) 100%);
-            color: var(--emas);
-            border-left: 3px solid var(--emas);
-            padding-left: 22px;
+            background-color: var(--emas-light);
+            color: var(--hijau-islam);
+            font-weight: 600;
+        }
+        
+        .admin-sidebar-nav a.active i {
+            color: var(--hijau-islam);
         }
 
-        .admin-sidebar-nav i {
+        .admin-sidebar-nav a i {
             width: 20px;
             text-align: center;
             font-size: 16px;
+            color: var(--text-muted);
         }
 
         .admin-sidebar::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
 
         .admin-sidebar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: transparent;
         }
 
         .admin-sidebar::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.3);
-            border-radius: 3px;
+            background: #e2e8f0;
+            border-radius: 2px;
         }
 
         /* ===== MAIN CONTENT ===== */
         .admin-main {
-            margin-left: 280px;
+            margin-left: 250px;
             flex: 1;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background-color: var(--bg-light);
         }
 
         .admin-topbar {
-            background: var(--bg-white);
-            padding: 20px 35px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            background: var(--bg-light);
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -161,10 +168,9 @@
 
         .admin-topbar-left h2 {
             margin: 0;
-            color: var(--text-dark);
-            font-size: 22px;
+            color: #1C2D25;
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: -0.3px;
         }
 
         .admin-topbar-right {
@@ -178,20 +184,19 @@
             align-items: center;
             gap: 12px;
             padding-right: 20px;
-            border-right: 1px solid var(--border-color);
         }
 
         .admin-user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
+            border-radius: 50%;
+            background: var(--emas-light);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
+            color: var(--hijau-islam);
+            font-size: 16px;
+            font-weight: 700;
         }
 
         .admin-user-details {
@@ -200,12 +205,12 @@
 
         .admin-user-name {
             font-weight: 600;
-            color: var(--text-dark);
+            color: #1C2D25;
             display: block;
         }
 
         .admin-user-email {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-top: 2px;
         }
@@ -213,32 +218,34 @@
         .admin-topbar-action {
             display: flex;
             align-items: center;
-            gap: 3px;
-            padding: 8px 12px;
-            color: var(--hijau-islam);
+            justify-content: center;
+            gap: 5px;
+            color: #1C2D25;
+            background: transparent;
             text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            border-radius: 6px;
-            transition: all 0.3s ease;
         }
 
         .admin-topbar-action:hover {
-            background-color: var(--bg-light);
-            color: var(--hijau-dark);
-        }
-
-        .admin-topbar-action.logout {
-            color: var(--danger);
-        }
-
-        .admin-topbar-action.logout:hover {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
+            opacity: 0.8;
+            color: var(--hijau-islam);
         }
 
         .admin-topbar-action i {
+            color: var(--text-muted);
             font-size: 16px;
+        }
+
+        .admin-topbar-action.logout {
+            color: #ef4444;
+        }
+        
+        .admin-topbar-action.logout i {
+            color: #ef4444;
         }
 
         .admin-content {
@@ -526,34 +533,54 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar" id="adminSidebar">
         <div class="admin-sidebar-header">
             <div class="admin-sidebar-title">
-                <i class="fas fa-mosque"></i>
-                <span>Admin</span>
+                <i class="fas fa-building" style="color: var(--emas);"></i>
+                <span style="color: #1C2D25;">Admin</span>
             </div>
         </div>
         <nav>
             <ul class="admin-sidebar-nav">
-                <li><a href="{{ route('admin.dashboard') }}" class="@if(Route::current()->getName() === 'admin.dashboard') active @endif"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
 
-                <li class="nav-label">Manajemen Akun</li>
-                <li><a href="{{ route('admin.users.create') }}" class="@if(Route::current()->getName() === 'admin.users.create') active @endif"><i class="fas fa-user-plus"></i> Tambah Siswa & Guru</a></li>
-                <li><a href="{{ route('admin.users.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.users')) active @endif"><i class="fas fa-users"></i> Data Siswa & Guru</a></li>
-                <li><a href="{{ route('admin.users.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.users')) active @endif"><i class="fas fa-key"></i> Username & Password</a></li>
+                <div class="nav-label">MANAJEMEN AKUN</div>
+                <li><a href="{{ route('admin.users.create') ?? '#' }}" class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"><i class="fas fa-user-plus"></i> Tambah Siswa & Guru</a></li>
+                <li><a href="{{ route('admin.users.index') ?? '#' }}" class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Data Siswa & Guru</a></li>
+                <li><a href="#" class=""><i class="fas fa-key"></i> Username & Password</a></li>
 
-                <li class="nav-label">PPDB</li>
-                <li><a href="{{ route('admin.ppdb.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.ppdb')) active @endif"><i class="fas fa-users"></i> Formulir PPDB</a></li>
+                <div class="nav-label">PPDB</div>
+                <li><a href="{{ route('admin.ppdb.index') }}" class="{{ request()->routeIs('admin.ppdb.*') ? 'active' : '' }}"><i class="fas fa-users"></i> Formulir PPDB</a></li>
 
-                <li class="nav-label">Berita & Informasi</li>
-                <li><a href="{{ route('admin.announcement.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.announcement')) active @endif"><i class="fas fa-bullhorn"></i> Pengumuman</a></li>
+                <div class="nav-label">BERITA & INFORMASI</div>
+                <li><a href="{{ route('admin.announcement.index') }}" class="{{ request()->routeIs('admin.announcement.*') ? 'active' : '' }}"><i class="fas fa-bullhorn"></i> Pengumuman</a></li>
 
-                <li class="nav-label">Pantau Website</li>
-                <li><a href="{{ route('admin.program.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.program')) active @endif"><i class="fas fa-book"></i> Program</a></li>
-                <li><a href="{{ route('admin.activity.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.activity')) active @endif"><i class="fas fa-calendar-alt"></i> Kegiatan</a></li>
-                <li><a href="{{ route('admin.gallery.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.gallery')) active @endif"><i class="fas fa-image"></i> Galeri</a></li>
-                <li><a href="{{ route('admin.faq.index') }}" class="@if(str_contains(Route::current()->getName(), 'admin.faq')) active @endif"><i class="fas fa-question-circle"></i> FAQ</a></li>
-                <li><a href="{{ route('admin.school-info.edit') }}" class="@if(str_contains(Route::current()->getName(), 'admin.school-info')) active @endif"><i class="fas fa-sliders-h"></i> Info Sekolah</a></li>
+                <div class="nav-label">PANTAU WEBSITE</div>
+                <li>
+                    <a href="{{ route('admin.activity.index') }}" class="{{ request()->routeIs('admin.activity.*') ? 'active' : '' }}">
+                        <i class="fas fa-calendar-alt"></i> Kegiatan
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.program.index') }}" class="{{ request()->routeIs('admin.program.*') ? 'active' : '' }}">
+                        <i class="fas fa-book-open"></i> Program Pendidikan
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.school-info.edit') }}" class="{{ request()->routeIs('admin.school-info.*') ? 'active' : '' }}">
+                        <i class="fas fa-info-circle"></i> Info Sekolah
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.gallery.index') }}" class="{{ request()->routeIs('admin.gallery.*') ? 'active' : '' }}">
+                        <i class="fas fa-images"></i> Galeri
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.faq.index') }}" class="{{ request()->routeIs('admin.faq.*') ? 'active' : '' }}">
+                        <i class="fas fa-question-circle"></i> FAQ
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>
@@ -563,7 +590,7 @@
         <!-- Top Bar -->
         <div class="admin-topbar">
             <div class="admin-topbar-left">
-                <h2>@yield('page-title', 'Dashboard')</h2>
+                <h2>@yield('title', 'Dashboard')</h2>
             </div>
             <div class="admin-topbar-right">
                 <div class="admin-user-info">
@@ -571,16 +598,16 @@
                         {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
                     </div>
                     <div class="admin-user-details">
-                        <span class="admin-user-name">{{ Auth::user()->name ?? 'Admin User' }}</span>
-                        <span class="admin-user-email">{{ Auth::user()->email ?? 'admin@example.com' }}</span>
+                        <span class="admin-user-name">{{ Auth::user()->name ?? 'Admin Nuurudzholaam' }}</span>
+                        <span class="admin-user-email">{{ Auth::user()->email ?? 'admin@nuurudzholaam.sch.id' }}</span>
                     </div>
                 </div>
-                <a href="{{ route('home') }}" class="admin-topbar-action">
+                <a href="{{ url('/') }}" class="admin-topbar-action" style="text-decoration: none; display: flex; align-items: center; gap: 5px; color: #6b7280; font-weight: 600;" target="_blank">
                     <i class="fas fa-globe"></i> Website
                 </a>
                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                     @csrf
-                    <button type="submit" class="admin-topbar-action logout" style="padding: 8px 12px;">
+                    <button type="submit" class="admin-topbar-action logout" style="background:none; border:none; display: flex; align-items: center; gap: 5px; color: #ef4444; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>
