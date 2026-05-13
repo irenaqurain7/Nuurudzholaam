@@ -32,8 +32,8 @@
                         <div class="col-md-6 mb-3">
                             <label for="role" class="form-label">Role</label>
                             <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required onchange="toggleRoleFields()">
-                                <option value="student" {{ old('role', $user->role) === 'student' ? 'selected' : '' }}>Siswa</option>
-                                <option value="teacher" {{ old('role', $user->role) === 'teacher' ? 'selected' : '' }}>Guru</option>
+                                <option value="siswa" {{ old('role', $user->role) === 'siswa' ? 'selected' : '' }}>Siswa</option>
+                                <option value="guru" {{ old('role', $user->role) === 'guru' ? 'selected' : '' }}>Guru</option>
                             </select>
                             @error('role')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -113,10 +113,10 @@
         const studentFields = document.getElementById('student-fields');
         const teacherFields = document.getElementById('teacher-fields');
 
-        if (role === 'student') {
+        if (role === 'siswa') {
             studentFields.style.display = 'flex';
             teacherFields.style.display = 'none';
-        } else if (role === 'teacher') {
+        } else if (role === 'guru') {
             studentFields.style.display = 'none';
             teacherFields.style.display = 'flex';
         } else {

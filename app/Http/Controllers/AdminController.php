@@ -24,8 +24,9 @@ class AdminController extends Controller
         $ppdbBaru = PPDBRegistration::where('status', 'pending')->count();
         $totalKegiatan = Activity::count();
         $totalProgram = Program::count();
+        $latestPPDB = PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(10)->get();
 
-        return view('admin.dashboard', compact('totalPPDB', 'ppdbBaru', 'totalKegiatan', 'totalProgram'));
+        return view('admin.dashboard', compact('totalPPDB', 'ppdbBaru', 'totalKegiatan', 'totalProgram', 'latestPPDB'));
     }
 
     // PPDB REGISTRATIONS
@@ -383,11 +384,11 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:student,teacher',
-            'nisn' => 'required_if:role,student|nullable|unique:users',
-            'class' => 'required_if:role,student|nullable|string',
-            'nip' => 'required_if:role,teacher|nullable|unique:users',
-            'specialization' => 'required_if:role,teacher|nullable|string',
+            'role' => 'required|in:siswa,guru',
+            'nisn' => 'required_if:role,siswa|nullable|unique:users',
+            'class' => 'required_if:role,siswa|nullable|string',
+            'nip' => 'required_if:role,guru|nullable|unique:users',
+            'specialization' => 'required_if:role,guru|nullable|string',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
         ]);
@@ -397,13 +398,13 @@ class AdminController extends Controller
         $user = User::create($validated);
 
         // Create related records
-        if ($user->role === 'student') {
+        if ($user->role === 'siswa') {
             Student::create([
                 'user_id' => $user->id,
                 'nisn' => $validated['nisn'],
                 'class' => $validated['class'],
             ]);
-        } elseif ($user->role === 'teacher') {
+        } elseif ($user->role === 'guru') {
             Teacher::create([
                 'user_id' => $user->id,
                 'nip' => $validated['nip'],
@@ -434,11 +435,11 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:student,teacher',
-            'nisn' => 'required_if:role,student|nullable|unique:users,nisn,' . $user->id,
-            'class' => 'required_if:role,student|nullable|string',
-            'nip' => 'required_if:role,teacher|nullable|unique:users,nip,' . $user->id,
-            'specialization' => 'required_if:role,teacher|nullable|string',
+            'role' => 'required|in:siswa,guru',
+            'nisn' => 'required_if:role,siswa|nullable|unique:users,nisn,' . $user->id,
+            'class' => 'required_if:role,siswa|nullable|string',
+            'nip' => 'required_if:role,guru|nullable|unique:users,nip,' . $user->id,
+            'specialization' => 'required_if:role,guru|nullable|string',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'is_active' => 'boolean',
@@ -447,7 +448,7 @@ class AdminController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
         $user->update($validated);
 
-        if ($validated['role'] === 'student') {
+        if ($validated['role'] === 'siswa') {
             if ($user->teacher) {
                 $user->teacher()->delete();
             }

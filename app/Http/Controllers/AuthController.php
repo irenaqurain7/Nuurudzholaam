@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -17,6 +18,37 @@ class AuthController extends Controller
             return redirect()->to($this->redirectByRole(Auth::user()));
         }
         return view('auth.login');
+    }
+
+    /**
+     * Show the registration form
+     */
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    /**
+     * Handle registration request
+     */
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:admin,guru,orangtua,siswa',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        $validated['is_active'] = true;
+
+        $user = User::create($validated);
+
+        Auth::login($user);
+
+        return redirect()->to($this->redirectByRole($user))->with('success', 'Registrasi berhasil!');
     }
 
     /**
@@ -75,12 +107,14 @@ class AuthController extends Controller
      */
     private function redirectByRole($user)
     {
-        if ($user->isStudent()) {
+        if ($user->role === 'siswa') {
             return route('student.dashboard');
-        } elseif ($user->isTeacher()) {
+        } elseif ($user->role === 'guru') {
             return route('teacher.dashboard');
-        } elseif ($user->isAdmin()) {
+        } elseif ($user->role === 'admin') {
             return route('admin.dashboard');
+        } elseif ($user->role === 'orangtua') {
+            return route('parent.dashboard');
         }
         return route('login');
     }

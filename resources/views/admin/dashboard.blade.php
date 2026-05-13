@@ -1,656 +1,645 @@
 @extends('layouts.admin')
 
 @section('title', 'Dashboard')
-@section('page-title', 'Dashboard Admin')
 
 @section('content')
-<div class="admin-dashboard">
-    <!-- Header Section -->
-    <div class="dashboard-header">
-        <div>
-            <h1>CMS Admin</h1>
-            <p class="subtitle">Kelola konten dan informasi institusional Sekolah Islam Nuurudzholaam</p>
-        </div>
-    </div>
+@php
+    $adminName = auth()->user()->name ?? 'Admin';
+    $adminEmail = auth()->user()->email ?? '-';
+    $adminInitial = strtoupper(substr($adminName, 0, 1));
+@endphp
 
-    <!-- Statistics Cards -->
-    <div class="stats-grid">
-        <div class="stat-card stat-card-blue">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">PPDB Terdaftar</p>
-                <h3 class="stat-value">{{ $totalPPDB ?? 42 }}</h3>
-            </div>
-        </div>
+<div class="admin-dashboard-shell">
+    <section class="admin-hero">
+        <div class="admin-hero-copy">
+            <p class="admin-hero-kicker">Panel Admin Sekolah Islam Nuurudzholaam</p>
+            <h1>Dashboard admin yang rapi, modern, dan mudah dipakai.</h1>
+            <p class="admin-hero-subtitle">
+                Pantau PPDB, program, kegiatan, dan pengumuman dari satu tempat.
+            </p>
 
-        <div class="stat-card stat-card-orange">
-            <div class="stat-icon">
-                <i class="fas fa-hourglass-half"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Pending Review</p>
-                <h3 class="stat-value">{{ $ppdbBaru ?? 2 }}</h3>
-            </div>
-        </div>
-
-        <div class="stat-card stat-card-cyan">
-            <div class="stat-icon">
-                <i class="fas fa-clipboard-list"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">Dokumen Aktif</p>
-                <h3 class="stat-value">{{ $totalProgram ?? 8 }}</h3>
-            </div>
-        </div>
-
-        <div class="stat-card stat-card-green">
-            <div class="stat-icon">
-                <i class="fas fa-image"></i>
-            </div>
-            <div class="stat-content">
-                <p class="stat-label">File di Galeri</p>
-                <h3 class="stat-value">{{ $totalKegiatan ?? 156 }}</h3>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Grid -->
-    <div class="dashboard-content-grid">
-        <!-- Quick Access Folders Section -->
-        <div class="section quick-access-section">
-            <h2 class="section-title">
-                <i class="fas fa-folder"></i> Akses Cepat Folder
-            </h2>
-            <div class="quick-access-grid">
-                <a href="{{ route('admin.ppdb.index') }}" class="quick-folder">
-                    <div class="folder-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <i class="fas fa-list-check"></i>
-                    </div>
-                    <div class="folder-info">
-                        <p class="folder-name">Data PPDB</p>
-                        <p class="folder-meta">{{ $totalPPDB ?? 42 }} File • 324 KB</p>
-                    </div>
+            <div class="admin-hero-actions">
+                <a href="{{ route('admin.ppdb.index') }}" class="admin-hero-btn primary">
+                    <i class="fas fa-file-invoice"></i>
+                    Kelola PPDB
                 </a>
-
-                <a href="{{ route('admin.activity.index') }}" class="quick-folder">
-                    <div class="folder-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <i class="fas fa-calendar-days"></i>
-                    </div>
-                    <div class="folder-info">
-                        <p class="folder-name">Kegiatan</p>
-                        <p class="folder-meta">12 Item • 854 KB</p>
-                    </div>
-                </a>
-
-                <a href="{{ route('admin.gallery.index') }}" class="quick-folder">
-                    <div class="folder-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <i class="fas fa-images"></i>
-                    </div>
-                    <div class="folder-info">
-                        <p class="folder-name">Galeri Foto</p>
-                        <p class="folder-meta">156 File • 2.5 MB</p>
-                    </div>
-                </a>
-
-                <a href="{{ route('admin.program.index') }}" class="quick-folder">
-                    <div class="folder-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <div class="folder-info">
-                        <p class="folder-name">Program</p>
-                        <p class="folder-meta">8 File • 128 KB</p>
-                    </div>
+                <a href="{{ route('home') }}" class="admin-hero-btn ghost" target="_blank" rel="noopener">
+                    <i class="fas fa-globe"></i>
+                    Buka Website
                 </a>
             </div>
         </div>
 
-        <!-- Two Column Layout -->
-        <div class="two-column-grid">
-            <!-- Live Announcements -->
-            <div class="section announcements-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-bullhorn"></i> Pengumuman Live
-                    </h2>
-                    <a href="{{ route('admin.announcement.index') }}" class="view-all-link">Lihat Semua</a>
+        <div class="admin-hero-card">
+            <div class="admin-hero-card-header">
+                <div>
+                    <span class="admin-status-pill">Aktif</span>
+                    <h2>{{ $adminName }}</h2>
+                    <p>{{ $adminEmail }}</p>
                 </div>
-
-                <div class="announcements-list">
-                    <div class="announcement-item" style="border-left: 4px solid #28a745;">
-                        <div class="announcement-badge announcement-badge-success">PENTING</div>
-                        <p class="announcement-text">Pendaftaran untuk Angkatan 2024/2025 telah dibuka!</p>
-                        <p class="announcement-date">Oct 30, 2024 • 10:30 AM</p>
-                    </div>
-
-                    <div class="announcement-item" style="border-left: 4px solid #f39c12;">
-                        <div class="announcement-badge announcement-badge-warning">INFO</div>
-                        <p class="announcement-text">Libur sekolah dimulai pada tanggal 15 Desember</p>
-                        <p class="announcement-date">Oct 25, 2024 • 2:00 PM</p>
-                    </div>
-
-                    <div class="announcement-item" style="border-left: 4px solid #3498db;">
-                        <div class="announcement-badge announcement-badge-info">UMUM</div>
-                        <p class="announcement-text">Perbaikan fasilitasGiliran: Updated di Lapangan Olahraga</p>
-                        <p class="announcement-date">Oct 15, 2024 • 9:15 AM</p>
-                    </div>
-                </div>
+                <div class="admin-avatar">{{ $adminInitial }}</div>
             </div>
 
-            <!-- Recent Activity -->
-            <div class="section recent-activity-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-history"></i> Aktivitas Terbaru
-                    </h2>
-                    <a href="#" class="view-all-link">Lihat Semua</a>
+            <div class="admin-hero-metrics">
+                <div>
+                    <span>Total PPDB</span>
+                    <strong>{{ $totalPPDB ?? 0 }}</strong>
                 </div>
-
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background: #e8f4f8; color: #3498db;">
-                            <i class="fas fa-file-upload"></i>
-                        </div>
-                        <div class="activity-info">
-                            <p class="activity-title">Dokumen di-upload</p>
-                            <p class="activity-description">Brosur_2024_Nuurudzholaam.pdf</p>
-                            <p class="activity-time">3 jam lalu</p>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background: #f0e8f4; color: #9b59b6;">
-                            <i class="fas fa-edit"></i>
-                        </div>
-                        <div class="activity-info">
-                            <p class="activity-title">Pengumuman di-update</p>
-                            <p class="activity-description">Registrasi Angkatan 2024/2025 dibuka</p>
-                            <p class="activity-time">5 jam lalu</p>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background: #f0f8e8; color: #27ae60;">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <div class="activity-info">
-                            <p class="activity-title">PPDB baru terdaftar</p>
-                            <p class="activity-description">Registrasi dari Ahmad Rifandi</p>
-                            <p class="activity-time">1 hari lalu</p>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-icon" style="background: #fef5e7; color: #f39c12;">
-                            <i class="fas fa-images"></i>
-                        </div>
-                        <div class="activity-info">
-                            <p class="activity-title">Foto ditambahkan</p>
-                            <p class="activity-description">Dokumentasi Acara Pembukaan Tahun Ajaran</p>
-                            <p class="activity-time">2 hari lalu</p>
-                        </div>
-                    </div>
+                <div>
+                    <span>Pending</span>
+                    <strong>{{ $ppdbBaru ?? 0 }}</strong>
+                </div>
+                <div>
+                    <span>Program Aktif</span>
+                    <strong>{{ $totalProgram ?? 0 }}</strong>
+                </div>
+                <div>
+                    <span>Kegiatan</span>
+                    <strong>{{ $totalKegiatan ?? 0 }}</strong>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Quick Actions Bottom -->
-    <div class="section quick-actions-bottom">
-        <h2 class="section-title">
-            <i class="fas fa-zap"></i> Tindakan Cepat
-        </h2>
-        <div class="actions-grid">
-            <a href="{{ route('admin.announcement.index') }}" class="action-btn">
-                <i class="fas fa-bell"></i>
-                <span>Kelola Pengumuman</span>
-            </a>
-            <a href="{{ route('admin.school-info.edit') }}" class="action-btn">
-                <i class="fas fa-cog"></i>
-                <span>Pengaturan Sekolah</span>
-            </a>
-            <a href="{{ route('admin.faq.index') }}" class="action-btn">
-                <i class="fas fa-question-circle"></i>
-                <span>Kelola FAQ</span>
-            </a>
-            <a href="{{ route('admin.activity.index') }}" class="action-btn">
-                <i class="fas fa-plus-circle"></i>
-                <span>Buat Kegiatan Baru</span>
-            </a>
+    <section class="admin-stat-grid">
+        <article class="admin-stat-card blue">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div>
+                <p>Total PPDB</p>
+                <h3>{{ $totalPPDB ?? 0 }}</h3>
+                <span>Seluruh pendaftar</span>
+            </div>
+        </article>
+
+        <article class="admin-stat-card amber">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div>
+                <p>Menunggu Review</p>
+                <h3>{{ $ppdbBaru ?? 0 }}</h3>
+                <span>Perlu ditindaklanjuti</span>
+            </div>
+        </article>
+
+        <article class="admin-stat-card green">
+            <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+            <div>
+                <p>Program</p>
+                <h3>{{ $totalProgram ?? 0 }}</h3>
+                <span>Program aktif</span>
+            </div>
+        </article>
+
+        <article class="admin-stat-card cyan">
+            <div class="stat-icon"><i class="fas fa-calendar-days"></i></div>
+            <div>
+                <p>Kegiatan</p>
+                <h3>{{ $totalKegiatan ?? 0 }}</h3>
+                <span>Data kegiatan</span>
+            </div>
+        </article>
+    </section>
+
+    <section class="admin-content-grid">
+        <div class="admin-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker">Akses cepat</p>
+                    <h2>Menu Utama</h2>
+                </div>
+            </div>
+
+            <div class="quick-grid">
+                <a href="{{ route('admin.ppdb.index') }}" class="quick-card">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>PPDB</span>
+                </a>
+                <a href="{{ route('admin.users.index') }}" class="quick-card">
+                    <i class="fas fa-user-group"></i>
+                    <span>Users</span>
+                </a>
+                <a href="{{ route('admin.program.index') }}" class="quick-card">
+                    <i class="fas fa-book"></i>
+                    <span>Program</span>
+                </a>
+                <a href="{{ route('admin.activity.index') }}" class="quick-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Kegiatan</span>
+                </a>
+                <a href="{{ route('admin.gallery.index') }}" class="quick-card">
+                    <i class="fas fa-images"></i>
+                    <span>Galeri</span>
+                </a>
+                <a href="{{ route('admin.announcement.index') }}" class="quick-card">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Pengumuman</span>
+                </a>
+            </div>
         </div>
-    </div>
+
+        <div class="admin-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker">PPDB terbaru</p>
+                    <h2>Pendaftar Terakhir</h2>
+                </div>
+                <a href="{{ route('admin.ppdb.index') }}" class="panel-link">Lihat semua</a>
+            </div>
+
+            <div class="table-wrap">
+                <table class="admin-table modern">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Program</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($latestPPDB ?? [] as $ppdb)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td><strong>{{ $ppdb->nama_lengkap ?? '-' }}</strong></td>
+                                <td>{{ $ppdb->email ?? '-' }}</td>
+                                <td>{{ ucfirst($ppdb->program ?? '-') }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ $ppdb->status ?? 'pending' }}">
+                                        {{ ucfirst($ppdb->status ?? 'pending') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.ppdb.show', $ppdb->id) }}" class="btn-mini">Detail</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="empty-state">Belum ada data pendaftar.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 </div>
 
 <style>
-    .admin-dashboard {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 30px 20px;
+    .admin-dashboard-shell {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 28px;
+        max-width: 1440px;
     }
 
-    /* Header */
-    .dashboard-header {
-        margin-bottom: 40px;
+    .admin-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+        gap: 24px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .dashboard-header h1 {
-        color: var(--hijau-islam);
-        font-size: 32px;
+    .admin-hero::before,
+    .admin-hero::after {
+        content: '';
+        position: absolute;
+        border-radius: 999px;
+        pointer-events: none;
+    }
+
+    .admin-hero::before {
+        width: 260px;
+        height: 260px;
+        right: -80px;
+        top: -90px;
+        background: rgba(255, 255, 255, 0.14);
+    }
+
+    .admin-hero::after {
+        width: 140px;
+        height: 140px;
+        right: 180px;
+        bottom: -60px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-hero-copy,
+    .admin-hero-card,
+    .admin-panel {
+        background: #ffffff;
+        border: 1px solid #e2ece8;
+        border-radius: 24px;
+        box-shadow: 0 18px 40px rgba(28, 45, 37, 0.08);
+    }
+
+    .admin-hero-copy {
+        padding: 32px;
+        background: linear-gradient(135deg, #23352c 0%, #2d4438 45%, #486e5a 100%);
+        color: #ffffff;
+    }
+
+    .admin-hero-kicker,
+    .panel-kicker {
+        margin: 0 0 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 12px;
         font-weight: 700;
-        margin: 0 0 10px 0;
+        opacity: 0.82;
     }
 
-    .dashboard-header .subtitle {
-        color: var(--text-light);
-        font-size: 16px;
+    .admin-hero-copy h1 {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 46px);
+        line-height: 1.08;
+        max-width: 12ch;
+    }
+
+    .admin-hero-subtitle {
+        margin: 16px 0 0;
+        max-width: 56ch;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 15px;
+    }
+
+    .admin-hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 26px;
+    }
+
+    .admin-hero-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .admin-hero-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .admin-hero-btn.primary {
+        background: #ffffff;
+        color: #1c2d25;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .admin-hero-btn.ghost {
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .admin-hero-card {
+        padding: 28px;
+        background: linear-gradient(180deg, #ffffff 0%, #fbfcfb 100%);
+    }
+
+    .admin-hero-card-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .admin-hero-card-header h2 {
+        margin: 10px 0 4px;
+        font-size: 22px;
+        color: #1c2d25;
+    }
+
+    .admin-hero-card-header p {
+        margin: 0;
+        color: #6c8b7c;
+        font-size: 14px;
+    }
+
+    .admin-status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #e2ece8;
+        color: #2d4438;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .admin-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #2d4438 0%, #486e5a 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .admin-hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .admin-hero-metrics div {
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: #f4f7f5;
+        border: 1px solid #e2ece8;
+    }
+
+    .admin-hero-metrics span,
+    .admin-hero-metrics strong {
+        display: block;
+    }
+
+    .admin-hero-metrics span {
+        color: #6c8b7c;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .admin-hero-metrics strong {
+        margin-top: 8px;
+        color: #1c2d25;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .admin-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .admin-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        border-radius: 22px;
+        background: #ffffff;
+        border: 1px solid #e2ece8;
+        box-shadow: 0 10px 24px rgba(28, 45, 37, 0.06);
+    }
+
+    .admin-stat-card p,
+    .admin-stat-card span,
+    .admin-stat-card h3 {
         margin: 0;
     }
 
-    /* Statistics Cards */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
+    .admin-stat-card p {
+        color: #6c8b7c;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
     }
 
-    .stat-card {
-        background: white;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        transition: all 0.3s ease;
-        border-top: 4px solid;
+    .admin-stat-card h3 {
+        margin-top: 8px;
+        color: #1c2d25;
+        font-size: 28px;
+        line-height: 1;
     }
 
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    }
-
-    .stat-card-blue {
-        border-top-color: #667eea;
-    }
-
-    .stat-card-orange {
-        border-top-color: #f39c12;
-    }
-
-    .stat-card-cyan {
-        border-top-color: #00bcd4;
-    }
-
-    .stat-card-green {
-        border-top-color: #27ae60;
+    .admin-stat-card span {
+        display: block;
+        margin-top: 6px;
+        color: #8aa092;
+        font-size: 13px;
     }
 
     .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 28px;
+        font-size: 22px;
+        color: #ffffff;
         flex-shrink: 0;
     }
 
-    .stat-card-blue .stat-icon {
-        background: rgba(102, 126, 234, 0.1);
-        color: #667eea;
+    .admin-stat-card.blue .stat-icon { background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%); }
+    .admin-stat-card.amber .stat-icon { background: linear-gradient(135deg, #d97706 0%, #fbbf24 100%); }
+    .admin-stat-card.green .stat-icon { background: linear-gradient(135deg, #059669 0%, #34d399 100%); }
+    .admin-stat-card.cyan .stat-icon { background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%); }
+
+    .admin-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 18px;
     }
 
-    .stat-card-orange .stat-icon {
-        background: rgba(243, 156, 18, 0.1);
-        color: #f39c12;
+    .admin-panel {
+        padding: 24px;
     }
 
-    .stat-card-cyan .stat-icon {
-        background: rgba(0, 188, 212, 0.1);
-        color: #00bcd4;
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
     }
 
-    .stat-card-green .stat-icon {
-        background: rgba(39, 174, 96, 0.1);
-        color: #27ae60;
-    }
-
-    .stat-content {
-        flex: 1;
-    }
-
-    .stat-label {
-        color: var(--text-light);
-        font-size: 13px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0 0 8px 0;
-    }
-
-    .stat-value {
-        color: var(--text-dark);
-        font-size: 28px;
-        font-weight: 700;
+    .panel-header h2 {
         margin: 0;
+        color: #1c2d25;
+        font-size: 22px;
     }
 
-    /* Dashboard Content Grid */
-    .dashboard-content-grid {
+    .panel-link {
+        color: #2d4438;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .quick-card {
+        min-height: 112px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, #f7faf8 0%, #edf4ef 100%);
+        border: 1px solid #dbe7e1;
         display: flex;
         flex-direction: column;
-        gap: 30px;
-    }
-
-    /* Sections */
-    .section {
-        background: white;
-        padding: 28px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-    }
-
-    .section-title {
-        color: var(--hijau-islam);
-        font-size: 18px;
-        font-weight: 700;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .section-title i {
-        font-size: 20px;
-    }
-
-    .view-all-link {
-        color: var(--hijau-islam);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-        transition: all 0.3s;
-    }
-
-    .view-all-link:hover {
-        color: var(--hijau-islam-light);
-    }
-
-    /* Quick Access Folders */
-    .quick-access-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-    }
-
-    .quick-folder {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 16px;
-        border-radius: 10px;
-        background: #f7fafc;
-        text-decoration: none;
-        transition: all 0.3s;
-        border: 1px solid #e2e8f0;
-    }
-
-    .quick-folder:hover {
-        background: #f0f4f8;
-        transform: translateX(5px);
-        border-color: #d0d8e8;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .folder-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 10px;
-        display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-size: 22px;
-        flex-shrink: 0;
+        gap: 10px;
+        text-decoration: none;
+        color: #1c2d25;
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
-    .folder-info {
-        flex: 1;
+    .quick-card:hover {
+        transform: translateY(-3px);
+        border-color: #2d4438;
+        box-shadow: 0 14px 30px rgba(28, 45, 37, 0.1);
     }
 
-    .folder-name {
-        color: var(--text-dark);
-        font-weight: 600;
-        font-size: 14px;
-        margin: 0 0 5px 0;
+    .quick-card i {
+        font-size: 28px;
+        color: #2d4438;
     }
 
-    .folder-meta {
-        color: var(--text-light);
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .admin-table.modern {
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .admin-table.modern thead {
+        background: #f4f7f5;
+    }
+
+    .admin-table.modern th {
+        color: #1c2d25;
+        padding: 14px 16px;
+        border-bottom: 1px solid #e2ece8;
+        text-align: left;
         font-size: 12px;
-        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
     }
 
-    /* Two Column Layout */
-    .two-column-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
+    .admin-table.modern td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e2ece8;
+        color: #1c2d25;
+        font-size: 14px;
     }
 
-    @media (max-width: 1024px) {
-        .two-column-grid {
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-diterima {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-ditolak {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .btn-mini {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 10px;
+        background: #2d4438;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-mini:hover {
+        background: #1c2d25;
+        transform: translateY(-1px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 16px !important;
+        color: #6c8b7c;
+    }
+
+    @media (max-width: 1100px) {
+        .admin-hero,
+        .admin-content-grid {
             grid-template-columns: 1fr;
         }
-    }
 
-    /* Announcements Section */
-    .announcements-list {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
+        .admin-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
 
-    .announcement-item {
-        padding: 16px;
-        background: #f7fafc;
-        border-radius: 8px;
-        border-left: 4px solid;
-        transition: all 0.3s;
-    }
-
-    .announcement-item:hover {
-        background: #eef2f7;
-        transform: translateX(4px);
-    }
-
-    .announcement-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 8px;
-    }
-
-    .announcement-badge-success {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .announcement-badge-warning {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .announcement-badge-info {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-
-    .announcement-text {
-        color: var(--text-dark);
-        font-weight: 600;
-        font-size: 14px;
-        margin: 0 0 8px 0;
-    }
-
-    .announcement-date {
-        color: var(--text-light);
-        font-size: 12px;
-        margin: 0;
-    }
-
-    /* Recent Activity Section */
-    .activity-list {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .activity-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 12px 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .activity-item:last-child {
-        border-bottom: none;
-    }
-
-    .activity-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        flex-shrink: 0;
-    }
-
-    .activity-info {
-        flex: 1;
-    }
-
-    .activity-title {
-        color: var(--text-dark);
-        font-weight: 600;
-        font-size: 14px;
-        margin: 0 0 4px 0;
-    }
-
-    .activity-description {
-        color: var(--text-light);
-        font-size: 13px;
-        margin: 0 0 4px 0;
-    }
-
-    .activity-time {
-        color: #95a5a6;
-        font-size: 12px;
-        margin: 0;
-    }
-
-    /* Quick Actions Bottom */
-    .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-    }
-
-    .action-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 20px;
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s;
-        font-size: 14px;
-    }
-
-    .action-btn i {
-        font-size: 24px;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(31, 127, 95, 0.3);
+        .quick-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     @media (max-width: 768px) {
-        .admin-dashboard {
-            padding: 20px 15px;
+        .admin-dashboard-shell {
+            padding: 16px;
         }
 
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
+        .admin-hero-copy,
+        .admin-hero-card,
+        .admin-panel {
+            border-radius: 18px;
+            padding: 20px;
         }
 
-        .quick-access-grid {
+        .admin-stat-grid,
+        .quick-grid,
+        .admin-hero-metrics {
             grid-template-columns: 1fr;
         }
 
-        .dashboard-header h1 {
-            font-size: 24px;
+        .admin-hero-card-header,
+        .panel-header {
+            flex-direction: column;
+            align-items: flex-start;
         }
-    }
 
-    .stat-card {
-        padding: 25px;
-        border-radius: 12px;
-        color: white;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
-    }
+        .admin-hero-actions {
+            flex-direction: column;
+        }
 
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    }
-
-    .quick-action-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        padding: 20px;
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        font-weight: 600;
-    }
-
-    .quick-action-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(31, 127, 95, 0.3);
-    }
-
-    .quick-action-btn i {
-        font-size: 28px;
+        .admin-hero-btn {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 @endsection

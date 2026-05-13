@@ -65,16 +65,20 @@ class User extends Authenticatable
 
     public function isStudent()
     {
-        return $this->role === 'student';
+        return $this->role === 'siswa';
     }
 
     public function isTeacher()
     {
-        return $this->role === 'teacher';
+        return $this->role === 'guru';
     }
 
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
-}
+
+    public function isParent()
+    {
+        return $this->role === 'orangtua';
+    }}

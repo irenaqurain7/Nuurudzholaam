@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Add role column (student, teacher, admin)
-            $table->enum('role', ['student', 'teacher', 'admin'])->default('student')->after('email');
+            // Add role column (admin, guru, orangtua, siswa)
+            $table->enum('role', ['admin', 'guru', 'orangtua', 'siswa'])->default('siswa')->after('email');
 
             // Add profile fields
             $table->string('phone')->nullable()->after('role');
@@ -29,8 +29,11 @@ return new class extends Migration
             $table->string('nip')->nullable()->unique()->after('class');
             $table->string('specialization')->nullable()->after('nip');
 
+            // For parent
+            $table->unsignedBigInteger('parent_id')->nullable()->after('specialization');
+
             // Account status
-            $table->boolean('is_active')->default(true)->after('specialization');
+            $table->boolean('is_active')->default(true)->after('parent_id');
         });
     }
 

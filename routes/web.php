@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\TeacherDashboardController;
+use App\Http\Controllers\ParentDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,8 +21,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // AUTH ROUTES
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
+Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
+Route::post('/register', [AuthController::class, 'register'])->name('register.store')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // PUBLIC ROUTES
@@ -47,7 +50,7 @@ Route::get('/admin/demo-announcement', [AdminController::class, 'announcementInd
 Route::get('/admin/demo-faq', [AdminController::class, 'faqIndex'])->name('admin-demo.faq.index');
 
 // ADMIN ROUTES
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
@@ -121,7 +124,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 });
 
 // STUDENT ROUTES
-Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
 
@@ -145,7 +148,7 @@ Route::middleware(['auth'])->prefix('student')->name('student.')->group(function
 });
 
 // TEACHER ROUTES
-Route::middleware(['auth'])->prefix('teacher')->name('teacher.')->group(function () {
+Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [TeacherDashboardController::class, 'index'])->name('dashboard');
 
@@ -173,4 +176,22 @@ Route::middleware(['auth'])->prefix('teacher')->name('teacher.')->group(function
     // Photo
     Route::get('/upload-photo', [TeacherDashboardController::class, 'showUploadPhoto'])->name('upload-photo');
     Route::post('/upload-photo', [TeacherDashboardController::class, 'uploadPhoto'])->name('upload-photo.store');
+});
+
+// PARENT ROUTES
+Route::middleware(['auth', 'role:orangtua'])->prefix('parent')->name('parent.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [ParentDashboardController::class, 'index'])->name('dashboard');
+
+    // Children
+    Route::get('/children', [ParentDashboardController::class, 'children'])->name('children');
+    Route::get('/children/{id}/details', [ParentDashboardController::class, 'childDetails'])->name('children.details');
+
+    // Profile
+    Route::get('/profile', [ParentDashboardController::class, 'profile'])->name('profile');
+    Route::put('/profile', [ParentDashboardController::class, 'updateProfile'])->name('profile.update');
+
+    // Password
+    Route::get('/change-password', [ParentDashboardController::class, 'showChangePassword'])->name('change-password');
+    Route::put('/change-password', [ParentDashboardController::class, 'updatePassword'])->name('change-password.update');
 });
