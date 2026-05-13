@@ -13,7 +13,7 @@
             <p class="form-kicker">Manajemen Akun</p>
             <h1>Tambah Siswa & Guru</h1>
             <p class="form-subtitle">
-                Buat akun baru untuk siswa atau guru beserta data dasar yang dibutuhkan untuk login dan pendataan.
+                Buat akun baru untuk siswa atau guru beserta data profil dasar yang dibutuhkan untuk login dan pendataan.
             </p>
         </div>
         <a href="{{ route('admin.users.index') }}" class="form-back-link">
@@ -36,7 +36,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.users.store') }}" method="POST" class="admin-form-card">
+    <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data" class="admin-form-card">
         @csrf
 
         <div class="form-grid two-col">
@@ -83,6 +83,26 @@
                 <input type="text" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Opsional">
                 @error('phone')<small>{{ $message }}</small>@enderror
             </div>
+        </div>
+
+        <div class="form-grid two-col">
+            <div class="field-group">
+                <label for="profile_photo">Foto Profil</label>
+                <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                @error('profile_photo')<small>{{ $message }}</small>@enderror
+            </div>
+
+            <div class="field-group">
+                <label for="address">Alamat</label>
+                <input type="text" id="address" name="address" value="{{ old('address') }}" placeholder="Alamat singkat">
+                @error('address')<small>{{ $message }}</small>@enderror
+            </div>
+        </div>
+
+        <div class="field-group">
+            <label for="bio">Bio Singkat</label>
+            <textarea id="bio" name="bio" rows="3" placeholder="Ringkasan singkat profil akun">{{ old('bio') }}</textarea>
+            @error('bio')<small>{{ $message }}</small>@enderror
         </div>
 
         <div class="role-panel" id="student-fields" style="display: none;">
@@ -133,10 +153,16 @@
             </div>
         </div>
 
-        <div class="field-group">
-            <label for="address">Alamat</label>
-            <textarea id="address" name="address" rows="4" placeholder="Alamat lengkap jika tersedia">{{ old('address') }}</textarea>
-            @error('address')<small>{{ $message }}</small>@enderror
+        <div class="field-group inline-toggle">
+            <label class="toggle-label" for="is_active">
+                <span>Status Akun</span>
+                <small>Akun aktif bisa langsung login ke sistem.</small>
+            </label>
+            <div class="toggle-control">
+                <input type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                <span>Akun aktif</span>
+            </div>
+            @error('is_active')<small>{{ $message }}</small>@enderror
         </div>
 
         <div class="form-actions">
@@ -288,6 +314,39 @@
     .field-group small {
         color: #dc2626;
         font-weight: 600;
+    }
+
+    .field-group.inline-toggle {
+        padding: 16px;
+        border-radius: 16px;
+        background: #f7faf8;
+        border: 1px solid #dbe7e1;
+    }
+
+    .toggle-label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+
+    .toggle-label small {
+        color: #6c8b7c;
+        font-weight: 500;
+    }
+
+    .toggle-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1c2d25;
+        font-weight: 700;
+    }
+
+    .toggle-control input {
+        width: 18px;
+        height: 18px;
+        accent-color: #2d4438;
     }
 
     .role-panel {

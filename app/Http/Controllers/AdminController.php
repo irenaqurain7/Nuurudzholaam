@@ -370,7 +370,11 @@ class AdminController extends Controller
     public function usersIndex()
     {
         $users = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(15);
-        return view('admin.users.index', compact('users'));
+        $totalSiswa = User::where('role', 'siswa')->count();
+        $totalGuru = User::where('role', 'guru')->count();
+        $totalOrangtua = User::where('role', 'orangtua')->count();
+
+        return view('admin.users.index', compact('users', 'totalSiswa', 'totalGuru', 'totalOrangtua'));
     }
 
     public function usersCreate()
@@ -391,9 +395,17 @@ class AdminController extends Controller
             'specialization' => 'required_if:role,guru|nullable|string',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'bio' => 'nullable|string|max:1000',
+            'profile_photo' => 'nullable|image|max:2048',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['is_active'] = $request->boolean('is_active');
+
+        if ($request->hasFile('profile_photo')) {
+            $validated['profile_photo'] = $request->file('profile_photo')->store('profiles', 'public');
+        }
 
         $user = User::create($validated);
 
@@ -442,10 +454,19 @@ class AdminController extends Controller
             'specialization' => 'required_if:role,guru|nullable|string',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'bio' => 'nullable|string|max:1000',
+            'profile_photo' => 'nullable|image|max:2048',
             'is_active' => 'boolean',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+
+        if ($request->hasFile('profile_photo')) {
+            $validated['profile_photo'] = $request->file('profile_photo')->store('profiles', 'public');
+        } else {
+            unset($validated['profile_photo']);
+        }
+
         $user->update($validated);
 
         if ($validated['role'] === 'siswa') {
