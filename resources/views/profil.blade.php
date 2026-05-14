@@ -7,7 +7,7 @@
 <div class="hero-new" style="background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%); padding: 100px 20px; text-align: center; color: white;">
     <div class="container">
         <h1 style="font-size: 40px; margin-bottom: 15px; font-weight: bold;">Profil Sekolah</h1>
-        <p style="font-size: 16px; opacity: 0.95;">Mengenal lebih dekat Al-Hikmah Academy, tempat di mana tradisi kelimuan berpadu dengan standar pendidikan modern berkualitas tinggi</p>
+        <p style="font-size: 16px; opacity: 0.95;">Mengenal lebih dekat sekolah nuurudzholaam, tempat di mana tradisi kelimuan berpadu dengan standar pendidikan modern berkualitas tinggi</p>
     </div>
 </div>
 
@@ -18,7 +18,7 @@
             <div>
                 <h2 style="font-size: 32px; color: var(--hijau-islam); margin-bottom: 25px; font-weight: bold;">Sejarah Singkat</h2>
                 <p style="color: var(--text-light); line-height: 1.8; font-size: 15px; margin-bottom: 20px;">
-                    Al-Hikmah Academy didirikan dengan semangat untuk menghadirkan inovasi pendidikan yang tidak hanya akademis namun juga mengintegrasikan nilai-nilai keislaman. Kami percaya bahwa pendidikan adalah investasi terbaik untuk masa depan generasi bangsa.
+                    Sekolah Nuurudzholaam didirikan dengan semangat untuk menghadirkan inovasi pendidikan yang tidak hanya akademis namun juga mengintegrasikan nilai-nilai keislaman. Kami percaya bahwa pendidikan adalah investasi terbaik untuk masa depan generasi bangsa.
                 </p>
                 <p style="color: var(--text-light); line-height: 1.8; font-size: 15px; margin-bottom: 20px;">
                     Perjalanan kami dimulai dengan komitmen teguh terhadap kualitas pembelajaran dan pengembangan karakter. Fasilitas kami dibangun dengan konsistensi teguh terhadap kualitas pengajaran yang menghangatkan dan mempersiapkan setiap siswa untuk menjadi pemimpin masa depan yang berani, bijaksana, dan bermoral.
@@ -56,7 +56,7 @@
                     @if($school && $school->visi)
                         "{{ $school->visi }}"
                     @else
-                        "Menjadi institusi pendidikan Islam terkemuka yang menciptakan generasi Qur'ani, berakhlak mulia, cerdas secara intelektual, dan siap menghadapi tantangan global dengan berpegang teguh pada nilai-nilai keislaman."
+                        Menjadi pesantren yang unggul, mandiri, disiplin, Berakhlakul karimah dan berwawasan kebangsaan dalam bingkai Ahlusunnah Wal-Jamaah
                     @endif
                 </p>
             </div>
@@ -71,10 +71,11 @@
                         <p style="margin: 0;">{{ $school->misi }}</p>
                     @else
                         <ul style="list-style: none; margin: 0; padding: 0;">
-                            <li style="margin-bottom: 10px;">• Menyelenggarakan pendidikan komprehensif yang menggabungkan akademis, karakter, dan keagamaan</li>
-                            <li style="margin-bottom: 10px;">• Membina siswa untuk menjadi pemimpin yang bertanggung jawab dan berakhlak mulia</li>
-                            <li style="margin-bottom: 10px;">• Mengembangkan kurikulum inovatif yang relevan dengan perkembangan zaman</li>
-                            <li>• Membangun komunitas sekolah yang solid dan mendukung pertumbuhan holistik setiap individu</li>
+                            <li style="margin-bottom: 10px;">• Mengembangkan pesantren berkualitas dalam ilmu agama, umum dan teknologi informasi dan komunikasi berlandaskan ahlakul karimah.</li>
+                            <li style="margin-bottom: 10px;">• Mengembangkan SDM secara mandiri untuk memajukan pesantren melalui kewirausahaan (Entrepreneurship).</li>
+                            <li style="margin-bottom: 10px;">• Mengembangkan pesantren yang memiliki jiwa kepemimpinan (Leadership).</li>
+                            <li style="margin-bottom: 10px;">• Mengembangkan pesantren yang berwawasan keagamaan dan kebangsaan</li>
+                            <li>• Mengembangkan pesantren yang berkehidupan Tertib dan Disiplin.</li>
                         </ul>
                     @endif
                 </div>
