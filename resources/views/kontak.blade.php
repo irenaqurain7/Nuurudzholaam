@@ -26,7 +26,7 @@
                         <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Alamat</h3>
                     </div>
                     <p style="color: var(--text-light); line-height: 1.6; margin: 0 0 0 47px; font-size: 0.95rem;">
-                        {{ $school->alamat ?? 'Jl. Pendidikan No. 123, Kelurahan Islamia, Kota' }}
+                        {{ $school->alamat ?? 'Jl. Sindangreret, Dangdeur, Kec. Bungursari, Kab. Purwakarta, Jawa Barat 41181' }}
                     </p>
                 </div>
 
@@ -39,17 +39,21 @@
                     <p style="color: var(--text-light); margin: 0 0 0 47px; font-size: 0.95rem;">
                         <a href="tel:{{ $school->no_telepon }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 600; transition: color 0.3s;">{{ $school->no_telepon }}</a>
                     </p>
-                    <p style="color: var(--text-light); margin: 8px 0 0 47px; font-size: 0.85rem;">Senin-Jumat, 08:00-16:00 WIB</p>
+                    <p style="color: var(--text-light); margin: 8px 0 0 47px; font-size: 0.85rem; line-height: 1.6;">
+                        085714673916 (Dede Ali)<br>
+                        081958159264 (Wiwi Suherti)<br>
+                        083816931133 (Ziun)
+                    </p>
                 </div>
 
                 <!-- Email Card -->
                 <div style="background: white; border: 1px solid #e0e7ff; border-left: 4px solid var(--hijau-islam); border-radius: 8px; padding: 25px; margin-bottom: 20px; transition: all 0.3s;">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px;">
                         <i class="fas fa-envelope" style="font-size: 24px; color: var(--emas); width: 32px; text-align: center;"></i>
-                        <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Email</h3>
+                        <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Email:</h3>
                     </div>
                     <p style="color: var(--text-light); margin: 0 0 0 47px; font-size: 0.95rem;">
-                        <a href="mailto:{{ $school->email }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 600; transition: color 0.3s;">{{ $school->email }}</a>
+                        <a href="mailto:{{ $school->email }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 400; transition: color 0.3s;">{{ $school->email }}Nuurudz@gmail.com</a>
                     </p>
                 </div>
 
@@ -57,20 +61,20 @@
                 <div style="background: white; border: 1px solid #e0e7ff; border-left: 4px solid var(--hijau-islam); border-radius: 8px; padding: 25px;">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                         <i class="fas fa-share-alt" style="font-size: 24px; color: var(--emas); width: 32px; text-align: center;"></i>
-                        <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Ikuti Kami</h3>
+                        <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Social media</h3>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-left: 47px;">
                         <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
-                            <i class="fab fa-facebook-f" style="width: 18px; text-align: center;"></i> Facebook
+                            <i class="fab fa-facebook-f" style="width: 18px; text-align: center;"></i> Ponpes Nuurudzholaam
                         </a>
                         <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
-                            <i class="fab fa-instagram" style="width: 18px; text-align: center;"></i> Instagram
+                            <i class="fab fa-instagram" style="width: 18px; text-align: center;"></i> Ponpes_Nuurudzholaam
                         </a>
                         <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
-                            <i class="fab fa-youtube" style="width: 18px; text-align: center;"></i> YouTube
+                            <i class="fab fa-youtube" style="width: 18px; text-align: center;"></i> Nuzo TV
                         </a>
                         <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
-                            <i class="fab fa-whatsapp" style="width: 18px; text-align: center;"></i> WhatsApp
+                            <i class="fab fa-tiktok" style="width: 18px; text-align: center;"></i>Media Nuzo
                         </a>
                     </div>
                 </div>

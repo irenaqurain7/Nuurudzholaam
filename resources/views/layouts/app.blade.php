@@ -649,7 +649,7 @@
                     <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-facebook"></i> Ponpes Nuurudzholaam</a>
                     <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-instagram"></i> ponpes_nuurudzholaam</a>
                     <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-youtube"></i> Nuzo TV</a>
-                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-tiktok"></i> Nuzo TV</a>
+                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-tiktok"></i> Media Nuzo</a>
                 </div>
             </div>
         </div>
