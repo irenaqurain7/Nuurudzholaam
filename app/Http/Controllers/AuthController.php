@@ -35,6 +35,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:50|alpha_dash|unique:users,username',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,guru,orangtua,siswa',
@@ -61,7 +62,9 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $credentials['login'])
+        $user = User::where('username', $credentials['login'])
+            ->orWhere('name', $credentials['login'])
+            ->orWhere('email', $credentials['login'])
             ->orWhere('nisn', $credentials['login'])
             ->orWhere('nip', $credentials['login'])
             ->first();
@@ -87,7 +90,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'login' => 'Username/NISN/NIP atau password tidak sesuai.',
+            'login' => 'Username/Email/NISN/NIP atau password tidak sesuai.',
         ]);
     }
 

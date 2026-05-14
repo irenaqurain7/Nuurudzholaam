@@ -137,9 +137,15 @@
         .login-right h1 {
             font-size: 32px;
             font-weight: 600;
-            margin-bottom: 25px;
+            margin-bottom: 8px;
             letter-spacing: 0.5px;
             color: #ffffff;
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: #9cb8ab;
+            margin-bottom: 22px;
         }
 
         .form-group {
@@ -206,6 +212,14 @@
             display: block;
             color: #fca5a5;
             font-size: 12px;
+            margin-top: 6px;
+            padding-left: 15px;
+        }
+
+        .field-help {
+            display: block;
+            color: #8fb0a0;
+            font-size: 11px;
             margin-top: 6px;
             padding-left: 15px;
         }
@@ -345,15 +359,17 @@
         <!-- RIGHT SIDE -->
         <div class="login-right">
             <h1>Login</h1>
+            <p class="login-subtitle">Masuk menggunakan username dan password akun Anda.</p>
 
             <form action="{{ route('login') }}" method="POST">
                 @csrf
 
                 <div class="form-group">
-                    <label for="login">NISN / NIP</label>
+                    <label for="login">Username</label>
                     <div class="input-wrapper">
-                        <input type="text" id="login" name="login" class="@error('login') is-invalid @enderror" placeholder="Masukkan NISN atau NIP Anda" value="{{ old('login') }}" required autofocus>
+                        <input type="text" id="login" name="login" class="@error('login') is-invalid @enderror" placeholder="Masukkan username, email, NISN, atau NIP" value="{{ old('login') }}" required autofocus>
                     </div>
+                    <span class="field-help">Gunakan username yang dibuat saat registrasi.</span>
                     @error('login')
                         <span class="error-message">{{ $message }}</span>
                     @enderror

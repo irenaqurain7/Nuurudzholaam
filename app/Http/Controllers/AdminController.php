@@ -535,4 +535,14 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Password telah direset ke: ' . $tempPassword . ' (harap segera ubah password saat login pertama)');
     }
+
+    public function usersUsernamePassword()
+    {
+        $users = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(15);
+        $totalSiswa = User::where('role', 'siswa')->count();
+        $totalGuru = User::where('role', 'guru')->count();
+        $totalOrangtua = User::where('role', 'orangtua')->count();
+
+        return view('admin.users.username-password', compact('users', 'totalSiswa', 'totalGuru', 'totalOrangtua'));
+    }
 }

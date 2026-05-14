@@ -114,6 +114,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // User Management
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [AdminController::class, 'usersIndex'])->name('index');
+        Route::get('/username-password', [AdminController::class, 'usersUsernamePassword'])->name('username-password');
         Route::get('/create', [AdminController::class, 'usersCreate'])->name('create');
         Route::post('/', [AdminController::class, 'usersStore'])->name('store');
         Route::get('/{id}/edit', [AdminController::class, 'usersEdit'])->name('edit');
