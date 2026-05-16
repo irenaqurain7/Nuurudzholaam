@@ -11,31 +11,40 @@
 
     <div class="container" style="text-align: center; z-index: 10; position: relative;">
         <h1 style="font-size: 48px; color: white; margin-bottom: 15px; font-weight: bold;">Informasi & Pengumuman</h1>
-        <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95);">Dapatkan informasi terbaru seputar kegiatan dan pengumuman penting dari Al-Hikmah Academy</p>
+        @php
+            $descriptions = [
+                'umum' => 'Dapatkan informasi terbaru seputar kegiatan dan pengumuman penting dari Sekolah Nuurudzholaam',
+                'penting' => 'Pengumuman penting terkait kebijakan, jadwal, dan informasi mendesak dari Sekolah Nuurudzholaam',
+                'ppdb' => 'Informasi pendaftaran peserta didik baru (PPDB) termasuk jadwal, persyaratan, dan alur pendaftaran Sekolah Nuurudzholaam',
+                'libur' => 'Pengumuman hari libur dan jadwal cuti sekolah dari Sekolah Nuurudzholaam'
+            ];
+            $tipeUntukDeskripsi = isset($activeTipe) ? $activeTipe : 'umum';
+        @endphp
+
+        <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95);">
+            {{ $descriptions[$tipeUntukDeskripsi] ?? $descriptions['umum'] }}
+        </p>
     </div>
 </div>
 
 <!-- Main Content -->
 <div style="background-color: #f8f9fa; padding: 60px 0;">
     <div class="container">
-        <!-- Navigation Tabs -->
-        <div style="display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap;">
-            <a href="{{ route('informasi') }}" 
-               style="padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; background-color: {{ !isset($activeTipe) || $activeTipe === null ? 'var(--hijau-islam)' : '#e0e0e0' }}; color: {{ !isset($activeTipe) || $activeTipe === null ? 'white' : '#333' }}; transition: all 0.3s; border: 2px solid {{ !isset($activeTipe) || $activeTipe === null ? 'var(--hijau-islam)' : '#e0e0e0' }}; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fas fa-newspaper"></i> Berita
-            </a>
-            <a href="{{ route('informasi.tipe', 'penting') }}" 
-               style="padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; background-color: {{ isset($activeTipe) && $activeTipe === 'penting' ? 'var(--hijau-islam)' : '#e0e0e0' }}; color: {{ isset($activeTipe) && $activeTipe === 'penting' ? 'white' : '#333' }}; transition: all 0.3s; border: 2px solid {{ isset($activeTipe) && $activeTipe === 'penting' ? 'var(--hijau-islam)' : '#e0e0e0' }}; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fas fa-exclamation-circle"></i> Pengumuman Penting
-            </a>
-            <a href="{{ route('informasi.tipe', 'ppdb') }}" 
-               style="padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; background-color: {{ isset($activeTipe) && $activeTipe === 'ppdb' ? 'var(--hijau-islam)' : '#e0e0e0' }}; color: {{ isset($activeTipe) && $activeTipe === 'ppdb' ? 'white' : '#333' }}; transition: all 0.3s; border: 2px solid {{ isset($activeTipe) && $activeTipe === 'ppdb' ? 'var(--hijau-islam)' : '#e0e0e0' }}; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fas fa-graduation-cap"></i> PPDB
-            </a>
-            <a href="{{ route('informasi.tipe', 'libur') }}" 
-               style="padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; background-color: {{ isset($activeTipe) && $activeTipe === 'libur' ? 'var(--hijau-islam)' : '#e0e0e0' }}; color: {{ isset($activeTipe) && $activeTipe === 'libur' ? 'white' : '#333' }}; transition: all 0.3s; border: 2px solid {{ isset($activeTipe) && $activeTipe === 'libur' ? 'var(--hijau-islam)' : '#e0e0e0' }}; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fas fa-calendar-days"></i> Libur
-            </a>
+        <!-- Navigation Tabs removed from page; navigation remains available in navbar dropdown -->
+
+        @php
+            $titles = [
+                'umum' => 'Berita',
+                'penting' => 'Pengumuman Penting',
+                'ppdb' => 'PPDB',
+                'libur' => 'Libur'
+            ];
+            $current = isset($activeTipe) ? ($titles[$activeTipe] ?? 'Berita') : 'Berita';
+        @endphp
+
+        <div style="margin: 30px 0 40px; text-align: left;">
+            <h2 style="font-size: 28px; margin: 0 0 6px 0; font-weight: 700; color: var(--hijau-islam);">{{ $current }}</h2>
+            <p style="margin: 0; color: var(--text-light);">{{ $descriptions[isset($activeTipe) ? $activeTipe : 'umum'] ?? 'Informasi terbaru dari Sekolah Nuurudzholaam' }}</p>
         </div>
 
         <!-- Announcements List -->
