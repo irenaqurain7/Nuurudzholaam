@@ -120,40 +120,96 @@
 <!-- Tim Pengajar & Manajemen -->
 <div class="section" style="background-color: #f7fafc;">
     <div class="container">
-        <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Tim Pengajar & Manajemen</h2>
-        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Pilar utama kesuksesan Al-Hikmah Academy adalah tim profesional yang berdedikasi tinggi</p>
+        <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Tenaga Pendidik</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Pilar utama kesuksesan Sekolah Nuurudzholaam adalah tenaga pendidik yang berdedikasi tinggi.</p>
 
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;">
             <div style="text-align: center;">
                 <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
                     <i class="fas fa-user"></i>
                 </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Ugi. H. Ahmad Farwuz, M.Pd</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Kepala Sekolah</p>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">A. Dede Ali, S.Pd</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Kepala Yayasan Raudhah Syarifah</p>
             </div>
 
             <div style="text-align: center;">
                 <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
                     <i class="fas fa-user"></i>
                 </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Ustadzah Siti Aminah, Lc</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Wakil Kurikulum Diniyyah</p>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Wiwi Suherti, S.Pd</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Kepala Sekolah Nuurudzholaam</p>
             </div>
 
             <div style="text-align: center;">
                 <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
                     <i class="fas fa-user"></i>
                 </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Uci. Budi Santoso, M.Sc</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Guru Sains & Teknologi</p>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Ade Royani, S.Pd</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
             </div>
 
             <div style="text-align: center;">
                 <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
                     <i class="fas fa-user"></i>
                 </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Ustadzah Nurul Huda, S.Pd</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Guru Bahasa Arab</p>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Siti Rokayah</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Siti Aminah</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Warnengsih</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Rinda Maryani, S.Pd</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik TK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Mochamad Fazhri Syamsi</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SMP, SMK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Dinda Aulia Putri</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SMP, SMK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Kurnia Amelia</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SMP, SMK Nuurudzholaam</p>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Jihan</h4>
+                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik TK Nuurudzholaam</p>
             </div>
         </div>
     </div>
@@ -162,7 +218,7 @@
 <!-- CTA Section -->
 <div style="background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%); color: white; padding: 80px 20px; text-align: center;">
     <div class="container">
-        <h2 style="font-size: 36px; margin-bottom: 15px; font-weight: bold;">Siap Bergabung dengan Al-Hikmah Academy?</h2>
+        <h2 style="font-size: 36px; margin-bottom: 15px; font-weight: bold;">Siap Bergabung dengan Sekolah Nuurudzholaam?</h2>
         <p style="font-size: 16px; margin-bottom: 30px; opacity: 0.95;">Jadilah bagian dari komunitas pembelajar yang dinamis dan bermimpi besar untuk masa depan</p>
         <a href="{{ route('ppdb') }}" style="background-color: white; color: var(--hijau-islam); padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; font-size: 16px;">Daftar Sekarang →</a>
     </div>
