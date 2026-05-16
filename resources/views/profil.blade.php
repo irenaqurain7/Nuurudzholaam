@@ -7,7 +7,7 @@
 <div class="hero-new" style="background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%); padding: 100px 20px; text-align: center; color: white;">
     <div class="container">
         <h1 style="font-size: 40px; margin-bottom: 15px; font-weight: bold;">Profil Sekolah</h1>
-        <p style="font-size: 16px; opacity: 0.95;">Mengenal lebih dekat sekolah nuurudzholaam, tempat di mana tradisi kelimuan berpadu dengan standar pendidikan modern berkualitas tinggi</p>
+        <p style="font-size: 16px; opacity: 0.95;">Mengenal lebih dekat sekolah nuurudzholaam, tempat di mana tradisi keilmuan berpadu dengan standar pendidikan modern berkualitas tinggi</p>
     </div>
 </div>
 
@@ -44,7 +44,7 @@
 <div class="section" style="background-color: #f7fafc;">
     <div class="container">
         <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Visi & Misi</h2>
-        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Kompass perjalanan Al-Hikmah Academy dalam mendidik generasi Qur'ani dan berakhlak mulia</p>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Kompass perjalanan Sekolah Nuurudzholaam dalam mendidik generasi Qur'ani dan berakhlak mulia</p>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
             <div class="card" style="text-align: center;">
