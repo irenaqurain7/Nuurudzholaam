@@ -14,7 +14,7 @@
             <span style="color: var(--emas); font-weight: 600; font-size: 14px;">PENDAFTARAN PESERTA DIDIK BARU 2024/2025</span>
         </div>
         <h1 style="font-size: 52px; color: white; margin-bottom: 20px; font-weight: bold; line-height: 1.3;">Membentuk Generasi Qurani dan Berakhlak Mulia</h1>
-        <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95); margin-bottom: 40px; line-height: 1.6;">Al-Hikmah Academy mengabungkan kurikulum nasional berkualitas dengan pendidikan nilai agama dan takhfidz Al-Qur'an untuk menciptakan pemimpin masa depan yang berkarakter</p>
+        <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95); margin-bottom: 40px; line-height: 1.6;">SekolahNuurudzholaam menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.</p>
         <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
             <a href="{{ route('ppdb') }}" style="background-color: white; color: var(--hijau-islam); padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; border: 2px solid white;">Daftar Sekarang</a>
             <a href="{{ route('profil') }}" style="background-color: transparent; color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; border: 2px solid white;">Lihat Program</a>
