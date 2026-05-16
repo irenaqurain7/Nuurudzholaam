@@ -38,12 +38,9 @@
                 </div>
             </div>
             <div>
-                <h2 style="font-size: 36px; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Selamat Datang di <br><span style="color: var(--emas);">Al-Hikmah Academy</span></h2>
-                <p style="color: var(--text-light); line-height: 1.8; font-size: 16px; margin-bottom: 20px;">
-                    Assalamu alaikum wa rahmatullahi wa barakatuh. Pal syukur semua akum atas kehadiran Anda di Al-Hikmah Academy. Sekolah kami berkomitmen untuk menciptakan pendidikan yang holistik dengan menggabungkan standar akademik internasional dengan nilai-nilai keislaman.
-                </p>
+                <h2 style="font-size: 36px; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Selamat Datang di <br><span style="color: var(--emas);">Sekolah Nuurudzholaam</span></h2>
                 <p style="color: var(--text-light); line-height: 1.8; font-size: 16px; margin-bottom: 30px;">
-                    Di tengah perkembangan zaman modern, kami meyakini perlunya keseimbangan antara ilmu pengetahuan, keterampilan abad 21, dan pemahaman mendalam tentang agama Islam untuk menghasilkan generasi yang tidak hanya cerdas secara akademis namun juga berakhlak mulia.
+                    Pondok pesantren Nuurudzholaam didirikan oleh A Dede Ali Asy'ari, S.Pd. Pada tahun 2012 dengan menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.
                 </p>
                 <a href="{{ route('profil') }}" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;">Pelajari Lebih Lanjut →</a>
             </div>
