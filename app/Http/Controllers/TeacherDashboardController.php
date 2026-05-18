@@ -16,7 +16,7 @@ class TeacherDashboardController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            if (Auth::user()->role !== 'teacher') {
+            if (Auth::user()->role !== 'guru') {
                 return redirect('/');
             }
             return $next($request);
@@ -145,7 +145,10 @@ class TeacherDashboardController extends Controller
             if ($grade->teacher_id !== $teacher->id) {
                 abort(403);
             }
-            $grade->update($validated);
+            foreach ($validated as $key => $value) {
+                $grade->$key = $value;
+            }
+            $grade->save();
             $message = 'Nilai berhasil diperbarui';
         } else {
             $validated['teacher_id'] = $teacher->id;
@@ -192,6 +195,7 @@ class TeacherDashboardController extends Controller
      */
     public function updateProfile(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -201,7 +205,10 @@ class TeacherDashboardController extends Controller
             'bio' => 'nullable|string|max:1000',
         ]);
 
-        $user->update($validated);
+        foreach ($validated as $key => $value) {
+            $user->$key = $value;
+        }
+        $user->save();
 
         return redirect()->route('teacher.profile')->with('success', 'Profil berhasil diperbarui');
     }
@@ -224,9 +231,10 @@ class TeacherDashboardController extends Controller
             'password' => 'required|confirmed|min:8|different:current_password',
         ]);
 
-        Auth::user()->update([
-            'password' => bcrypt($request->password),
-        ]);
+        /** @var User $user */
+        $user = Auth::user();
+        $user->password = bcrypt($request->password);
+        $user->save();
 
         return redirect()->route('teacher.profile')->with('success', 'Password berhasil diubah');
     }
@@ -248,6 +256,7 @@ class TeacherDashboardController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Delete old photo if exists
@@ -258,9 +267,8 @@ class TeacherDashboardController extends Controller
         // Store new photo
         $path = $request->file('photo')->store('profile-photos', 'public');
 
-        $user->update([
-            'profile_photo' => $path,
-        ]);
+        $user->profile_photo = $path;
+        $user->save();
 
         return redirect()->route('teacher.profile')->with('success', 'Foto profil berhasil diubah');
     }

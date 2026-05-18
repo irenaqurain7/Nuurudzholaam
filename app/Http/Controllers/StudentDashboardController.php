@@ -14,7 +14,7 @@ class StudentDashboardController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            if (Auth::user()->role !== 'student') {
+            if (Auth::user()->role !== 'siswa') {
                 return redirect('/');
             }
             return $next($request);
@@ -82,6 +82,7 @@ class StudentDashboardController extends Controller
      */
     public function updateProfile(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -91,7 +92,10 @@ class StudentDashboardController extends Controller
             'bio' => 'nullable|string|max:1000',
         ]);
 
-        $user->update($validated);
+        foreach ($validated as $key => $value) {
+            $user->$key = $value;
+        }
+        $user->save();
 
         return redirect()->route('student.profile')->with('success', 'Profil berhasil diperbarui');
     }
@@ -114,9 +118,10 @@ class StudentDashboardController extends Controller
             'password' => 'required|confirmed|min:8|different:current_password',
         ]);
 
-        Auth::user()->update([
-            'password' => bcrypt($request->password),
-        ]);
+        /** @var User $user */
+        $user = Auth::user();
+        $user->password = bcrypt($request->password);
+        $user->save();
 
         return redirect()->route('student.profile')->with('success', 'Password berhasil diubah');
     }
@@ -138,6 +143,7 @@ class StudentDashboardController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Delete old photo if exists
@@ -148,9 +154,8 @@ class StudentDashboardController extends Controller
         // Store new photo
         $path = $request->file('photo')->store('profile-photos', 'public');
 
-        $user->update([
-            'profile_photo' => $path,
-        ]);
+        $user->profile_photo = $path;
+        $user->save();
 
         return redirect()->route('student.profile')->with('success', 'Foto profil berhasil diubah');
     }
