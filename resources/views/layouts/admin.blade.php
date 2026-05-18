@@ -55,26 +55,26 @@
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            border-right: 1px solid #f1f5f9;
+            border-right: 1px solid #E2ECE8;
             z-index: 1000;
         }
 
         .admin-sidebar-header {
             padding: 0 25px 20px;
             margin-bottom: 10px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #E2ECE8;
         }
 
         .admin-sidebar-title {
             font-size: 20px;
             font-weight: 700;
-            color: #1C2D25;
+            color: #2D4438;
             display: flex;
             align-items: center;
             gap: 12px;
             letter-spacing: 0.3px;
         }
-        
+
         .admin-sidebar-title i {
             color: var(--emas);
         }
@@ -91,7 +91,7 @@
         .admin-sidebar-nav .nav-label {
             margin-top: 20px;
             padding: 10px 15px;
-            color: var(--text-muted);
+            color: #5A7E6B;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -103,7 +103,7 @@
             align-items: center;
             gap: 14px;
             padding: 12px 15px;
-            color: #1C2D25;
+            color: #2D4438;
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -112,24 +112,24 @@
         }
 
         .admin-sidebar-nav a:hover {
-            background-color: var(--bg-light);
+            background-color: #E2ECE8;
         }
 
         .admin-sidebar-nav a.active {
-            background-color: var(--emas-light);
-            color: var(--hijau-islam);
+            background-color: #E2ECE8;
+            color: #2D4438;
             font-weight: 600;
         }
-        
+
         .admin-sidebar-nav a.active i {
-            color: var(--hijau-islam);
+            color: #2D4438;
         }
 
         .admin-sidebar-nav a i {
             width: 20px;
             text-align: center;
             font-size: 16px;
-            color: var(--text-muted);
+            color: #5A7E6B;
         }
 
         .admin-sidebar::-webkit-scrollbar {
@@ -152,11 +152,11 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: var(--bg-light);
+            background-color: #F4F7F5;
         }
 
         .admin-topbar {
-            background: var(--bg-light);
+            background: #F4F7F5;
             padding: 20px 40px;
             display: flex;
             justify-content: space-between;
@@ -168,7 +168,7 @@
 
         .admin-topbar-left h2 {
             margin: 0;
-            color: #1C2D25;
+            color: #2D4438;
             font-size: 24px;
             font-weight: 700;
         }
@@ -190,11 +190,11 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--emas-light);
+            background: #E2ECE8;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--hijau-islam);
+            color: #2D4438;
             font-size: 16px;
             font-weight: 700;
         }
@@ -205,13 +205,13 @@
 
         .admin-user-name {
             font-weight: 600;
-            color: #1C2D25;
+            color: #2D4438;
             display: block;
         }
 
         .admin-user-email {
             font-size: 11px;
-            color: var(--text-muted);
+            color: #5A7E6B;
             margin-top: 2px;
         }
 
@@ -220,7 +220,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            color: #1C2D25;
+            color: #2D4438;
             background: transparent;
             text-decoration: none;
             transition: all 0.2s ease;
@@ -232,18 +232,18 @@
 
         .admin-topbar-action:hover {
             opacity: 0.8;
-            color: var(--hijau-islam);
+            color: #1f7f5f;
         }
 
         .admin-topbar-action i {
-            color: var(--text-muted);
+            color: #5A7E6B;
             font-size: 16px;
         }
 
         .admin-topbar-action.logout {
             color: #ef4444;
         }
-        
+
         .admin-topbar-action.logout i {
             color: #ef4444;
         }
@@ -316,7 +316,7 @@
         /* ===== TABLES ===== */
         .admin-table {
             width: 100%;
-            background: var(--bg-white);
+            background: #ffffff;
             border-collapse: collapse;
             border-radius: 12px;
             overflow: hidden;
@@ -324,7 +324,7 @@
         }
 
         .admin-table thead {
-            background: linear-gradient(90deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
+            background: linear-gradient(90deg, #2D4438 0%, #486E5A 100%);
             color: white;
         }
 
@@ -339,7 +339,7 @@
 
         .admin-table td {
             padding: 16px 18px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #E2ECE8;
             font-size: 14px;
         }
 
@@ -348,7 +348,7 @@
         }
 
         .admin-table tbody tr:hover {
-            background-color: rgba(31, 127, 95, 0.02);
+            background-color: rgba(45, 68, 56, 0.02);
         }
 
         .admin-table tbody tr:last-child td {
@@ -362,7 +362,7 @@
             justify-content: center;
             gap: 8px;
             padding: 10px 16px;
-            background-color: var(--hijau-islam);
+            background-color: #2D4438;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -375,9 +375,9 @@
         }
 
         .admin-btn:hover {
-            background-color: var(--hijau-islam-light);
+            background-color: #1f7f5f;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(31, 127, 95, 0.2);
+            box-shadow: 0 6px 16px rgba(45, 68, 56, 0.2);
         }
 
         .admin-btn:active {
@@ -385,7 +385,7 @@
         }
 
         .admin-btn.danger {
-            background-color: var(--danger);
+            background-color: #ef4444;
         }
 
         .admin-btn.danger:hover {
@@ -394,7 +394,7 @@
         }
 
         .admin-btn.warning {
-            background-color: var(--warning);
+            background-color: #f59e0b;
             color: #7c2d12;
         }
 
@@ -405,7 +405,7 @@
         }
 
         .admin-btn.success {
-            background-color: var(--success);
+            background-color: #10b981;
         }
 
         .admin-btn.success:hover {
@@ -414,8 +414,8 @@
         }
 
         .admin-btn.secondary {
-            background-color: var(--border-color);
-            color: var(--text-dark);
+            background-color: #E2ECE8;
+            color: #2D4438;
         }
 
         .admin-btn.secondary:hover {
