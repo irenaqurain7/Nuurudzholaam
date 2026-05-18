@@ -589,9 +589,7 @@
                         <i class="fas fa-circle-info"></i> Informasi <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="nav-dropdown-menu" id="informasi-menu">
-                        <a href="{{ route('informasi') }}"><i class="fas fa-newspaper"></i> Berita</a>
                         <a href="{{ route('informasi.tipe', 'penting') }}"><i class="fas fa-exclamation-circle"></i> Pengumuman Penting</a>
-                        <a href="{{ route('informasi.tipe', 'ppdb') }}"><i class="fas fa-graduation-cap"></i> PPDB</a>
                         <a href="{{ route('informasi.tipe', 'libur') }}"><i class="fas fa-calendar-days"></i> Libur</a>
                     </div>
                 </li>

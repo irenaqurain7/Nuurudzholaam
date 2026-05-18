@@ -61,55 +61,6 @@
             </div>
         </article>
     </section>
-
-    <section class="admin-content-grid">
-        <article class="admin-panel">
-            <div class="panel-header">
-                <div>
-                    <p class="section-kicker">PPDB Terbaru</p>
-                    <h2>Pendaftar Terakhir</h2>
-                </div>
-                <a href="{{ route('admin.ppdb.index') }}" class="panel-link">Lihat semua</a>
-            </div>
-
-            <div class="table-wrap">
-                <table class="admin-table modern">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Program</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($latestPPDB ?? [] as $ppdb)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td><strong>{{ $ppdb->nama_lengkap ?? '-' }}</strong></td>
-                                <td>{{ $ppdb->email ?? '-' }}</td>
-                                <td>{{ ucfirst($ppdb->program ?? '-') }}</td>
-                                <td>
-                                    <span class="status-badge status-{{ $ppdb->status ?? 'pending' }}">
-                                        {{ ucfirst($ppdb->status ?? 'pending') }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="{{ route('admin.ppdb.show', $ppdb->id) }}" class="btn-mini">Detail</a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="empty-state">Belum ada data pendaftar.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </article>
-    </section>
 </div>
 
 <style>
@@ -225,110 +176,9 @@
     .stat-icon.green { background: linear-gradient(135deg, #059669 0%, #34d399 100%); }
     .stat-icon.cyan { background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%); }
 
-    .admin-content-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .admin-panel {
-        padding: 24px;
-    }
-
-    .panel-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: center;
-        margin-bottom: 18px;
-    }
-
-    .panel-header h2 {
-        margin: 6px 0 0;
-        font-size: 22px;
-        color: var(--text-dark);
-    }
-
-    .panel-link {
-        font-weight: 700;
-        color: var(--hijau-islam-light);
-        text-decoration: none;
-    }
-
-    .table-wrap {
-        overflow-x: auto;
-        border-radius: 16px;
-    }
-
-    .admin-table.modern {
-        min-width: 640px;
-        box-shadow: none;
-        border: 1px solid #e2ece8;
-    }
-
-    .admin-table.modern thead {
-        background: linear-gradient(90deg, #244033 0%, #486e5a 100%);
-    }
-
-    .admin-table.modern th {
-        padding: 14px 16px;
-        font-size: 12px;
-    }
-
-    .admin-table.modern td {
-        padding: 14px 16px;
-    }
-
-    .status-badge {
-        display: inline-flex;
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: capitalize;
-    }
-
-    .status-badge.status-pending {
-        background: rgba(245, 158, 11, 0.14);
-        color: #92400e;
-    }
-
-    .status-badge.status-accepted {
-        background: rgba(16, 185, 129, 0.14);
-        color: #047857;
-    }
-
-    .status-badge.status-rejected {
-        background: rgba(239, 68, 68, 0.14);
-        color: #991b1b;
-    }
-
-    .btn-mini {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 12px;
-        border-radius: 10px;
-        background: var(--hijau-islam-light);
-        color: #ffffff;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .empty-state {
-        text-align: center;
-        color: var(--text-muted);
-        padding: 24px 16px;
-    }
-
     @media (max-width: 1200px) {
         .admin-stat-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .admin-content-grid {
-            grid-template-columns: 1fr;
         }
     }
 
@@ -337,18 +187,12 @@
             padding: 18px;
         }
 
-        .admin-hero-card,
-        .admin-content-grid {
+        .admin-hero-card {
             grid-template-columns: 1fr;
         }
 
         .admin-stat-grid {
             grid-template-columns: 1fr;
-        }
-
-        .panel-header {
-            flex-direction: column;
-            align-items: flex-start;
         }
     }
 </style>

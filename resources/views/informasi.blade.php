@@ -13,16 +13,14 @@
         <h1 style="font-size: 48px; color: white; margin-bottom: 15px; font-weight: bold;">Informasi & Pengumuman</h1>
         @php
             $descriptions = [
-                'umum' => 'Dapatkan informasi terbaru seputar kegiatan dan pengumuman penting dari Sekolah Nuurudzholaam',
                 'penting' => 'Pengumuman penting terkait kebijakan, jadwal, dan informasi mendesak dari Sekolah Nuurudzholaam',
-                'ppdb' => 'Informasi pendaftaran peserta didik baru (PPDB) termasuk jadwal, persyaratan, dan alur pendaftaran Sekolah Nuurudzholaam',
                 'libur' => 'Pengumuman hari libur dan jadwal cuti sekolah dari Sekolah Nuurudzholaam'
             ];
-            $tipeUntukDeskripsi = isset($activeTipe) ? $activeTipe : 'umum';
+            $tipeUntukDeskripsi = isset($activeTipe) ? $activeTipe : 'penting';
         @endphp
 
         <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95);">
-            {{ $descriptions[$tipeUntukDeskripsi] ?? $descriptions['umum'] }}
+            {{ $descriptions[$tipeUntukDeskripsi] ?? $descriptions['penting'] }}
         </p>
     </div>
 </div>
@@ -34,17 +32,15 @@
 
         @php
             $titles = [
-                'umum' => 'Berita',
                 'penting' => 'Pengumuman Penting',
-                'ppdb' => 'PPDB',
                 'libur' => 'Libur'
             ];
-            $current = isset($activeTipe) ? ($titles[$activeTipe] ?? 'Berita') : 'Berita';
+            $current = isset($activeTipe) ? ($titles[$activeTipe] ?? 'Pengumuman Penting') : 'Pengumuman Penting';
         @endphp
 
         <div style="margin: 30px 0 40px; text-align: left;">
             <h2 style="font-size: 28px; margin: 0 0 6px 0; font-weight: 700; color: var(--hijau-islam);">{{ $current }}</h2>
-            <p style="margin: 0; color: var(--text-light);">{{ $descriptions[isset($activeTipe) ? $activeTipe : 'umum'] ?? 'Informasi terbaru dari Sekolah Nuurudzholaam' }}</p>
+            <p style="margin: 0; color: var(--text-light);">{{ $descriptions[isset($activeTipe) ? $activeTipe : 'penting'] ?? 'Informasi terbaru dari Sekolah Nuurudzholaam' }}</p>
         </div>
 
         <!-- Announcements List -->
@@ -59,14 +55,8 @@
                                     <span><i class="fas fa-calendar-alt"></i> {{ $item->tanggal_mulai->format('d M Y') }}</span>
                                     <span style="background: var(--emas); color: white; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; font-size: 12px; font-weight: 600;">
                                         @switch($item->tipe)
-                                            @case('umum')
-                                                Berita
-                                                @break
                                             @case('penting')
                                                 Penting
-                                                @break
-                                            @case('ppdb')
-                                                PPDB
                                                 @break
                                             @case('libur')
                                                 Libur
@@ -107,7 +97,7 @@
         div[style*="display: flex; gap: 15px"] {
             flex-direction: column;
         }
-        
+
         a[style*="padding: 12px 30px"] {
             width: 100%;
             justify-content: center;
