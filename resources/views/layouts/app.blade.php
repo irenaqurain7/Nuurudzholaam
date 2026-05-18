@@ -602,14 +602,6 @@
                 @auth
                     @if(!auth()->user()->isAdmin())
                         <li>
-                            <a
-                                href="{{ auth()->user()->isStudent() ? route('student.dashboard') : route('teacher.dashboard') }}"
-                                class="nav-btn solid"
-                            >
-                                <i class="fas fa-gauge"></i> Dashboard
-                            </a>
-                        </li>
-                        <li>
                             <form action="{{ route('logout') }}" method="POST" class="nav-form">
                                 @csrf
                                 <button type="submit" class="nav-btn logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
