@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Models\Teacher;
 use App\Models\Grade;
 use App\Models\Student;
+use App\Models\Announcement;
+use App\Models\Activity;
+use App\Models\SchoolInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -271,5 +274,41 @@ class TeacherDashboardController extends Controller
         $user->save();
 
         return redirect()->route('teacher.profile')->with('success', 'Foto profil berhasil diubah');
+    }
+
+    /**
+     * Show teacher informasi page
+     */
+    public function informasi()
+    {
+        $announcements = Announcement::where('status', 'published')->orderBy('created_at', 'desc')->get();
+
+        return view('teacher.informasi', [
+            'announcements' => $announcements,
+        ]);
+    }
+
+    /**
+     * Show teacher kegiatan page
+     */
+    public function kegiatan()
+    {
+        $activities = Activity::where('status', 'published')->orderBy('created_at', 'desc')->get();
+
+        return view('teacher.kegiatan', [
+            'activities' => $activities,
+        ]);
+    }
+
+    /**
+     * Show teacher kontak page
+     */
+    public function kontak()
+    {
+        $schoolInfo = SchoolInfo::first();
+
+        return view('teacher.kontak', [
+            'schoolInfo' => $schoolInfo,
+        ]);
     }
 }

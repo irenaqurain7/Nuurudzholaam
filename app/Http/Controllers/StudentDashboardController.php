@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Student;
+use App\Models\Announcement;
+use App\Models\Activity;
+use App\Models\SchoolInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -158,5 +161,41 @@ class StudentDashboardController extends Controller
         $user->save();
 
         return redirect()->route('student.profile')->with('success', 'Foto profil berhasil diubah');
+    }
+
+    /**
+     * Show student informasi page
+     */
+    public function informasi()
+    {
+        $announcements = Announcement::where('status', 'published')->orderBy('created_at', 'desc')->get();
+
+        return view('student.informasi', [
+            'announcements' => $announcements,
+        ]);
+    }
+
+    /**
+     * Show student kegiatan page
+     */
+    public function kegiatan()
+    {
+        $activities = Activity::where('status', 'published')->orderBy('created_at', 'desc')->get();
+
+        return view('student.kegiatan', [
+            'activities' => $activities,
+        ]);
+    }
+
+    /**
+     * Show student kontak page
+     */
+    public function kontak()
+    {
+        $schoolInfo = SchoolInfo::first();
+
+        return view('student.kontak', [
+            'schoolInfo' => $schoolInfo,
+        ]);
     }
 }

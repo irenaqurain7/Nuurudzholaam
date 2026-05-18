@@ -1,0 +1,29 @@
+@extends('student.layout')
+
+@section('student-content')
+<div style="max-width: 1000px;">
+    <h1 style="color: #2D4438; margin-bottom: 30px; font-size: 28px;">Informasi Penting</h1>
+
+    @if($announcements->isEmpty())
+        <div style="background: #F4F7F5; border-left: 4px solid #709D88; padding: 20px; border-radius: 8px;">
+            <p style="color: #666; margin: 0;">Belum ada informasi terbaru.</p>
+        </div>
+    @else
+        <div style="display: grid; gap: 20px;">
+            @foreach($announcements as $announcement)
+                <div style="background: white; border-left: 4px solid #709D88; padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <h2 style="margin: 0; color: #2D4438; font-size: 20px;">{{ $announcement->title }}</h2>
+                        <span style="background: #E2ECE8; color: #2D4438; padding: 5px 12px; border-radius: 20px; font-size: 12px;">
+                            {{ $announcement->created_at->format('d M Y') }}
+                        </span>
+                    </div>
+                    <div style="color: #555; line-height: 1.6;">
+                        {!! nl2br(e($announcement->content)) !!}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
+@endsection

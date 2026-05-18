@@ -2,8 +2,11 @@
 
 @section('content')
 <style>
-    /* Hide navbar from app layout for student dashboard */
+    /* Hide navbar and footer from app layout for student dashboard */
     .navbar {
+        display: none;
+    }
+    .footer {
         display: none;
     }
 </style>
@@ -158,6 +161,8 @@
             font-size: 18px;
             font-weight: 600;
             color: var(--text-dark);
+            display: flex;
+            align-items: center;
         }
 
         .student-topbar-user {
@@ -291,17 +296,17 @@
             </li>
             <div class="sidebar-divider"></div>
             <li>
-                <a href="{{ route('informasi.tipe', 'penting') }}">
+                <a href="{{ route('student.informasi') }}">
                     <i class="fas fa-bell"></i> <span>Informasi</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('kegiatan') }}">
+                <a href="{{ route('student.kegiatan') }}">
                     <i class="fas fa-calendar-check"></i> <span>Kegiatan</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('kontak') }}">
+                <a href="{{ route('student.kontak') }}">
                     <i class="fas fa-envelope"></i> <span>Kontak</span>
                 </a>
             </li>
@@ -322,7 +327,8 @@
         <!-- Topbar -->
         <div class="student-topbar">
             <div class="student-topbar-title">
-                Dashboard Siswa
+                <img src="{{ asset('images/logo-nuzo.png') }}" alt="Logo" style="height: 40px; margin-right: 12px;">
+                <span>Sekolah Nuurudzholaam</span>
             </div>
             <div class="student-topbar-user">
                 <span style="color: var(--text-light); font-size: 14px;">{{ date('l, d F Y') }}</span>

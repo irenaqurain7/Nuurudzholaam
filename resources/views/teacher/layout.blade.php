@@ -2,8 +2,11 @@
 
 @section('content')
 <style>
-    /* Hide navbar from app layout for teacher dashboard */
+    /* Hide navbar and footer from app layout for teacher dashboard */
     .navbar {
+        display: none;
+    }
+    .footer {
         display: none;
     }
 
@@ -149,6 +152,15 @@
         margin: 0;
     }
 
+    .teacher-topbar-title {
+        color: var(--hijau-islam);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
     .teacher-topbar-date {
         color: var(--text-dark);
         font-size: 0.95rem;
@@ -283,17 +295,17 @@
             </li>
             <div class="sidebar-divider"></div>
             <li>
-                <a href="{{ route('informasi.tipe', 'penting') }}">
+                <a href="{{ route('teacher.informasi') }}">
                     <i class="fas fa-bell"></i> <span>Informasi</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('kegiatan') }}">
+                <a href="{{ route('teacher.kegiatan') }}">
                     <i class="fas fa-calendar-check"></i> <span>Kegiatan</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('kontak') }}">
+                <a href="{{ route('teacher.kontak') }}">
                     <i class="fas fa-envelope"></i> <span>Kontak</span>
                 </a>
             </li>
@@ -313,7 +325,10 @@
     <div class="teacher-main-content">
         <!-- Topbar -->
         <div class="teacher-topbar">
-            <h2>Dashboard Guru</h2>
+            <div class="teacher-topbar-title">
+                <img src="{{ asset('images/logo-nuzo.png') }}" alt="Logo" style="height: 40px; margin-right: 12px;">
+                <span>Sekolah Nuurudzholaam</span>
+            </div>
             <span class="teacher-topbar-date" id="current-date"></span>
         </div>
 

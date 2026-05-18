@@ -146,6 +146,11 @@ Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->
     // Photo
     Route::get('/upload-photo', [StudentDashboardController::class, 'showUploadPhoto'])->name('upload-photo');
     Route::post('/upload-photo', [StudentDashboardController::class, 'uploadPhoto'])->name('upload-photo.store');
+
+    // Informasi, Kegiatan, Kontak
+    Route::get('/informasi', [StudentDashboardController::class, 'informasi'])->name('informasi');
+    Route::get('/kegiatan', [StudentDashboardController::class, 'kegiatan'])->name('kegiatan');
+    Route::get('/kontak', [StudentDashboardController::class, 'kontak'])->name('kontak');
 });
 
 // TEACHER ROUTES
@@ -177,6 +182,11 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
     // Photo
     Route::get('/upload-photo', [TeacherDashboardController::class, 'showUploadPhoto'])->name('upload-photo');
     Route::post('/upload-photo', [TeacherDashboardController::class, 'uploadPhoto'])->name('upload-photo.store');
+
+    // Informasi, Kegiatan, Kontak
+    Route::get('/informasi', [TeacherDashboardController::class, 'informasi'])->name('informasi');
+    Route::get('/kegiatan', [TeacherDashboardController::class, 'kegiatan'])->name('kegiatan');
+    Route::get('/kontak', [TeacherDashboardController::class, 'kontak'])->name('kontak');
 });
 
 // PARENT ROUTES
