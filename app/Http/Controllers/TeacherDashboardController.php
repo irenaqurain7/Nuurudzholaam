@@ -77,6 +77,36 @@ class TeacherDashboardController extends Controller
     }
 
     /**
+     * Show student detail
+     */
+    public function studentDetail($id)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $student = Student::with('user')->findOrFail($id);
+
+        // Verify that teacher teaches this student
+        $hasStudent = Grade::where('teacher_id', $teacher->id)
+            ->where('student_id', $student->id)
+            ->exists();
+
+        if (!$hasStudent) {
+            abort(403, 'Anda tidak mengajar siswa ini');
+        }
+
+        $grades = Grade::where('student_id', $student->id)
+            ->where('teacher_id', $teacher->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('teacher.student-detail', [
+            'student' => $student,
+            'grades' => $grades,
+        ]);
+    }
+
+    /**
      * Show grades for specific student or all students
      */
     public function grades(Request $request)

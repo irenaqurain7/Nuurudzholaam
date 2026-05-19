@@ -163,6 +163,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
 
     // Students
     Route::get('/students', [TeacherDashboardController::class, 'students'])->name('students');
+    Route::get('/students/{id}', [TeacherDashboardController::class, 'studentDetail'])->name('students.show');
 
     // Grades
     Route::get('/grades', [TeacherDashboardController::class, 'grades'])->name('grades');
