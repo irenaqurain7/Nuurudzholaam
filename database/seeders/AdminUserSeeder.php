@@ -18,6 +18,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'admin@nuurudzholaam.sch.id'],
             [
                 'name' => 'Admin Nuurudzholaam',
+                'username' => 'admin',
                 'password' => Hash::make('admin123'),
                 'email_verified_at' => now(),
                 'role' => 'admin',
@@ -30,6 +31,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'siswa@example.com'],
             [
                 'name' => 'Test Siswa',
+                'username' => 'siswa',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role' => 'siswa',
@@ -42,6 +44,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'guru@example.com'],
             [
                 'name' => 'Test Guru',
+                'username' => 'guru',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role' => 'guru',
@@ -54,6 +57,7 @@ class AdminUserSeeder extends Seeder
             ['email' => 'orangtua@example.com'],
             [
                 'name' => 'Test Orang Tua',
+                'username' => 'orangtua',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'role' => 'orangtua',
