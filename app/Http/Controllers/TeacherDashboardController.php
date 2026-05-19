@@ -19,8 +19,12 @@ class TeacherDashboardController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            if (Auth::user()->role !== 'guru') {
+            $user = Auth::user();
+            if ($user->role !== 'guru') {
                 return redirect('/');
+            }
+            if (!$user->teacher) {
+                return redirect('/')->with('error', 'Data guru tidak ditemukan. Hubungi admin.');
             }
             return $next($request);
         });
