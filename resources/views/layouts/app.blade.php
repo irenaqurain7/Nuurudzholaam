@@ -571,7 +571,7 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+        <div class="container" style="display: flex; align-items: center; gap: 20px; padding: 15px 20px;">
             <a href="{{ route('home') }}" class="navbar-brand">
                 <img src="/images/logo-nuzo.png" alt="Logo Nuzo" style="height: 55px; width: auto; margin-right: 4px;">
                 <span>Nuurudzholaam (Nuzo)</span>
@@ -579,7 +579,7 @@
             <button class="navbar-toggle" id="navbar-toggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <ul class="navbar-nav" id="navbar-menu">
+            <ul class="navbar-nav" id="navbar-menu" style="flex: 1;">
                 <li><a href="{{ route('home') }}" class="@if(Route::current()->getName() === 'home') active @endif">Beranda</a></li>
                 <li><a href="{{ route('ppdb') }}" class="@if(Route::current()->getName() === 'ppdb') active @endif">PPDB</a></li>
                 <li><a href="{{ route('program') }}" class="@if(Route::current()->getName() === 'program') active @endif">Program</a></li>
@@ -596,6 +596,7 @@
                 <li><a href="{{ route('profil') }}" class="@if(Route::current()->getName() === 'profil') active @endif">Profil</a></li>
                 <li><a href="{{ route('faq') }}" class="@if(Route::current()->getName() === 'faq') active @endif">FAQ</a></li>
                 <li><a href="{{ route('kontak') }}" class="@if(Route::current()->getName() === 'kontak') active @endif">Kontak</a></li>
+                <li style="flex: 1;"></li>
                 @guest
                     <li><a href="{{ route('login') }}" class="nav-btn solid"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                 @endguest

@@ -550,7 +550,8 @@
                 <li><a href="{{ route('admin.users.username-password') ?? '#' }}" class="{{ request()->routeIs('admin.users.username-password') ? 'active' : '' }}"><i class="fas fa-key"></i> Username & Password</a></li>
 
                 <div class="nav-label">PPDB</div>
-                <li><a href="{{ route('admin.ppdb.index') }}" class="{{ request()->routeIs('admin.ppdb.*') ? 'active' : '' }}"><i class="fas fa-users"></i> Formulir PPDB</a></li>
+                <li><a href="{{ route('admin.ppdb.index') }}" class="{{ request()->routeIs('admin.ppdb.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Formulir PPDB</a></li>
+                <li><a href="{{ route('admin.ppdb.settings') }}" class="{{ request()->routeIs('admin.ppdb.settings') ? 'active' : '' }}"><i class="fas fa-cog"></i> Pengaturan PPDB</a></li>
 
                 <div class="nav-label">BERITA & INFORMASI</div>
                 <li><a href="{{ route('admin.announcement.index') }}" class="{{ request()->routeIs('admin.announcement.*') ? 'active' : '' }}"><i class="fas fa-bullhorn"></i> Pengumuman</a></li>

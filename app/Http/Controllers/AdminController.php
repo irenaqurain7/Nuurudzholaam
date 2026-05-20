@@ -372,6 +372,41 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Informasi sekolah berhasil diperbarui.');
     }
 
+    // PPDB SETTINGS
+    public function ppdbSettingsEdit()
+    {
+        $school = SchoolInfo::first() ?? new SchoolInfo();
+        return view('admin.ppdb.settings', compact('school'));
+    }
+
+    public function ppdbSettingsUpdate(Request $request)
+    {
+        $school = SchoolInfo::first();
+        
+        // Jika belum ada school info, buat baru dengan data minimal
+        if (!$school) {
+            $school = SchoolInfo::create([
+                'nama_sekolah' => 'Sekolah Nuurudzholaam',
+                'deskripsi' => 'Deskripsi sekolah belum diisi. Silakan update di halaman Informasi Sekolah.',
+                'alamat' => 'Alamat belum diisi',
+                'no_telepon' => '-',
+                'email' => 'info@nuurudzholaam.sch.id',
+            ]);
+        }
+
+        $validated = $request->validate([
+            'ppdb_active' => 'nullable|boolean',
+            'ppdb_start_date' => 'nullable|date',
+            'ppdb_end_date' => 'nullable|date|after_or_equal:ppdb_start_date',
+        ]);
+
+        // Handle checkbox conversion
+        $validated['ppdb_active'] = $request->has('ppdb_active');
+
+        $school->update($validated);
+        return redirect()->back()->with('success', 'Pengaturan PPDB berhasil diperbarui.');
+    }
+
     // USER MANAGEMENT
     public function usersIndex()
     {

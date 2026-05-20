@@ -107,6 +107,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/faq/{id}', [AdminController::class, 'faqUpdate'])->name('faq.update');
     Route::delete('/faq/{id}', [AdminController::class, 'faqDestroy'])->name('faq.destroy');
 
+    // PPDB Settings Management
+    Route::get('/ppdb-settings', [AdminController::class, 'ppdbSettingsEdit'])->name('ppdb.settings');
+    Route::put('/ppdb-settings', [AdminController::class, 'ppdbSettingsUpdate'])->name('ppdb.settings.update');
+
     // School Info Management
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');
