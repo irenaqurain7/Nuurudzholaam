@@ -11,6 +11,63 @@
     </div>
 </div>
 
+<!-- PPDB Status Banner -->
+<div class="section" style="background-color: #f5f5f5; padding: 30px 20px;">
+    <div class="container">
+        @php
+            $today = now();
+            $ppdbOpen = false;
+            $statusMessage = '';
+            $statusColor = '#d4af37';
+            $statusBgColor = '#fff9e6';
+            $statusIcon = 'fas fa-clock';
+
+            if ($school && $school->ppdb_active) {
+                if ($school->ppdb_start_date && $school->ppdb_end_date) {
+                    $startDate = $school->ppdb_start_date;
+                    $endDate = $school->ppdb_end_date;
+                    
+                    if ($today >= $startDate && $today <= $endDate) {
+                        $ppdbOpen = true;
+                        $statusMessage = 'Pendaftaran PPDB Dibuka';
+                        $statusColor = '#2e7d32';
+                        $statusBgColor = '#e8f5e9';
+                        $statusIcon = 'fas fa-check-circle';
+                    } elseif ($today < $startDate) {
+                        $statusMessage = 'Pendaftaran Akan Dibuka';
+                        $statusColor = '#1976d2';
+                        $statusBgColor = '#e3f2fd';
+                        $statusIcon = 'fas fa-hourglass-start';
+                    } else {
+                        $statusMessage = 'Pendaftaran Telah Ditutup';
+                        $statusColor = '#d32f2f';
+                        $statusBgColor = '#ffebee';
+                        $statusIcon = 'fas fa-times-circle';
+                    }
+                }
+            } else {
+                $statusMessage = 'Pendaftaran PPDB Tidak Aktif';
+                $statusColor = '#d32f2f';
+                $statusBgColor = '#ffebee';
+                $statusIcon = 'fas fa-ban';
+            }
+        @endphp
+
+        <div style="background-color: {{ $statusBgColor }}; border-left: 4px solid {{ $statusColor }}; padding: 20px; border-radius: 8px; display: flex; align-items: center; gap: 20px;">
+            <i class="{{ $statusIcon }}" style="font-size: 32px; color: {{ $statusColor }};"></i>
+            <div style="flex: 1;">
+                <h3 style="color: {{ $statusColor }}; margin: 0 0 8px 0; font-weight: bold;">{{ $statusMessage }}</h3>
+                @if ($school && $school->ppdb_start_date && $school->ppdb_end_date)
+                <p style="color: {{ $statusColor }}; margin: 0; font-size: 14px;">
+                    <strong>Periode Pendaftaran:</strong> 
+                    {{ $school->ppdb_start_date->format('d F Y') }} - {{ $school->ppdb_end_date->format('d F Y') }}
+                </p>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Main Content -->
 <div class="section">
     <div class="container">
@@ -38,8 +95,20 @@
         </div>
         @endif
 
-        <form method="POST" action="{{ route('ppdb.store') }}" id="ppdbForm">
+        <form method="POST" action="{{ route('ppdb.store') }}" id="ppdbForm" @if(!$ppdbOpen) style="pointer-events: none; opacity: 0.6;" @endif>
             @csrf
+            
+            @if(!$ppdbOpen)
+            <div style="background-color: #ffebee; border: 1px solid #ef5350; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 15px; align-items: center;">
+                <i class="fas fa-lock" style="font-size: 24px; color: #d32f2f; flex-shrink: 0;"></i>
+                <div style="flex: 1;">
+                    <h3 style="color: #d32f2f; margin: 0 0 5px 0; font-weight: bold;">Formulir Pendaftaran Ditutup</h3>
+                    <p style="color: #d32f2f; margin: 0; font-size: 14px;">
+                        Maaf, pendaftaran PPDB sedang tidak dibuka. Silakan menunggu periode pendaftaran berikutnya atau hubungi sekolah untuk informasi lebih lanjut.
+                    </p>
+                </div>
+            </div>
+            @endif
             
             <!-- Form Steps -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px;">

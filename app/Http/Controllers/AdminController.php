@@ -345,6 +345,9 @@ class AdminController extends Controller
             'website' => 'nullable|string',
             'logo' => 'nullable|image|max:2048',
             'gambar_utama' => 'nullable|image|max:2048',
+            'ppdb_active' => 'nullable|boolean',
+            'ppdb_start_date' => 'nullable|date',
+            'ppdb_end_date' => 'nullable|date|after_or_equal:ppdb_start_date',
         ]);
 
         $school = SchoolInfo::first() ?? new SchoolInfo();
@@ -356,6 +359,9 @@ class AdminController extends Controller
         if ($request->hasFile('gambar_utama')) {
             $validated['gambar_utama'] = $request->file('gambar_utama')->store('school', 'public');
         }
+
+        // Handle checkbox conversion
+        $validated['ppdb_active'] = $request->has('ppdb_active');
 
         if ($school->exists) {
             $school->update($validated);

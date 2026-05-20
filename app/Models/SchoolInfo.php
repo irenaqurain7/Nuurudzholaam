@@ -22,5 +22,14 @@ class SchoolInfo extends Model
         'website',
         'logo',
         'gambar_utama',
+        'ppdb_start_date',
+        'ppdb_end_date',
+        'ppdb_active',
+    ];
+
+    protected $casts = [
+        'ppdb_start_date' => 'date',
+        'ppdb_end_date' => 'date',
+        'ppdb_active' => 'boolean',
     ];
 }

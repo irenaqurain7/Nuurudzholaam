@@ -57,6 +57,42 @@
                 <label for="website">Website</label>
                 <input type="url" id="website" name="website" value="{{ old('website', $school->website ?? '') }}">
             </div>
+
+            <!-- PPDB Settings Section -->
+            <div style="background-color: #f0f4f8; padding: 20px; border-radius: 8px; border-left: 4px solid var(--hijau-islam); margin-top: 30px;">
+                <h3 style="color: var(--hijau-islam); margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-calendar-alt"></i> Pengaturan Periode PPDB
+                </h3>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="ppdb_active" name="ppdb_active" value="1" @if(old('ppdb_active', $school->ppdb_active ?? false)) checked @endif style="width: auto; padding: 0; margin: 0;">
+                        <span style="margin: 0; color: var(--text-dark); font-weight: 600;">Aktifkan PPDB</span>
+                    </label>
+                    <p style="font-size: 12px; color: var(--text-light); margin-top: 8px; margin-bottom: 0;">Centang untuk mengaktifkan pendaftaran PPDB</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div class="form-group">
+                        <label for="ppdb_start_date">Tanggal Mulai PPDB</label>
+                        <input type="date" id="ppdb_start_date" name="ppdb_start_date" value="{{ old('ppdb_start_date', $school->ppdb_start_date?->format('Y-m-d') ?? '') }}">
+                        <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">Tanggal dimulainya pendaftaran PPDB</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ppdb_end_date">Tanggal Akhir PPDB</label>
+                        <input type="date" id="ppdb_end_date" name="ppdb_end_date" value="{{ old('ppdb_end_date', $school->ppdb_end_date?->format('Y-m-d') ?? '') }}">
+                        <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">Tanggal berakhirnya pendaftaran PPDB</p>
+                    </div>
+                </div>
+
+                <div style="background-color: #e8f5e9; border: 1px solid #c8e6c9; padding: 12px; border-radius: 6px; margin-top: 15px; display: flex; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: #2e7d32; flex-shrink: 0; margin-top: 2px;"></i>
+                    <p style="color: #2e7d32; margin: 0; font-size: 13px;">
+                        <strong>Informasi:</strong> Formulir PPDB hanya dapat diisi ketika tanggal saat ini berada dalam periode yang telah ditentukan dan PPDB diaktifkan.
+                    </p>
+                </div>
+            </div>
         </div>
 
         <div>
@@ -108,7 +144,14 @@
         color: var(--hijau-islam);
     }
 
-    .form-group input,
+    .form-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--hijau-islam);
+    }
+
+    .form-group input:not([type="checkbox"]),
     .form-group textarea,
     .form-group select {
         width: 100%;
@@ -120,7 +163,7 @@
         font-family: inherit;
     }
 
-    .form-group input:focus,
+    .form-group input:not([type="checkbox"]):focus,
     .form-group textarea:focus,
     .form-group select:focus {
         outline: none;
