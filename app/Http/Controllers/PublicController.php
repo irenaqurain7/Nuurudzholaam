@@ -8,7 +8,9 @@ use App\Models\FAQ;
 use App\Models\Gallery;
 use App\Models\Program;
 use App\Models\SchoolInfo;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PublicController extends Controller
 {
@@ -57,8 +59,85 @@ class PublicController extends Controller
     {
         $school = $this->schoolInfo();
         $galleries = Gallery::orderBy('tanggal', 'desc')->take(12)->get();
+        $teachers = Teacher::with('user')->get();
         
-        return view('profil', compact('school', 'galleries'));
+        // Mapping foto guru dari public/images/ (gunakan slug-safe names)
+        $teacherPhotos = [
+            'A. Dede Ali, S.Pd' => 'a-dede-ali-s-pd.jpeg',
+        ];
+        
+        // Fallback data jika tidak ada guru di database
+        $defaultTeachers = [
+            (object)['name' => 'A. Dede Ali, S.Pd', 'role' => 'Kepala Yayasan Raudhah Syarifah', 'photo' => $teacherPhotos['A. Dede Ali, S.Pd'] ?? null],
+            (object)['name' => 'Wiwi Suherti, S.Pd', 'role' => 'Kepala Sekolah Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Ade Royani, S.Pd', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Siti Rokayah', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Siti Aminah', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Warnengsih', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Rinda Maryani, S.Pd', 'role' => 'Tenaga Pendidik TK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Mochamad Fazhri Syamsi', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Dinda Aulia Putri', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Kurnia Amelia', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Ananda Jihan Kamilah', 'role' => 'Tenaga Pendidik TK Nuurudzholaam', 'photo' => null],
+        ];
+        
+        // Coba deteksi foto otomatis di public/images berdasarkan nama guru
+        $extensions = ['jpg', 'jpeg', 'png', 'webp'];
+        foreach ($defaultTeachers as $idx => $t) {
+            // jika sudah ada foto ditentukan, cek apakah file ada; jika tidak, coba ekstensi lain
+            if (!empty($t->photo)) {
+                $path = public_path('images/' . $t->photo);
+                if (!file_exists($path)) {
+                    $base = pathinfo($t->photo, PATHINFO_FILENAME);
+                    // try same base with other extensions
+                    foreach ($extensions as $ext) {
+                        $try = public_path("images/{$base}.{$ext}");
+                        if (file_exists($try)) {
+                            $defaultTeachers[$idx]->photo = basename($try);
+                            break;
+                        }
+                    }
+
+                    // try slug/underscore variants of the base
+                    $variants = [Str::slug($base, '-'), Str::slug($base, '_')];
+                    foreach ($variants as $v) {
+                        foreach ($extensions as $ext) {
+                            $try = public_path("images/{$v}.{$ext}");
+                            if (file_exists($try)) {
+                                $defaultTeachers[$idx]->photo = basename($try);
+                                break 2;
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
+
+            // buat kandidat nama file dari nama guru
+            $name = $t->name;
+            $normalizedName = str_replace('.', ' ', $name);
+            $candidates = [];
+            $candidates[] = $name; // asli
+            $candidates[] = preg_replace('/[.,]/', '', $name); // tanpa tanda baca
+            $candidates[] = Str::slug($name, '-'); // slug
+            $candidates[] = Str::slug($name, '_'); // underscore
+            $candidates[] = Str::slug($normalizedName, '-'); // slug setelah titik jadi spasi
+            $candidates[] = Str::slug($normalizedName, '_'); // underscore setelah titik jadi spasi
+
+            $found = false;
+            foreach ($candidates as $cand) {
+                foreach ($extensions as $ext) {
+                    $file = public_path("images/{$cand}.{$ext}");
+                    if (file_exists($file)) {
+                        $defaultTeachers[$idx]->photo = basename($file);
+                        $found = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return view('profil', compact('school', 'galleries', 'teachers', 'defaultTeachers'));
     }
 
     public function kontak()

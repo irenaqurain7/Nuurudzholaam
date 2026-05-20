@@ -56,7 +56,7 @@
                     @if($school && $school->visi)
                         "{{ $school->visi }}"
                     @else
-                        Menjadi pesantren yang unggul, mandiri, disiplin, Berakhlakul karimah dan berwawasan kebangsaan dalam bingkai Ahlusunnah Wal-Jamaah
+                        Terwujudnya pribadi anak yang beriman bertaqwa. berakhlak mulia, kreatif, sehat, cerdas dan memiliki kesiapan fisik maupun mental dalam memasuki pendidikan lebih lanjut.
                     @endif
                 </p>
             </div>
@@ -123,94 +123,65 @@
         <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Tenaga Pendidik</h2>
         <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Pilar utama kesuksesan Sekolah Nuurudzholaam adalah tenaga pendidik yang berdedikasi tinggi.</p>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;">
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">A. Dede Ali, S.Pd</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Kepala Yayasan Raudhah Syarifah</p>
-            </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px;">
+            @if($teachers->count() > 0)
+                @foreach($teachers as $teacher)
+                    <div style="text-align: center;">
+                        <div style="width: 150px; height: 150px; border-radius: 18px; overflow: hidden; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(31, 127, 95, 0.15);">
+                            @if($teacher->user && $teacher->user->profile_photo)
+                                <img src="{{ asset('storage/' . $teacher->user->profile_photo) }}" alt="{{ $teacher->user->name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                            @else
+                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-weight: bold;">{{ $teacher->user->name ?? 'Tenaga Pendidik' }}</h4>
+                        <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">{{ $teacher->specialization ?? 'Tenaga Pendidik Nuurudzholaam' }}</p>
+                    </div>
+                @endforeach
+            @else
+                @foreach($defaultTeachers as $teacher)
+                    <div style="text-align: center;">
+                        <div style="width: 150px; height: 150px; border-radius: 18px; overflow: hidden; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(31, 127, 95, 0.15);">
+                            @if($teacher->photo)
+                                @php
+                                    $photoName = $teacher->photo;
+                                    $candidates = [];
+                                    if (!empty($photoName)) {
+                                        $candidates[] = $photoName;
+                                        $base = pathinfo($photoName, PATHINFO_FILENAME);
+                                        $ext = pathinfo($photoName, PATHINFO_EXTENSION);
+                                        $candidates[] = \Illuminate\Support\Str::slug($base, '-') . '.' . $ext;
+                                        $candidates[] = \Illuminate\Support\Str::slug($base, '_') . '.' . $ext;
+                                        $candidates[] = preg_replace('/[.,]+/', '', $photoName);
+                                    }
+                                    $found = false;
+                                    foreach ($candidates as $cand) {
+                                        if (empty($cand)) continue;
+                                        if (file_exists(public_path('images/' . $cand))) {
+                                            $photoName = $cand;
+                                            $found = true;
+                                            break;
+                                        }
+                                    }
+                                @endphp
+                                <img src="{{ asset('images/' . urlencode($photoName)) }}" alt="{{ $teacher->name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                            @else
+                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-weight: bold;">{{ $teacher->name }}</h4>
+                        <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">{{ $teacher->role }}</p>
+                    </div>
+                @endforeach
+            @endif
 
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Wiwi Suherti, S.Pd</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Kepala Sekolah Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Ade Royani, S.Pd</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Siti Rokayah</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Siti Aminah</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Warnengsih</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SD, SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Rinda Maryani, S.Pd</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik TK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Mochamad Fazhri Syamsi</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Dinda Aulia Putri</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Kurnia Amelia</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik SMP, SMK Nuurudzholaam</p>
-            </div>
-
-            <div style="text-align: center;">
-                <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; box-shadow: 0 8px 20px rgba(31, 127, 95, 0.15);">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 5px; font-weight: bold;">Jihan</h4>
-                <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">Tenaga Pendidik TK Nuurudzholaam</p>
-            </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>
