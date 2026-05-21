@@ -14,7 +14,7 @@
 <!-- Main Content -->
 <div class="section">
     <div class="container">
-        <h2 class="section-title">Kegiatan Sekolah</h2>
+        <h2 class="section-title">Dokumentasi Kegiatan Sekolah</h2>
 
         @if($activities->count() > 0)
         <div class="grid-responsive">
