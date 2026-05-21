@@ -34,11 +34,6 @@
             <strong>{{ $totalGuru ?? 0 }}</strong>
             <small>Akun aktif dan nonaktif</small>
         </article>
-        <article class="stat-card amber">
-            <span class="stat-label">Orang Tua</span>
-            <strong>{{ $totalOrangtua ?? 0 }}</strong>
-            <small>Akun pendamping siswa</small>
-        </article>
     </section>
 
     <section class="users-panel">
@@ -71,48 +66,57 @@
                             <tr>
                                 <td>
                                     <div class="user-cell">
-                                        <div class="user-avatar">
+                                        <div class="user-avatar role-{{ $user->role }}">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
                                         <div>
                                             <strong>{{ $user->name }}</strong>
-                                            <span>{{ $user->phone ?? 'Tidak ada nomor' }}</span>
+                                            <span>{{ $user->phone ?? '—' }}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ $user->email }}</td>
+                                <td><span class="email-cell">{{ $user->email }}</span></td>
                                 <td>
                                     <span class="role-badge role-{{ $user->role }}">
                                         {{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'guru' ? 'Guru' : 'Orang Tua') }}
                                     </span>
                                 </td>
-                                <td>{{ $user->nisn ?? $user->nip ?? '-' }}</td>
+                                <td><span class="nisn-cell">{{ $user->nisn ?? $user->nip ?? '—' }}</span></td>
                                 <td>
                                     <span class="status-badge {{ $user->is_active ? 'active' : 'inactive' }}">
+                                        <i class="fas fa-circle"></i>
                                         {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
                                     </span>
                                 </td>
                                 <td>
                                     <div class="action-group">
-                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="action-btn edit">
-                                            <i class="fas fa-pen"></i>
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="action-btn soft" onclick="return confirm('Reset password user ini?')">
-                                                <i class="fas fa-key"></i>
-                                                Reset
+                                        <div class="dropdown-menu">
+                                            <button class="action-menu-btn" aria-label="Menu tindakan">
+                                                <i class="fas fa-ellipsis-v"></i>
                                             </button>
-                                        </form>
-                                        <form action="{{ route('admin.users.delete', $user->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="action-btn danger" onclick="return confirm('Yakin ingin menghapus user ini?')">
-                                                <i class="fas fa-trash"></i>
-                                                Hapus
-                                            </button>
-                                        </form>
+                                            <div class="dropdown-content">
+                                                <a href="{{ route('admin.users.edit', $user->id) }}" class="dropdown-item edit">
+                                                    <i class="fas fa-pen-to-square"></i>
+                                                    Edit
+                                                </a>
+                                                <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" style="display: contents;">
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item reset" onclick="return confirm('Reset password user ini?')">
+                                                        <i class="fas fa-key"></i>
+                                                        Reset Password
+                                                    </button>
+                                                </form>
+                                                <hr class="dropdown-divider">
+                                                <form action="{{ route('admin.users.delete', $user->id) }}" method="POST" style="display: contents;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="dropdown-item danger" onclick="return confirm('Yakin ingin menghapus user ini?')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -202,6 +206,12 @@
         font-weight: 800;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
         white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .users-create-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
     }
 
     .users-create-btn.compact {
@@ -210,7 +220,7 @@
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 16px;
     }
 
@@ -251,7 +261,9 @@
         justify-content: space-between;
         gap: 16px;
         align-items: flex-start;
-        margin-bottom: 18px;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e2ece8;
     }
 
     .panel-header h2 {
@@ -262,12 +274,12 @@
 
     .panel-meta {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
     }
 
     .panel-meta span {
-        padding: 8px 12px;
+        padding: 8px 14px;
         border-radius: 999px;
         background: #f4f7f5;
         color: #5a7e6b;
@@ -286,24 +298,30 @@
     }
 
     .users-table thead {
-        background: #f4f7f5;
+        background: #f8faf9;
     }
 
     .users-table th {
         padding: 14px 16px;
         text-align: left;
-        font-size: 12px;
+        font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #1c2d25;
-        border-bottom: 1px solid #e2ece8;
+        letter-spacing: 0.1em;
+        color: #5a7e6b;
+        font-weight: 700;
+        border-bottom: 2px solid #e2ece8;
     }
 
     .users-table td {
-        padding: 16px;
-        border-bottom: 1px solid #e2ece8;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f3f2;
         color: #1c2d25;
         vertical-align: middle;
+        height: 56px;
+    }
+
+    .users-table tbody tr {
+        transition: background-color 0.15s ease;
     }
 
     .users-table tbody tr:hover {
@@ -317,40 +335,63 @@
     }
 
     .user-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #2d4438 0%, #486e5a 100%);
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 800;
         flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+
+    .user-avatar.role-siswa {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .user-avatar.role-guru {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .user-avatar.role-orangtua {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
 
     .user-cell strong {
         display: block;
         font-size: 14px;
-        margin-bottom: 2px;
+        font-weight: 600;
+        margin-bottom: 3px;
     }
 
     .user-cell span {
         display: block;
-        color: #6c8b7c;
+        color: #9ca3a0;
         font-size: 12px;
+    }
+
+    .email-cell, .nisn-cell {
+        font-size: 13px;
+        color: #6c8b7c;
     }
 
     .role-badge,
     .status-badge {
         display: inline-flex;
         align-items: center;
+        gap: 6px;
         padding: 6px 12px;
         border-radius: 999px;
         font-size: 12px;
-        font-weight: 800;
+        font-weight: 700;
         white-space: nowrap;
+    }
+
+    .role-badge {
+        text-transform: capitalize;
     }
 
     .role-siswa {
@@ -369,8 +410,13 @@
     }
 
     .status-badge.active {
-        background: #dcfce7;
-        color: #166534;
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.active i {
+        color: #10b981;
+        font-size: 8px;
     }
 
     .status-badge.inactive {
@@ -378,60 +424,126 @@
         color: #991b1b;
     }
 
+    .status-badge.inactive i {
+        color: #ef4444;
+        font-size: 8px;
+    }
+
     .action-col {
-        width: 280px;
+        width: 60px;
+        text-align: center;
     }
 
     .action-group {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        justify-content: center;
     }
 
-    .action-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        border-radius: 12px;
-        border: 1px solid transparent;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: 800;
+    .dropdown-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+    .action-menu-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #e2ece8;
+        background: #f8faf9;
+        color: #5a7e6b;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        padding: 0;
+    }
+
+    .action-menu-btn:hover {
         background: #edf4ef;
         color: #1c2d25;
+        border-color: #d1e8df;
     }
 
-    .action-btn:hover {
-        transform: translateY(-1px);
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: white;
+        min-width: 160px;
+        box-shadow: 0 8px 24px rgba(28, 45, 37, 0.12);
+        border-radius: 12px;
+        border: 1px solid #e2ece8;
+        z-index: 1;
+        overflow: hidden;
     }
 
-    .action-btn.edit {
-        background: #eef2ff;
+    .dropdown-menu:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-item {
+        color: #1c2d25;
+        padding: 10px 14px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        border: none;
+        background: none;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        transition: all 0.15s ease;
+    }
+
+    .dropdown-item:hover {
+        background: #f8faf9;
+        color: #2d4438;
+    }
+
+    .dropdown-item.edit {
         color: #3730a3;
     }
 
-    .action-btn.soft {
-        background: #eff6ff;
+    .dropdown-item.edit:hover {
+        background: #eef2ff;
+    }
+
+    .dropdown-item.reset {
         color: #075985;
     }
 
-    .action-btn.danger {
-        background: #fef2f2;
+    .dropdown-item.reset:hover {
+        background: #eff6ff;
+    }
+
+    .dropdown-item.danger {
         color: #b91c1c;
+    }
+
+    .dropdown-item.danger:hover {
+        background: #fef2f2;
+    }
+
+    .dropdown-divider {
+        border: none;
+        border-top: 1px solid #e2ece8;
+        margin: 4px 0;
     }
 
     .pagination-wrap {
         display: flex;
         justify-content: center;
-        margin-top: 18px;
+        margin-top: 24px;
     }
 
     .empty-state {
         text-align: center;
-        padding: 40px 16px;
+        padding: 50px 16px;
         color: #5a7e6b;
     }
 
@@ -451,10 +563,11 @@
     .empty-state h3 {
         margin: 0 0 8px;
         color: #1c2d25;
+        font-size: 18px;
     }
 
     .empty-state p {
-        margin: 0 0 18px;
+        margin: 0 0 24px;
         color: #6c8b7c;
     }
 
@@ -484,13 +597,17 @@
             grid-template-columns: 1fr;
         }
 
-        .action-group {
-            flex-direction: column;
-            align-items: stretch;
+        .panel-header {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
         }
 
-        .action-btn {
-            justify-content: center;
+        .users-table td {
+            padding: 12px;
+        }
+
+        .action-col {
+            width: 50px;
         }
     }
 </style>

@@ -547,7 +547,6 @@
                 <div class="nav-label">MANAJEMEN AKUN</div>
                 <li><a href="{{ route('admin.users.create') ?? '#' }}" class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"><i class="fas fa-user-plus"></i> Tambah Siswa & Guru</a></li>
                 <li><a href="{{ route('admin.users.index') ?? '#' }}" class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Manajer User</a></li>
-                <li><a href="{{ route('admin.users.username-password') ?? '#' }}" class="{{ request()->routeIs('admin.users.username-password') ? 'active' : '' }}"><i class="fas fa-key"></i> Username & Password</a></li>
 
                 <div class="nav-label">PPDB</div>
                 <li><a href="{{ route('admin.ppdb.index') }}" class="{{ request()->routeIs('admin.ppdb.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Formulir PPDB</a></li>
