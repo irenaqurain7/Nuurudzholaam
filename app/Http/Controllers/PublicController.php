@@ -63,6 +63,19 @@ class PublicController extends Controller
         return view('kegiatan', compact('school', 'activities'));
     }
 
+    public function showActivity($id)
+    {
+        $school = $this->schoolInfo();
+        $activity = Activity::where('visibility', 'publik')->findOrFail($id);
+        $relatedActivities = Activity::where('visibility', 'publik')
+            ->where('id', '!=', $id)
+            ->orderBy('tanggal', 'desc')
+            ->take(3)
+            ->get();
+
+        return view('kegiatan-detail', compact('school', 'activity', 'relatedActivities'));
+    }
+
     public function program()
     {
         $school = $this->schoolInfo();

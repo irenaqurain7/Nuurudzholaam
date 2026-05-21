@@ -32,6 +32,7 @@ Route::get('/', [PublicController::class, 'index'])->name('home');
 Route::get('/ppdb', [PublicController::class, 'ppdb'])->name('ppdb');
 Route::post('/ppdb', [PPDBController::class, 'store'])->name('ppdb.store');
 Route::get('/kegiatan', [PublicController::class, 'kegiatan'])->name('kegiatan');
+Route::get('/kegiatan/{id}', [PublicController::class, 'showActivity'])->name('kegiatan.show');
 Route::get('/program', [PublicController::class, 'program'])->name('program');
 Route::get('/profil', [PublicController::class, 'profil'])->name('profil');
 Route::get('/kontak', [PublicController::class, 'kontak'])->name('kontak');
