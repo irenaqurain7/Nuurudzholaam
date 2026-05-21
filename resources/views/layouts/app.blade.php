@@ -349,7 +349,7 @@
             background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
             color: var(--putih);
             padding: 50px 20px 20px;
-            margin-top: 100px;
+            margin-top: 0; /* removed large gap so sections connect cleanly */
         }
 
         .footer-content {
