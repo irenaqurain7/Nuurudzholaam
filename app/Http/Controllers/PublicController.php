@@ -26,11 +26,11 @@ class PublicController extends Controller
         $activities = Activity::where('visibility', 'publik')->orderBy('tanggal', 'desc')->take(6)->get();
         $programs = Program::all();
         $galleries = Gallery::orderBy('tanggal', 'desc')->take(8)->get();
-        
+
         // PPDB Status
         $today = now();
         $ppdbStatus = 'inactive'; // inactive, coming, open, closed
-        
+
         if ($school && $school->ppdb_active) {
             if ($school->ppdb_start_date && $school->ppdb_end_date) {
                 if ($today < $school->ppdb_start_date) {
@@ -42,7 +42,7 @@ class PublicController extends Controller
                 }
             }
         }
-        
+
         return view('index', compact('school', 'announcements', 'activities', 'programs', 'galleries', 'ppdbStatus'));
     }
 
@@ -51,7 +51,7 @@ class PublicController extends Controller
         $school = $this->schoolInfo();
         $programs = Program::all();
         $announcements = Announcement::where('status', 'aktif')->where('tipe', 'ppdb')->first();
-        
+
         return view('ppdb', compact('school', 'programs', 'announcements'));
     }
 
@@ -59,7 +59,7 @@ class PublicController extends Controller
     {
         $school = $this->schoolInfo();
         $activities = Activity::where('visibility', 'publik')->orderBy('tanggal', 'desc')->paginate(9);
-        
+
         return view('kegiatan', compact('school', 'activities'));
     }
 
@@ -67,7 +67,7 @@ class PublicController extends Controller
     {
         $school = $this->schoolInfo();
         $programs = Program::all();
-        
+
         return view('program', compact('school', 'programs'));
     }
 
@@ -75,28 +75,40 @@ class PublicController extends Controller
     {
         $school = $this->schoolInfo();
         $galleries = Gallery::orderBy('tanggal', 'desc')->take(12)->get();
-        $teachers = Teacher::with('user')->get();
-        
-        // Mapping foto guru dari public/images/ (gunakan slug-safe names)
+        $teachers = Teacher::with('user')->whereHas('user', function ($query) {
+            $query->whereNotNull('profile_photo');
+        })->get();
+
+        // Mapping foto guru dari public/images/
         $teacherPhotos = [
             'A. Dede Ali, S.Pd' => 'a-dede-ali-s-pd.jpeg',
+            'Wiwi Suherti, S.Pd' => 'wiwi-suherti-s-pd.jpeg',
+            'Ade Royani, S.Pd' => 'ade-royani-s-pd.jpeg',
+            'Siti Rokayah' => 'siti-rokayah.jpeg',
+            'Siti Aminah' => 'siti-aminah.jpeg',
+            'Warnengsih' => 'Warnengsih.jpeg',
+            'Rinda Maryani, S.Pd' => 'rinda-maryani-s-pd.jpeg',
+            'Mochamad Fazhri Syamsi' => 'mochamad-fazhri-syamsi.jpeg',
+            'Dinda Aulia Putri' => 'dinda-aulia-putri.jpeg',
+            'Kurnia Amelia' => 'Kurnia Amelia.jpeg',
+            'Ananda Jihan Kamilah' => 'Ananda Jihan Kamilah.jpeg',
         ];
-        
+
         // Fallback data jika tidak ada guru di database
         $defaultTeachers = [
             (object)['name' => 'A. Dede Ali, S.Pd', 'role' => 'Kepala Yayasan Raudhah Syarifah', 'photo' => $teacherPhotos['A. Dede Ali, S.Pd'] ?? null],
-            (object)['name' => 'Wiwi Suherti, S.Pd', 'role' => 'Kepala Sekolah Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Ade Royani, S.Pd', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Siti Rokayah', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Siti Aminah', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Warnengsih', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Rinda Maryani, S.Pd', 'role' => 'Tenaga Pendidik TK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Mochamad Fazhri Syamsi', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Dinda Aulia Putri', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Kurnia Amelia', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => null],
-            (object)['name' => 'Ananda Jihan Kamilah', 'role' => 'Tenaga Pendidik TK Nuurudzholaam', 'photo' => null],
+            (object)['name' => 'Wiwi Suherti, S.Pd', 'role' => 'Kepala Sekolah Nuurudzholaam', 'photo' => $teacherPhotos['Wiwi Suherti, S.Pd'] ?? null],
+            (object)['name' => 'Ade Royani, S.Pd', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Ade Royani, S.Pd'] ?? null],
+            (object)['name' => 'Siti Rokayah', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Siti Rokayah'] ?? null],
+            (object)['name' => 'Siti Aminah', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Siti Aminah'] ?? null],
+            (object)['name' => 'Warnengsih', 'role' => 'Tenaga Pendidik SD, SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Warnengsih'] ?? null],
+            (object)['name' => 'Rinda Maryani, S.Pd', 'role' => 'Tenaga Pendidik TK Nuurudzholaam', 'photo' => $teacherPhotos['Rinda Maryani, S.Pd'] ?? null],
+            (object)['name' => 'Mochamad Fazhri Syamsi', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Mochamad Fazhri Syamsi'] ?? null],
+            (object)['name' => 'Dinda Aulia Putri', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Dinda Aulia Putri'] ?? null],
+            (object)['name' => 'Kurnia Amelia', 'role' => 'Tenaga Pendidik SMP, SMK Nuurudzholaam', 'photo' => $teacherPhotos['Kurnia Amelia'] ?? null],
+            (object)['name' => 'Ananda Jihan Kamilah', 'role' => 'Tenaga Pendidik TK Nuurudzholaam', 'photo' => $teacherPhotos['Ananda Jihan Kamilah'] ?? null],
         ];
-        
+
         // Coba deteksi foto otomatis di public/images berdasarkan nama guru
         $extensions = ['jpg', 'jpeg', 'png', 'webp'];
         foreach ($defaultTeachers as $idx => $t) {
@@ -159,7 +171,7 @@ class PublicController extends Controller
     public function kontak()
     {
         $school = $this->schoolInfo();
-        
+
         return view('kontak', compact('school'));
     }
 
@@ -167,7 +179,7 @@ class PublicController extends Controller
     {
         $school = $this->schoolInfo();
         $faqs = FAQ::orderBy('urutan')->get();
-        
+
         return view('faq', compact('school', 'faqs'));
     }
 
@@ -178,14 +190,14 @@ class PublicController extends Controller
             ->where('tipe', 'umum')
             ->orderBy('tanggal_mulai', 'desc')
             ->paginate(10);
-        
+
         return view('informasi', compact('school', 'berita'));
     }
 
     public function getInformasi($tipe)
     {
         $validTypes = ['umum', 'ppdb', 'libur', 'penting'];
-        
+
         if (!in_array($tipe, $validTypes)) {
             abort(404);
         }
@@ -194,7 +206,7 @@ class PublicController extends Controller
             ->where('tipe', $tipe)
             ->orderBy('tanggal_mulai', 'desc')
             ->paginate(10);
-        
+
         return view('informasi', [
             'school' => $this->schoolInfo(),
             'berita' => $announcements,
@@ -213,7 +225,7 @@ class PublicController extends Controller
 
         // TODO: Simpan pesan kontak ke database atau kirim email
         // Untuk sekarang, hanya redirect dengan pesan sukses
-        
+
         return redirect()->back()->with('success', 'Pesan Anda telah dikirim. Terima kasih!');
     }
 }
