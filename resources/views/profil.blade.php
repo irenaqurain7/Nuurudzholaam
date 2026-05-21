@@ -124,6 +124,7 @@
         <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Pilar utama kesuksesan Sekolah Nuurudzholaam adalah tenaga pendidik yang berdedikasi tinggi.</p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px;">
+            {{-- Display teachers from database with profile photos --}}
             @if($teachers->count() > 0)
                 @foreach($teachers as $teacher)
                     <div style="text-align: center;">
@@ -140,44 +141,24 @@
                         <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">{{ $teacher->specialization ?? 'Tenaga Pendidik Nuurudzholaam' }}</p>
                     </div>
                 @endforeach
-            @else
-                @foreach($defaultTeachers as $teacher)
-                    <div style="text-align: center;">
-                        <div style="width: 150px; height: 150px; border-radius: 18px; overflow: hidden; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(31, 127, 95, 0.15);">
-                            @if($teacher->photo)
-                                @php
-                                    $photoName = $teacher->photo;
-                                    $candidates = [];
-                                    if (!empty($photoName)) {
-                                        $candidates[] = $photoName;
-                                        $base = pathinfo($photoName, PATHINFO_FILENAME);
-                                        $ext = pathinfo($photoName, PATHINFO_EXTENSION);
-                                        $candidates[] = \Illuminate\Support\Str::slug($base, '-') . '.' . $ext;
-                                        $candidates[] = \Illuminate\Support\Str::slug($base, '_') . '.' . $ext;
-                                        $candidates[] = preg_replace('/[.,]+/', '', $photoName);
-                                    }
-                                    $found = false;
-                                    foreach ($candidates as $cand) {
-                                        if (empty($cand)) continue;
-                                        if (file_exists(public_path('images/' . $cand))) {
-                                            $photoName = $cand;
-                                            $found = true;
-                                            break;
-                                        }
-                                    }
-                                @endphp
-                                <img src="{{ asset('images/' . urlencode($photoName)) }}" alt="{{ $teacher->name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                            @else
-                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                            @endif
-                        </div>
-                        <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-weight: bold;">{{ $teacher->name }}</h4>
-                        <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">{{ $teacher->role }}</p>
-                    </div>
-                @endforeach
             @endif
+            
+            {{-- Display default teachers from public/images/ --}}
+            @foreach($defaultTeachers as $teacher)
+                <div style="text-align: center;">
+                    <div style="width: 150px; height: 150px; border-radius: 18px; overflow: hidden; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(31, 127, 95, 0.15);">
+                        @if($teacher->photo && file_exists(public_path('images/' . $teacher->photo)))
+                            <img src="{{ asset('images/' . $teacher->photo) }}" alt="{{ $teacher->name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                        @else
+                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        @endif
+                    </div>
+                    <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-weight: bold;">{{ $teacher->name }}</h4>
+                    <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">{{ $teacher->role }}</p>
+                </div>
+            @endforeach
 
         </div>
     </div>

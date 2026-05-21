@@ -90,8 +90,8 @@ class PublicController extends Controller
             'Rinda Maryani, S.Pd' => 'rinda-maryani-s-pd.jpeg',
             'Mochamad Fazhri Syamsi' => 'mochamad-fazhri-syamsi.jpeg',
             'Dinda Aulia Putri' => 'dinda-aulia-putri.jpeg',
-            'Kurnia Amelia' => 'Kurnia Amelia.jpeg',
-            'Ananda Jihan Kamilah' => 'Ananda Jihan Kamilah.jpeg',
+            'Kurnia Amelia' => 'kurnia-amelia.jpeg',
+            'Ananda Jihan Kamilah' => 'ananda-jihan-kamilah.jpeg',
         ];
 
         // Fallback data jika tidak ada guru di database
