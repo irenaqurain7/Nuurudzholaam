@@ -461,5 +461,65 @@
             flex-direction: column;
         }
     }
+    /* --- UI tweaks: improve spacing, cards, table header and empty state --- */
+    .management-toolbar {
+        background: var(--putih);
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(31,127,95,0.04);
+        align-items: center;
+    }
+
+    .search-input {
+        border-radius: 10px;
+    }
+
+    .btn-export {
+        border-radius: 10px;
+        padding: 10px 16px;
+    }
+
+    .mini-stat {
+        min-height: 86px;
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .mini-stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 10px;
+        font-size: 18px;
+    }
+
+    .data-table-container {
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(31,127,95,0.06);
+    }
+
+    /* round table header corners */
+    .data-table thead th:first-child { border-top-left-radius: 12px; }
+    .data-table thead th:last-child { border-top-right-radius: 12px; }
+
+    .data-table tbody tr td {
+        vertical-align: middle;
+    }
+
+    /* empty state larger spacing and muted icon */
+    .data-table tbody tr td.text-center i {
+        font-size: 56px;
+        opacity: 0.18;
+        margin-bottom: 8px;
+    }
+
+    .data-table tbody tr td.text-center p {
+        margin: 0;
+        color: var(--text-light);
+        font-size: 15px;
+    }
+
+    .pagination-wrapper {
+        margin-top: 6px;
+    }
 </style>
 @endsection
