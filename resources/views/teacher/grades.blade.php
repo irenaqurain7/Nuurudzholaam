@@ -98,6 +98,16 @@
     .table tbody td { vertical-align:middle; }
     .table a { text-decoration:none; }
 
+    /* Students list specific tweaks */
+    .custom-grades-table th, .custom-grades-table td { padding: 0.9rem 1.1rem; }
+    .custom-grades-table thead th { background: #eef6f2; color: var(--hijau-islam); font-weight:600; }
+    .custom-grades-table tbody tr:hover { background: rgba(45,68,56,0.03); }
+    .col-nis { width: 110px; }
+    .col-class { width: 120px; }
+    .col-actions { width: 220px; }
+    .action-buttons { display:flex; gap:0.5rem; align-items:center; }
+    .action-buttons .btn { padding: .35rem .6rem; font-size:.82rem; }
+
     /* Button theme overrides to match teacher pages */
     .btn-success {
         background-color:var(--hijau-islam);
@@ -261,13 +271,13 @@
         <div class="card-body">
             @if($studentsInSelectedClass->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
+                    <table class="table custom-grades-table table-striped table-hover align-middle">
                         <thead>
                             <tr>
-                                <th>Nama Siswa</th>
-                                <th>NIS</th>
-                                <th>Kelas</th>
-                                <th>Aksi</th>
+                                <th class="col-name">Nama Siswa</th>
+                                <th class="col-nis">NIS</th>
+                                <th class="col-class">Kelas</th>
+                                <th class="col-actions">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -277,13 +287,15 @@
                                     <td class="fw-semibold">{{ $student->user->name ?? '-' }}</td>
                                     <td>{{ $studentNis }}</td>
                                     <td>Kelas {{ $student->class }}</td>
-                                    <td>
-                                        <a href="{{ route('teacher.grades', ['class' => $student->class, 'student_id' => $student->id]) }}" class="btn btn-sm btn-outline-primary">
-                                            Lihat Nilai
-                                        </a>
-                                        <a href="{{ route('teacher.grades.edit') . '?student_id=' . $student->id }}" class="btn btn-sm btn-outline-success">
-                                            Tambah Nilai
-                                        </a>
+                                    <td class="col-actions">
+                                        <div class="action-buttons">
+                                            <a href="{{ route('teacher.grades', ['class' => $student->class, 'student_id' => $student->id]) }}" class="btn btn-sm btn-primary" title="Lihat Nilai">
+                                                <i class="fas fa-eye me-1"></i> Lihat
+                                            </a>
+                                            <a href="{{ route('teacher.grades.edit') . '?student_id=' . $student->id }}" class="btn btn-sm btn-outline-success" title="Tambah Nilai">
+                                                <i class="fas fa-plus me-1"></i> Tambah
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
