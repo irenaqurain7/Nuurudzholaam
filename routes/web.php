@@ -211,3 +211,39 @@ Route::middleware(['auth', 'role:orangtua'])->prefix('parent')->name('parent.')-
     Route::get('/change-password', [ParentDashboardController::class, 'showChangePassword'])->name('change-password');
     Route::put('/change-password', [ParentDashboardController::class, 'updatePassword'])->name('change-password.update');
 });
+
+/*
+ | Temporary preview route for visual QA of teacher grades page.
+ | Visible only in local development. Remove before production.
+ */
+if (app()->environment('local')) {
+    Route::get('/dev/preview-grades', function () {
+        // Attempt to login as the first teacher user so layout can access auth()->user()
+        $firstTeacherUser = \App\Models\User::where('role', 'guru')->first();
+        if ($firstTeacherUser) {
+            try {
+                \Illuminate\Support\Facades\Auth::loginUsingId($firstTeacherUser->id);
+            } catch (\Throwable $e) {
+                // Fallback to setUser if loginUsingId fails in this environment
+                \Illuminate\Support\Facades\Auth::setUser($firstTeacherUser);
+            }
+            // Also ensure the auth user is set on the container for rendering
+            \Illuminate\Support\Facades\Auth::setUser($firstTeacherUser);
+        }
+
+        $students = \App\Models\Student::with('user')->get();
+        $selectedClass = '1A';
+        $selectedStudentObj = $students->where('class', $selectedClass)->first();
+        $selectedStudent = $selectedStudentObj ? $selectedStudentObj->id : null;
+        $grades = $selectedStudent ? \App\Models\Grade::where('student_id', $selectedStudent)->get() : collect();
+        $classes = ['1A','2A','3A','4A','5A','6A'];
+
+        return view('teacher.grades', [
+            'students' => $students,
+            'grades' => $grades,
+            'classes' => $classes,
+            'selectedClass' => $selectedClass,
+            'selectedStudent' => $selectedStudent,
+        ]);
+    });
+}

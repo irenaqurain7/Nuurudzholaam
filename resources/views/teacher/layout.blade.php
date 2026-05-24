@@ -256,15 +256,15 @@
     <!-- Sidebar -->
     <aside class="teacher-sidebar">
         <div class="teacher-sidebar-header">
-            @if(auth()->user()->profile_photo)
-                <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="{{ auth()->user()->name }}" class="teacher-sidebar-avatar">
-            @else
-                <div class="teacher-sidebar-avatar d-inline-flex align-items-center justify-content-center" style="background: var(--hijau-light);">
-                    <i class="fas fa-user" style="color: var(--putih); font-size: 2rem;"></i>
-                </div>
-            @endif
-            <h5>{{ auth()->user()->name }}</h5>
-            <small>{{ auth()->user()->teacher->specialization ?? 'Guru' }}</small>
+                @if(optional(auth()->user())->profile_photo)
+                    <img src="{{ asset('storage/' . optional(auth()->user())->profile_photo) }}" alt="{{ optional(auth()->user())->name }}" class="teacher-sidebar-avatar">
+                @else
+                    <div class="teacher-sidebar-avatar d-inline-flex align-items-center justify-content-center" style="background: var(--hijau-light);">
+                        <i class="fas fa-user" style="color: var(--putih); font-size: 2rem;"></i>
+                    </div>
+                @endif
+                <h5>{{ optional(auth()->user())->name ?? 'Guru' }}</h5>
+                <small>{{ optional(optional(auth()->user())->teacher)->specialization ?? 'Guru' }}</small>
         </div>
 
         <ul class="teacher-sidebar-menu">

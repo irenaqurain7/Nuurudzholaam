@@ -125,21 +125,32 @@ class TeacherDashboardController extends Controller
         }
 
         $grades = $query->get();
+
+        // Get students taught by this teacher
         $students = Student::whereHas('grades', function ($q) use ($teacher) {
             $q->where('teacher_id', $teacher->id);
         })->with('user')->get();
 
+        // Derive class list from students and include default classes 1..6
+        $studentClasses = $students->pluck('class')->unique()->filter()->values()->toArray();
+        $defaultClasses = ['1A','2A','3A','4A','5A','6A'];
+
+        // Merge preserving defaults order, then append any additional classes
+        $classes = collect($defaultClasses)->merge(array_values(array_diff($studentClasses, $defaultClasses)))->filter()->values();
+
         return view('teacher.grades', [
             'grades' => $grades,
             'students' => $students,
+            'classes' => $classes,
             'selectedStudent' => $request->student_id,
+            'selectedClass' => $request->class ?? null,
         ]);
     }
 
     /**
      * Show form to add/edit grade
      */
-    public function editGrade($id = null)
+    public function editGrade(Request $request, $id = null)
     {
         $user = Auth::user();
         $teacher = $user->teacher;
@@ -156,9 +167,13 @@ class TeacherDashboardController extends Controller
             $q->where('teacher_id', $teacher->id);
         })->with('user')->get();
 
+        // Allow preselecting a student via query param ?student_id=..
+        $selectedStudentId = $request->query('student_id');
+
         return view('teacher.edit-grade', [
             'grade' => $grade,
             'students' => $students,
+            'selectedStudentId' => $selectedStudentId,
         ]);
     }
 

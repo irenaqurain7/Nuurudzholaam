@@ -25,7 +25,7 @@
                         <select class="form-select form-select-lg @error('student_id') is-invalid @enderror" id="student_id" name="student_id" required>
                             <option value="">-- Pilih Siswa --</option>
                             @foreach($students as $student)
-                                <option value="{{ $student->id }}" @if(($grade->student_id ?? null) == $student->id) selected @endif>
+                                <option value="{{ $student->id }}" @if((($grade->student_id ?? null) == $student->id) || (isset($selectedStudentId) && $selectedStudentId == $student->id)) selected @endif>
                                     {{ $student->user->name }} - {{ $student->class }} (NISN: {{ $student->nisn }})
                                 </option>
                             @endforeach

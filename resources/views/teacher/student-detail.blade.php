@@ -53,7 +53,7 @@
         <div class="card mb-4">
             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Nilai Siswa</h5>
-                <a href="{{ route('teacher.grades.edit', '?student_id=' . $student->id) }}" class="btn btn-sm btn-light">
+                <a href="{{ route('teacher.grades.edit') . '?student_id=' . $student->id }}" class="btn btn-sm btn-light">
                     <i class="fas fa-plus"></i> Tambah Nilai
                 </a>
             </div>
