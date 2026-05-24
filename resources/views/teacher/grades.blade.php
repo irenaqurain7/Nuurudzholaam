@@ -29,6 +29,16 @@
     /* Header */
     .grades-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.5rem; }
     .grades-header h1 { margin:0; font-size:1.75rem; font-weight:700; color:var(--hijau-islam); }
+    /* Tidy table and class cards for cleaner layout */
+    .classes-grid { gap: 1.1rem; }
+    .class-card { border-radius: 10px; padding: .9rem 1rem; transition: transform .08s ease; }
+    .class-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(2,6,23,0.06); }
+    .custom-grades-table th, .custom-grades-table td { padding: .95rem 1.2rem; vertical-align: middle; }
+    .custom-grades-table tbody tr:hover { background: #fbfbfb; }
+    .table-action-group { display:flex; gap:.5rem; align-items:center; }
+    .table-action-group .btn { padding:.45rem .7rem; border-radius:8px; }
+    .student-summary { gap:1rem; align-items:center; }
+    @media (max-width: 767px) { .class-card { padding:.7rem; } }
 
     /* Class grid */
     .class-grid { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:.75rem; margin-bottom:1.5rem; }
