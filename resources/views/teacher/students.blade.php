@@ -16,53 +16,58 @@
         </div>
     </div>
 
-    @foreach($studentsByClass as $className => $classStudents)
-        <div class="card mb-4 border-0 shadow-sm class-group-card">
-            <div class="card-header bg-light border-0 class-group-header">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <h5 class="mb-0">
-                        <i class="fas fa-users me-1"></i>Daftar Siswa Kelas {{ $className }}
-                    </h5>
-                    <span class="badge bg-success-subtle text-success-emphasis">{{ $classStudents->count() }} siswa</span>
-                </div>
+    <div class="card mb-4 border-0 shadow-sm class-group-card">
+        <div class="card-header bg-light border-0 class-group-header">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="fas fa-users me-1"></i>Daftar Siswa per Kelas
+                </h5>
+                <span class="badge bg-success-subtle text-success-emphasis">{{ $students->count() }} siswa</span>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive class-student-scroll">
-                    <table class="table table-hover align-middle mb-0 class-student-table">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nama Siswa</th>
-                                <th>NISN</th>
-                                <th>Kelas</th>
-                                <th class="text-end">Aksi</th>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive class-student-scroll">
+                <table class="table table-hover align-middle mb-0 class-student-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="col-class-name">Kelas</th>
+                            <th>Nama Siswa</th>
+                            <th class="col-nisn">NISN</th>
+                            <th class="text-end col-actions">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($studentsByClass as $className => $classStudents)
+                            <tr class="class-divider-row">
+                                <td colspan="4">
+                                    <div class="class-divider">
+                                        <span>Kelas {{ $className }}</span>
+                                        <strong>{{ $classStudents->count() }} siswa</strong>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
                             @foreach($classStudents as $student)
                                 <tr>
+                                    <td class="text-muted fw-semibold">{{ $student->class }}</td>
                                     <td>
                                         <div class="fw-semibold">{{ $student->user->name }}</div>
                                     </td>
                                     <td>{{ $student->nisn }}</td>
-                                    <td>{{ $student->class }}</td>
                                     <td class="text-end">
                                         <div class="d-inline-flex flex-wrap gap-2 justify-content-end">
                                             <a href="{{ route('teacher.students.show', $student->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fas fa-eye me-1"></i>Lihat Detail
                                             </a>
-                                            <a href="{{ route('teacher.grades', ['student_id' => $student->id]) }}" class="btn btn-sm btn-outline-success">
-                                                <i class="fas fa-star me-1"></i>Kelola Nilai
-                                            </a>
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
-    @endforeach
+    </div>
 
     <style>
         .hover-shadow:hover {
@@ -79,14 +84,14 @@
         }
 
         .class-student-scroll {
-            max-height: clamp(280px, 45vh, 420px);
+            max-height: clamp(320px, 60vh, 620px);
             overflow: auto;
             border-top: 1px solid #e9ecef;
         }
 
         .class-student-table {
             width: 100%;
-            min-width: 860px;
+            min-width: 900px;
             table-layout: fixed;
         }
 
@@ -104,19 +109,45 @@
             box-shadow: inset 0 -1px 0 #e9ecef;
         }
 
+        .class-divider-row td {
+            padding: 0;
+            border: 0;
+        }
+
+        .class-divider {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: .8rem 1.25rem;
+            background: linear-gradient(90deg, rgba(45, 68, 56, 0.08), rgba(45, 68, 56, 0.03));
+            color: #21312a;
+            font-weight: 700;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .class-divider strong {
+            color: var(--hijau-islam);
+        }
+
+        .col-class-name {
+            width: 120px;
+        }
+
         .class-student-table td:nth-child(1),
         .class-student-table th:nth-child(1) {
-            min-width: 220px;
+            min-width: 120px;
         }
 
         .class-student-table td:nth-child(2),
         .class-student-table th:nth-child(2) {
-            min-width: 120px;
+            min-width: 260px;
         }
 
         .class-student-table td:nth-child(3),
         .class-student-table th:nth-child(3) {
-            min-width: 110px;
+            min-width: 130px;
         }
 
         .class-student-table td:nth-child(4),

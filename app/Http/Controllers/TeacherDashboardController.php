@@ -75,7 +75,15 @@ class TeacherDashboardController extends Controller
             $query->where('teacher_id', $teacher->id);
         })->with('user')->get();
 
-        $studentsByClass = $students->sortBy('class')->groupBy('class');
+        $classOrder = ['1A', '2A', '3A', '4A', '5A', '6A'];
+        $studentsByClass = $students
+            ->sortBy(function ($student) use ($classOrder) {
+                $classIndex = array_search($student->class, $classOrder, true);
+                $classIndex = $classIndex === false ? PHP_INT_MAX : $classIndex;
+
+                return [$classIndex, strtolower($student->user->name ?? ''), $student->nisn ?? ''];
+            })
+            ->groupBy('class');
 
         return view('teacher.students', [
             'students' => $students,
@@ -209,6 +217,10 @@ class TeacherDashboardController extends Controller
             $validated['teacher_id'] = $teacher->id;
             Grade::create($validated);
             $message = 'Nilai berhasil ditambahkan';
+        }
+
+        if ($request->boolean('from_student_detail')) {
+            return redirect()->route('teacher.students.show', $validated['student_id'])->with('success', $message);
         }
 
         return redirect()->route('teacher.grades')->with('success', $message);
