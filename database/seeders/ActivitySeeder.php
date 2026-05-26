@@ -31,7 +31,7 @@ class ActivitySeeder extends Seeder
             ],
             [
                 'judul' => 'Memperingati Hari Guru',
-                'deskripsi' => 'Siswa-siswi Nuurudzholaam memberikan apresiasi kepada para pendidik melalui berbagai acara spesial termasuk pertunjukan seni, pemberian hadiah, dan upacara peringatan. Acara ini menjadi momentum untuk menghargai dedikasi dan pengorbanan guru-guru dalam mendidik generasi muda.',
+                'deskripsi' => 'Dalam rangka memperingati Hari Guru Nasional, sekolah Nuurudzholam mengadakan berbagai kegiatan sebagai bentuk penghormatan dan apresiasi kepada para guru yang telah mendidik dengan penuh dedikasi. Kegiatan diisi dengan penampilan dari siswa, pemberian ucapan dan hadiah sederhana, serta acara kebersamaan antara guru dan siswa. Peringatan ini menjadi momen untuk menumbuhkan rasa hormat, terima kasih, dan semangat belajar dalam lingkungan sekolah.',
                 'tanggal' => now()->setMonth(11)->setDay(25),
                 'kategori' => 'kegiatan',
                 'visibility' => 'publik',

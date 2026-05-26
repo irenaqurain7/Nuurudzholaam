@@ -15,7 +15,7 @@ class UpdateActivitySeeder extends Seeder
         Activity::where('judul', 'Pentas Seni (Konser Musik dan Tari)')
             ->update([
                 'judul' => 'Pentas Seni (Perpisahan Sekolah)',
-                'deskripsi' => 'Pentas Seni Perpisahan Sekolah adalah acara spesial yang menampilkan performa seni siswa kelas akhir sebagai bentuk perayaan dan kenang-kenangan. Acara ini menampilkan musik, tari, drama, dan seni pertunjukan lainnya dari siswa yang akan lulus. Momen ini menjadi kesempatan emas bagi mereka untuk meninggalkan warisan seni yang indah dan berkesan bagi adik-adik kelas mereka.',
+                'deskripsi' => 'Pentas Seni Perpisahan Sekolah merupakan kegiatan tahunan yang diselenggarakan sebagai bentuk perayaan sekaligus momen kebersamaan seluruh keluarga besar Nuurudzholam. Acara ini menampilkan berbagai kreativitas siswa seperti tari, musik, drama, pembacaan puisi, dan penampilan seni lainnya. Selain menjadi wadah untuk menyalurkan bakat, kegiatan ini juga menjadi momen perpisahan yang penuh kesan bagi siswa kelas akhir sebelum melanjutkan ke jenjang pendidikan berikutnya.',
             ]);
     }
 }
