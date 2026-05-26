@@ -75,8 +75,11 @@ class TeacherDashboardController extends Controller
             $query->where('teacher_id', $teacher->id);
         })->with('user')->get();
 
+        $studentsByClass = $students->sortBy('class')->groupBy('class');
+
         return view('teacher.students', [
             'students' => $students,
+            'studentsByClass' => $studentsByClass,
         ]);
     }
 
