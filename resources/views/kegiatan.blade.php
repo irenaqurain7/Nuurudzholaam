@@ -3,16 +3,8 @@
 @section('title', 'Kegiatan dan Dokumentasi')
 
 @section('content')
-<!-- Hero Section -->
-<div class="hero">
-    <div class="container">
-        <h1>Kegiatan dan Dokumentasi</h1>
-        <p>Ikuti perkembangan dan kegiatan menarik di sekolah kami</p>
-    </div>
-</div>
-
 <!-- Main Content -->
-<div class="section">
+<div class="section" style="padding-top: 20px;">
     <div class="container">
         <h2 class="section-title">Dokumentasi Kegiatan Sekolah</h2>
 
