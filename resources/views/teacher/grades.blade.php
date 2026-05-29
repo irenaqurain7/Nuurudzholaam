@@ -138,21 +138,126 @@
     /* Small action buttons spacing */
     .table .btn { padding:.35rem .5rem; font-size:.82rem; }
 
+    /* Header buttons styling */
+    .btn-header-group { display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; }
+    .btn-header-group .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.65rem 1.3rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(45, 68, 56, 0.2);
+        border: none;
+    }
+    .btn-header-group .btn-success {
+        background: linear-gradient(135deg, #2D4438 0%, #163022 100%);
+        color: white;
+    }
+    .btn-header-group .btn-success:hover:not(:disabled) {
+        background: linear-gradient(135deg, #163022 0%, #0f1f18 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(45, 68, 56, 0.3);
+    }
+    .btn-header-group .btn-success:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .btn-header-group .btn-dark {
+        background: linear-gradient(135deg, #2D4438 0%, #163022 100%);
+        color: white;
+    }
+    .btn-header-group .btn-dark:hover {
+        background: linear-gradient(135deg, #163022 0%, #0f1f18 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(45, 68, 56, 0.3);
+    }
+    .btn-header-group .dropdown-toggle::after {
+        margin-left: 0.4rem;
+    }
+
+    /* Dropdown menu styling */
+    .btn-header-group .dropdown-menu {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+        display: none !important;
+    }
+    .btn-header-group .dropdown-menu.show {
+        display: block !important;
+    }
+    .btn-header-group .dropdown-item {
+        padding: 0.7rem 1.2rem;
+        font-weight: 500;
+        color: #2D4438;
+        transition: all 0.2s ease;
+    }
+    .btn-header-group .dropdown-item:hover {
+        background: rgba(45, 68, 56, 0.08);
+        color: #163022;
+    }
+    .btn-header-group .dropdown-item i {
+        margin-right: 0.6rem;
+        width: 14px;
+        color: #2D4438;
+    }
+
     @media (max-width: 1199px) { .class-grid { grid-template-columns:repeat(3, minmax(0,1fr)); } }
     @media (max-width: 768px) { .class-grid { grid-template-columns:repeat(2, minmax(0,1fr)); } }
-    @media (max-width: 576px) { .grades-header { flex-direction:column; align-items:flex-start; } }
+    @media (max-width: 576px) { 
+        .grades-header { flex-direction:column; align-items:flex-start; }
+        .btn-header-group { width: 100%; }
+        .btn-header-group .btn { flex: 1; }
+    }
 </style>
 
 <div class="grades-header">
     <h1 class="h2">Kelola Nilai Siswa</h1>
-    <a
-        href="{{ $hasSelectedStudent ? route('teacher.grades.edit') . '?student_id=' . $selectedStudent : '#' }}"
-        class="btn btn-success {{ $hasSelectedStudent ? '' : 'disabled' }}"
-        id="add-grade-btn"
-        {{ $hasSelectedStudent ? '' : 'aria-disabled=true' }}
-    >
-        <i class="fas fa-plus me-2"></i> Tambah Nilai
-    </a>
+    <div class="btn-header-group">
+        <button
+            class="btn btn-success"
+            id="add-grade-ajax-btn"
+            {{ !$hasSelectedStudent ? 'disabled' : '' }}
+            data-bs-toggle="modal"
+            data-bs-target="#addGradeModal"
+            title="Tambah nilai dengan form cepat"
+        >
+            <i class="fas fa-plus me-2"></i> Tambah Nilai
+        </button>
+        <button
+            class="btn btn-dark"
+            id="import-grades-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#importGradesModal"
+            title="Import nilai dari file CSV/Excel"
+        >
+            <i class="fas fa-file-import me-2"></i> Import
+        </button>
+        <div class="dropdown">
+            <button
+                class="btn btn-dark dropdown-toggle"
+                type="button"
+                id="exportDropdownBtn"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Download laporan nilai"
+            >
+                <i class="fas fa-file-export me-2"></i> Export
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdownBtn">
+                <li>
+                    <a class="dropdown-item" href="{{ route('teacher.grades.export') }}">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('teacher.grades.export-excel') }}">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <div class="class-grid">
@@ -328,4 +433,206 @@
 @endif
 
 <!-- Filter removed: no client-side JS required -->
+
+<!-- MODAL: Tambah Nilai dengan AJAX -->
+<div class="modal fade" id="addGradeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white" style="background: linear-gradient(135deg, #2D4438 0%, #163022 100%) !important;">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Tambah Nilai Cepat</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addGradeForm">
+                <div class="modal-body">
+                    <input type="hidden" id="studentIdField" name="student_id" value="{{ $selectedStudent ?? '' }}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Siswa</label>
+                        <div class="form-text text-dark">{{ $selectedStudentObj->user->name ?? '-' }}</div>
+                        <div class="form-text text-muted small">{{ $selectedStudentObj->nisn ?? '-' }} | Kelas {{ $selectedStudentObj->class ?? '-' }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subjectField" class="form-label fw-bold">Mata Pelajaran <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="subjectField" name="subject" placeholder="Contoh: Matematika" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gradeField" class="form-label fw-bold">Nilai (0-100) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="gradeField" name="grade" min="0" max="100" step="0.01" placeholder="85" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notesField" class="form-label fw-bold">Keterangan</label>
+                        <textarea class="form-control" id="notesField" name="notes" rows="2" placeholder="Opsional"></textarea>
+                    </div>
+
+                    <div id="formMessage" class="alert d-none" role="alert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success" style="background: linear-gradient(135deg, #2D4438 0%, #163022 100%) !important;">
+                        <i class="fas fa-save me-2"></i>Simpan Nilai
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Import Nilai dari File -->
+<div class="modal fade" id="importGradesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white" style="background: linear-gradient(135deg, #2D4438 0%, #163022 100%) !important;">
+                <h5 class="modal-title"><i class="fas fa-file-import me-2"></i>Import Nilai (CSV/Excel)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="importGradesForm">
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        <strong>Format File CSV:</strong><br>
+                        <small>NISN | Mata Pelajaran | Nilai | Keterangan</small><br>
+                        <small class="text-muted">Contoh: 1234567890 | Matematika | 85.5 | Bagus</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label fw-bold">Pilih File <span class="text-danger">*</span></label>
+                        <input 
+                            type="file" 
+                            class="form-control" 
+                            id="fileInput" 
+                            name="file" 
+                            accept=".csv,.xlsx,.txt"
+                            required
+                        >
+                        <small class="form-text text-muted">Max 2MB. Format: CSV, TXT, XLSX</small>
+                    </div>
+
+                    <div id="importMessage" class="alert d-none" role="alert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success" id="importSubmitBtn" style="background: linear-gradient(135deg, #2D4438 0%, #163022 100%) !important;">
+                        <i class="fas fa-upload me-2"></i>Upload & Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT: AJAX Form & File Upload -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ==================== AJAX FORM TAMBAH NILAI ====================
+    const addGradeForm = document.getElementById('addGradeForm');
+    const formMessage = document.getElementById('formMessage');
+
+    if (addGradeForm) {
+        addGradeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Menyimpan...';
+
+            try {
+                const response = await fetch('{{ route("teacher.grades.ajax.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    formMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + data.message;
+                    formMessage.className = 'alert alert-success';
+                    formMessage.classList.remove('d-none');
+
+                    addGradeForm.reset();
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    formMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + data.message;
+                    formMessage.className = 'alert alert-danger';
+                    formMessage.classList.remove('d-none');
+                }
+            } catch (error) {
+                formMessage.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Terjadi kesalahan: ' + error.message;
+                formMessage.className = 'alert alert-danger';
+                formMessage.classList.remove('d-none');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Simpan Nilai';
+            }
+        });
+    }
+
+    // ==================== FILE IMPORT ====================
+    const importGradesForm = document.getElementById('importGradesForm');
+    const importMessage = document.getElementById('importMessage');
+    const importSubmitBtn = document.getElementById('importSubmitBtn');
+
+    if (importGradesForm) {
+        importGradesForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                importMessage.innerHTML = 'Pilih file terlebih dahulu';
+                importMessage.className = 'alert alert-warning';
+                importMessage.classList.remove('d-none');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            importSubmitBtn.disabled = true;
+            importSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+            try {
+                const response = await fetch('{{ route("teacher.grades.import") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    importMessage.innerHTML = `
+                        <strong>✅ ${data.message}</strong><br>
+                        <small>Berhasil: ${data.imported} | Gagal: ${data.failed}</small>
+                    `;
+                    importMessage.className = 'alert alert-success';
+                    importMessage.classList.remove('d-none');
+
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    importMessage.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + data.message;
+                    importMessage.className = 'alert alert-danger';
+                    importMessage.classList.remove('d-none');
+                }
+            } catch (error) {
+                importMessage.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Error: ' + error.message;
+                importMessage.className = 'alert alert-danger';
+                importMessage.classList.remove('d-none');
+            } finally {
+                importSubmitBtn.disabled = false;
+                importSubmitBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload & Import';
+            }
+        });
+    }
+});
+</script>
+
 @endsection

@@ -257,6 +257,234 @@ class TeacherDashboardController extends Controller
     }
 
     /**
+     * Store grade via AJAX (no page reload)
+     */
+    public function storeGradeAjax(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject' => 'required|string|max:255',
+            'grade' => 'required|numeric|min:0|max:100',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $validated['teacher_id'] = $teacher->id;
+            $grade = Grade::create($validated);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Nilai berhasil ditambahkan',
+                'grade' => [
+                    'id' => $grade->id,
+                    'subject' => $grade->subject,
+                    'grade' => number_format($grade->grade, 2),
+                    'notes' => $grade->notes ?? '-',
+                    'created_at' => $grade->created_at->format('d M Y'),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * Import grades from CSV file (bulk import)
+     */
+    public function importGrades(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt,xlsx|max:2048'
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $path = $file->getRealPath();
+            
+            $imported = 0;
+            $failed = 0;
+            $errors = [];
+
+            // Open and read CSV
+            if (($handle = fopen($path, 'r')) !== false) {
+                $header = fgetcsv($handle);
+                
+                while (($row = fgetcsv($handle)) !== false) {
+                    if (count($row) < 4) continue;
+
+                    try {
+                        $nisn = trim($row[0]);
+                        $subject = trim($row[1]);
+                        $grade = (float) trim($row[2]);
+                        $notes = isset($row[3]) ? trim($row[3]) : null;
+
+                        // Validate data
+                        if (empty($nisn) || empty($subject) || $grade < 0 || $grade > 100) {
+                            $failed++;
+                            continue;
+                        }
+
+                        // Find student by NISN
+                        $student = Student::where('nisn', $nisn)
+                            ->whereHas('grades', function ($q) use ($teacher) {
+                                $q->where('teacher_id', $teacher->id);
+                            })
+                            ->first();
+
+                        if (!$student) {
+                            $failed++;
+                            continue;
+                        }
+
+                        // Create grade
+                        Grade::create([
+                            'student_id' => $student->id,
+                            'teacher_id' => $teacher->id,
+                            'subject' => $subject,
+                            'grade' => $grade,
+                            'notes' => $notes,
+                        ]);
+
+                        $imported++;
+                    } catch (\Exception $e) {
+                        $failed++;
+                    }
+                }
+                fclose($handle);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Berhasil import $imported nilai, $failed baris gagal",
+                'imported' => $imported,
+                'failed' => $failed,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal import file: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * Export grades report to CSV
+     */
+    public function exportGrades(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $grades = Grade::where('teacher_id', $teacher->id)
+            ->with(['student' => function ($q) {
+                $q->with('user');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Create CSV
+        $filename = 'laporan_nilai_' . date('Y-m-d_His') . '.csv';
+        $handle = fopen('php://output', 'w');
+        
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        // Add BOM for Excel UTF-8 compatibility
+        fwrite($handle, "\xEF\xBB\xBF");
+
+        // Header row
+        fputcsv($handle, ['NISN', 'Nama Siswa', 'Kelas', 'Mata Pelajaran', 'Nilai', 'Keterangan', 'Tanggal'], ';');
+
+        // Data rows
+        foreach ($grades as $grade) {
+            fputcsv($handle, [
+                $grade->student->nisn ?? '-',
+                $grade->student->user->name ?? '-',
+                $grade->student->class ?? '-',
+                $grade->subject,
+                number_format($grade->grade, 2),
+                $grade->notes ?? '-',
+                $grade->created_at->format('d-m-Y H:i:s')
+            ], ';');
+        }
+
+        fclose($handle);
+        exit;
+    }
+
+    /**
+     * Export grades report to Excel (XLSX)
+     */
+    public function exportGradesExcel(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $grades = Grade::where('teacher_id', $teacher->id)
+            ->with(['student' => function ($q) {
+                $q->with('user');
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'laporan_nilai_' . date('Y-m-d_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+
+        // Generate Excel XML format
+        echo '<?xml version="1.0" encoding="UTF-8"?>';
+        echo '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">';
+        echo '<Styles>';
+        echo '<Style ss:ID="Header"><Interior ss:Color="#2D4438" ss:Pattern="Solid"/><Font ss:Bold="1" ss:Color="white" ss:Size="11"/><Alignment ss:Horizontal="Center" ss:Vertical="Center"/></Style>';
+        echo '<Style ss:ID="Data"><Font ss:Size="10"/></Style>';
+        echo '</Styles>';
+        echo '<Worksheet ss:Name="Laporan Nilai">';
+        echo '<Table>';
+
+        // Header row
+        echo '<Row ss:StyleID="Header">';
+        echo '<Cell><Data ss:Type="String">NISN</Data></Cell>';
+        echo '<Cell><Data ss:Type="String">Nama Siswa</Data></Cell>';
+        echo '<Cell><Data ss:Type="String">Kelas</Data></Cell>';
+        echo '<Cell><Data ss:Type="String">Mata Pelajaran</Data></Cell>';
+        echo '<Cell><Data ss:Type="String">Nilai</Data></Cell>';
+        echo '<Cell><Data ss:Type="String">Keterangan</Data></Cell>';
+        echo '<Cell><Data ss:Type="String">Tanggal</Data></Cell>';
+        echo '</Row>';
+
+        // Data rows
+        foreach ($grades as $grade) {
+            echo '<Row ss:StyleID="Data">';
+            echo '<Cell><Data ss:Type="String">' . htmlspecialchars($grade->student->nisn ?? '-') . '</Data></Cell>';
+            echo '<Cell><Data ss:Type="String">' . htmlspecialchars($grade->student->user->name ?? '-') . '</Data></Cell>';
+            echo '<Cell><Data ss:Type="String">' . htmlspecialchars($grade->student->class ?? '-') . '</Data></Cell>';
+            echo '<Cell><Data ss:Type="String">' . htmlspecialchars($grade->subject) . '</Data></Cell>';
+            echo '<Cell ss:StyleID="Data"><Data ss:Type="Number">' . $grade->grade . '</Data></Cell>';
+            echo '<Cell><Data ss:Type="String">' . htmlspecialchars($grade->notes ?? '-') . '</Data></Cell>';
+            echo '<Cell><Data ss:Type="String">' . $grade->created_at->format('d-m-Y H:i:s') . '</Data></Cell>';
+            echo '</Row>';
+        }
+
+        echo '</Table>';
+        echo '</Worksheet>';
+        echo '</Workbook>';
+
+        exit;
+    }
+
+    /**
      * Show teacher profile
      */
     public function profile()

@@ -176,6 +176,10 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
     Route::post('/grades', [TeacherDashboardController::class, 'storeGrade'])->name('grades.store');
     Route::put('/grades/{id}', [TeacherDashboardController::class, 'storeGrade'])->name('grades.update');
     Route::delete('/grades/{id}', [TeacherDashboardController::class, 'deleteGrade'])->name('grades.delete');
+    Route::post('/grades/ajax/store', [TeacherDashboardController::class, 'storeGradeAjax'])->name('grades.ajax.store');
+    Route::post('/grades/import', [TeacherDashboardController::class, 'importGrades'])->name('grades.import');
+    Route::get('/grades/export', [TeacherDashboardController::class, 'exportGrades'])->name('grades.export');
+    Route::get('/grades/export-excel', [TeacherDashboardController::class, 'exportGradesExcel'])->name('grades.export-excel');
 
     // Profile
     Route::get('/profile', [TeacherDashboardController::class, 'profile'])->name('profile');
