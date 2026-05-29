@@ -388,4 +388,42 @@ class TeacherDashboardController extends Controller
             'schoolInfo' => $schoolInfo,
         ]);
     }
+
+    /**
+     * API endpoint for live student search
+     */
+    public function searchStudents(Request $request)
+    {
+        $search = $request->input('q', '');
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        if (strlen($search) < 1) {
+            return response()->json([]);
+        }
+
+        $students = Student::whereHas('grades', function ($q) use ($teacher) {
+            $q->where('teacher_id', $teacher->id);
+        })
+        ->with('user')
+        ->where(function ($q) use ($search) {
+            $q->whereHas('user', function ($userQuery) use ($search) {
+                $userQuery->where('name', 'like', '%' . $search . '%');
+            })->orWhere('nisn', 'like', '%' . $search . '%');
+        })
+        ->limit(10)
+        ->get()
+        ->map(function ($student) {
+            return [
+                'id' => $student->id,
+                'name' => $student->user->name,
+                'nisn' => $student->nisn,
+                'class' => $student->class,
+                'url' => route('teacher.students.show', $student->id),
+            ];
+        });
+
+        return response()->json($students);
+    }
 }
+
