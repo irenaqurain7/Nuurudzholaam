@@ -65,15 +65,27 @@ class TeacherDashboardController extends Controller
     /**
      * Show students list
      */
-    public function students()
+    public function students(Request $request)
     {
         $user = Auth::user();
         $teacher = $user->teacher;
+        $search = $request->input('search', '');
 
         // Get unique students taught by this teacher
-        $students = Student::whereHas('grades', function ($query) use ($teacher) {
-            $query->where('teacher_id', $teacher->id);
-        })->with('user')->get();
+        $query = Student::whereHas('grades', function ($q) use ($teacher) {
+            $q->where('teacher_id', $teacher->id);
+        })->with('user');
+
+        // Apply search filter if search query is provided
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%');
+                })->orWhere('nisn', 'like', '%' . $search . '%');
+            });
+        }
+
+        $students = $query->get();
 
         $classOrder = ['1A', '2A', '3A', '4A', '5A', '6A'];
         $studentsByClass = $students
@@ -88,6 +100,7 @@ class TeacherDashboardController extends Controller
         return view('teacher.students', [
             'students' => $students,
             'studentsByClass' => $studentsByClass,
+            'search' => $search,
         ]);
     }
 

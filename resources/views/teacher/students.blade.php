@@ -1,7 +1,47 @@
 @extends('teacher.layout')
 
 @section('teacher-content')
-<h1 class="h2 mb-4">Data Siswa Saya</h1>
+<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <h1 class="h2 mb-0">Data Siswa Saya</h1>
+</div>
+
+<!-- Search Box -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="GET" action="{{ route('teacher.students') }}" class="d-flex gap-2 flex-wrap align-items-center">
+            <div class="flex-grow-1" style="min-width: 250px;">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input 
+                        type="text" 
+                        class="form-control border-start-0 ps-0" 
+                        name="search" 
+                        placeholder="Cari berdasarkan nama atau NISN..." 
+                        value="{{ $search }}"
+                    >
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i>Cari
+            </button>
+            @if($search)
+                <a href="{{ route('teacher.students') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>Reset
+                </a>
+            @endif
+        </form>
+        @if($search)
+            <div class="mt-3">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Hasil pencarian untuk: <strong>"{{ $search }}"</strong> - Ditemukan <strong>{{ $students->count() }}</strong> siswa
+                </small>
+            </div>
+        @endif
+    </div>
+</div>
 
 @if($students->count() > 0)
     <div class="row mb-4">
@@ -165,7 +205,13 @@
     </style>
 @else
     <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i> Belum ada data siswa yang tersedia.
+        <i class="fas fa-info-circle"></i>
+        @if($search)
+            Tidak ada siswa yang cocok dengan pencarian "<strong>{{ $search }}</strong>". 
+            <a href="{{ route('teacher.students') }}">Tampilkan semua siswa</a>
+        @else
+            Belum ada data siswa yang tersedia.
+        @endif
     </div>
 @endif
 @endsection
