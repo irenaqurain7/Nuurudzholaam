@@ -586,7 +586,7 @@ class TeacherDashboardController extends Controller
      */
     public function informasi()
     {
-        $announcements = Announcement::where('status', 'published')->orderBy('created_at', 'desc')->get();
+        $announcements = Announcement::where('status', 'aktif')->orderBy('created_at', 'desc')->get();
 
         return view('teacher.informasi', [
             'announcements' => $announcements,
@@ -598,7 +598,7 @@ class TeacherDashboardController extends Controller
      */
     public function kegiatan()
     {
-        $activities = Activity::where('status', 'published')->orderBy('created_at', 'desc')->get();
+        $activities = Activity::orderBy('tanggal', 'desc')->get();
 
         return view('teacher.kegiatan', [
             'activities' => $activities,
