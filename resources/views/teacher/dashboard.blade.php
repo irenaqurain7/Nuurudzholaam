@@ -268,9 +268,10 @@
 
     .cards-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: 1fr;
         gap: 25px;
         margin-bottom: 40px;
+        max-width: 600px;
     }
 
     @media (max-width: 768px) {
@@ -342,27 +343,6 @@
 
 <!-- Main Content -->
 <div class="cards-grid">
-    <!-- Quick Actions -->
-    <div class="action-card">
-        <div class="action-card-header">
-            <h5><i class="fas fa-lightning-bolt"></i>Aksi Cepat</h5>
-        </div>
-        <div class="action-card-body">
-            <a href="{{ route('teacher.grades.edit') }}" class="action-btn">
-                <i class="fas fa-plus-circle"></i>Tambah Nilai Baru
-            </a>
-            <a href="{{ route('teacher.students') }}" class="action-btn">
-                <i class="fas fa-list"></i>Lihat Daftar Siswa
-            </a>
-            <a href="{{ route('teacher.grades') }}" class="action-btn">
-                <i class="fas fa-star"></i>Kelola Nilai
-            </a>
-            <a href="{{ route('teacher.schedule') }}" class="action-btn">
-                <i class="fas fa-calendar"></i>Lihat Jadwal
-            </a>
-        </div>
-    </div>
-
     <!-- Profile Info -->
     <div class="info-card">
         <div class="info-card-header">
