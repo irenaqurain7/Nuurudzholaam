@@ -1,122 +1,434 @@
 @extends('teacher.layout')
 
 @section('teacher-content')
-<h1 class="h2 mb-4">Profil Saya</h1>
+<style>
+    :root {
+        --hijau-islam: #2D4438;
+        --hijau-light: #486E5A;
+        --emas: #709D88;
+        --emas-light: #E2ECE8;
+        --text-dark: #1C2D25;
+        --text-light: #5A7E6B;
+        --bg-light: #F4F7F5;
+        --putih: #ffffff;
+        --red: #dc3545;
+    }
 
-<div class="row">
-    <!-- Profile Photo -->
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-image"></i> Foto Profil</h5>
+    .profile-header {
+        margin-bottom: 40px;
+    }
+
+    .profile-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .profile-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    /* Photo Card */
+    .photo-card {
+        background: var(--putih);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
+        overflow: hidden;
+    }
+
+    .photo-card-header {
+        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
+        color: var(--putih);
+        padding: 20px;
+        font-weight: 600;
+    }
+
+    .photo-card-header i {
+        margin-right: 10px;
+    }
+
+    .photo-card-body {
+        padding: 30px 25px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .photo-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto;
+        background-color: var(--emas-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 3px solid var(--emas);
+    }
+
+    .photo-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-preview i {
+        font-size: 3rem;
+        color: var(--text-light);
+    }
+
+    .photo-btn {
+        background: var(--hijau-islam);
+        color: var(--putih);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .photo-btn:hover {
+        background: var(--hijau-light);
+        color: var(--putih);
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(45, 68, 56, 0.15);
+    }
+
+    /* Security Card */
+    .security-card {
+        background: var(--putih);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
+        overflow: hidden;
+        margin-top: 30px;
+    }
+
+    .security-card-header {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: var(--putih);
+        padding: 20px;
+        font-weight: 600;
+    }
+
+    .security-card-header i {
+        margin-right: 10px;
+    }
+
+    .security-card-body {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .security-description {
+        font-size: 14px;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .security-btn {
+        background: #f39c12;
+        color: var(--putih);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .security-btn:hover {
+        background: #e67e22;
+        color: var(--putih);
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+    }
+
+    /* Form Card */
+    .form-card {
+        background: var(--putih);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
+        color: var(--putih);
+        padding: 20px;
+        font-weight: 600;
+    }
+
+    .form-card-header i {
+        margin-right: 10px;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .form-row.full {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .form-group label .required {
+        color: var(--red);
+        margin-left: 3px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 15px;
+        border: 1.5px solid var(--emas-light);
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--hijau-light);
+        box-shadow: 0 0 0 3px rgba(72, 110, 90, 0.1);
+        background-color: rgba(226, 236, 232, 0.3);
+    }
+
+    .form-group input:disabled,
+    .form-group textarea:disabled {
+        background-color: var(--emas-light);
+        color: var(--text-light);
+        cursor: not-allowed;
+    }
+
+    .form-group small {
+        font-size: 13px;
+        color: var(--text-light);
+        margin-top: 6px;
+    }
+
+    .form-group.error input,
+    .form-group.error textarea {
+        border-color: var(--red);
+    }
+
+    .error-message {
+        color: var(--red);
+        font-size: 13px;
+        margin-top: 6px;
+        display: block;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
+        color: var(--putih);
+        border: none;
+        padding: 14px 30px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(45, 68, 56, 0.2);
+    }
+
+    .submit-btn i {
+        margin-right: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .profile-header h1 {
+            font-size: 24px;
+        }
+
+        .form-card-body {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="profile-header">
+    <h1>Profil Saya</h1>
+</div>
+
+<div class="profile-container">
+    <!-- Sidebar -->
+    <div>
+        <!-- Photo Card -->
+        <div class="photo-card">
+            <div class="photo-card-header">
+                <i class="fas fa-image"></i>Foto Profil
             </div>
-            <div class="card-body text-center">
-                @if(auth()->user()->profile_photo)
-                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Profile" class="img-fluid rounded mb-3" style="max-width: 100%; max-height: 250px; object-fit: cover;">
-                @else
-                    <div class="bg-light p-5 rounded mb-3">
-                        <i class="fas fa-user-circle fa-5x text-muted"></i>
-                    </div>
-                @endif
-                <div>
-                    <a href="{{ route('teacher.upload-photo') }}" class="btn btn-primary btn-sm w-100">
-                        <i class="fas fa-upload"></i> Ubah Foto
-                    </a>
+            <div class="photo-card-body">
+                <div class="photo-preview">
+                    @if(auth()->user()->profile_photo)
+                        <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Profile">
+                    @else
+                        <i class="fas fa-user-circle"></i>
+                    @endif
                 </div>
+                <a href="{{ route('teacher.upload-photo') }}" class="photo-btn">
+                    <i class="fas fa-upload"></i>Ubah Foto
+                </a>
             </div>
         </div>
 
         <!-- Security Card -->
-        <div class="card shadow-sm mt-4">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-lock"></i> Keamanan</h5>
+        <div class="security-card">
+            <div class="security-card-header">
+                <i class="fas fa-lock"></i>Keamanan
             </div>
-            <div class="card-body">
-                <p class="mb-3 text-muted">Kelola keamanan akun Anda</p>
-                <a href="{{ route('teacher.change-password') }}" class="btn btn-warning btn-sm w-100">
-                    <i class="fas fa-key"></i> Ubah Password
+            <div class="security-card-body">
+                <p class="security-description">Kelola keamanan akun Anda</p>
+                <a href="{{ route('teacher.change-password') }}" class="security-btn">
+                    <i class="fas fa-key"></i>Ubah Password
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Profile Data -->
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-user"></i> Data Pribadi</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('teacher.profile.update') }}" method="POST">
-                    @csrf
-                    @method('PUT')
+    <!-- Main Form -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <i class="fas fa-user"></i>Data Pribadi
+        </div>
+        <div class="form-card-body">
+            <form action="{{ route('teacher.profile.update') }}" method="POST">
+                @csrf
+                @method('PUT')
 
-                    <!-- Nama Lengkap -->
-                    <div class="mb-4">
-                        <label for="name" class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-lg @error('name') is-invalid @enderror" id="name" name="name" value="{{ auth()->user()->name }}" required>
+                <!-- Row 1: Nama Lengkap -->
+                <div class="form-row full">
+                    <div class="form-group @error('name') error @enderror">
+                        <label for="name">
+                            Nama Lengkap
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" id="name" name="name" value="{{ auth()->user()->name }}" required>
                         @error('name')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
+                </div>
 
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label for="email" class="form-label fw-bold">Email</label>
-                        <input type="email" class="form-control form-control-lg" id="email" value="{{ auth()->user()->email }}" disabled>
-                        <small class="text-muted">Email tidak dapat diubah</small>
+                <!-- Row 2: Email & NIP -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" value="{{ auth()->user()->email }}" disabled>
+                        <small>Email tidak dapat diubah</small>
                     </div>
-
-                    <!-- NIP -->
-                    <div class="mb-4">
-                        <label for="nip" class="form-label fw-bold">NIP</label>
-                        <input type="text" class="form-control form-control-lg" id="nip" value="{{ auth()->user()->nip ?? '-' }}" disabled>
-                        <small class="text-muted">Nomor Induk Pegawai tidak dapat diubah</small>
+                    <div class="form-group">
+                        <label for="nip">NIP</label>
+                        <input type="text" id="nip" value="{{ auth()->user()->nip ?? '-' }}" disabled>
+                        <small>Nomor Induk Pegawai tidak dapat diubah</small>
                     </div>
+                </div>
 
-                    <!-- Bidang Keahlian -->
-                    <div class="mb-4">
-                        <label for="specialization" class="form-label fw-bold">Bidang Keahlian</label>
-                        <input type="text" class="form-control form-control-lg" id="specialization" value="{{ auth()->user()->teacher->specialization ?? '-' }}" disabled>
-                        <small class="text-muted">Bidang keahlian tidak dapat diubah</small>
+                <!-- Row 3: Bidang Keahlian & No. Telepon -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="specialization">Bidang Keahlian</label>
+                        <input type="text" id="specialization" value="{{ auth()->user()->teacher->specialization ?? '-' }}" disabled>
+                        <small>Bidang keahlian tidak dapat diubah</small>
                     </div>
-
-                    <!-- No. Telepon -->
-                    <div class="mb-4">
-                        <label for="phone" class="form-label fw-bold">No. Telepon</label>
-                        <input type="text" class="form-control form-control-lg @error('phone') is-invalid @enderror" id="phone" name="phone" placeholder="Contoh: 08123456789" value="{{ auth()->user()->phone }}">
+                    <div class="form-group @error('phone') error @enderror">
+                        <label for="phone">No. Telepon</label>
+                        <input type="text" id="phone" name="phone" placeholder="Contoh: 08123456789" value="{{ auth()->user()->phone }}">
                         @error('phone')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
+                </div>
 
-                    <!-- Alamat -->
-                    <div class="mb-4">
-                        <label for="address" class="form-label fw-bold">Alamat</label>
-                        <textarea class="form-control form-control-lg @error('address') is-invalid @enderror" id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap Anda">{{ auth()->user()->address }}</textarea>
+                <!-- Row 4: Alamat -->
+                <div class="form-row full">
+                    <div class="form-group @error('address') error @enderror">
+                        <label for="address">Alamat</label>
+                        <textarea id="address" name="address" rows="3" placeholder="Masukkan alamat lengkap Anda">{{ auth()->user()->address }}</textarea>
                         @error('address')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
+                </div>
 
-                    <!-- Biodata Singkat -->
-                    <div class="mb-4">
-                        <label for="bio" class="form-label fw-bold">Biodata Singkat</label>
-                        <textarea class="form-control form-control-lg @error('bio') is-invalid @enderror" id="bio" name="bio" rows="3" placeholder="Ceritakan tentang diri Anda secara singkat...">{{ auth()->user()->bio }}</textarea>
-                        <small class="text-muted">Opsional - untuk profil publik Anda</small>
+                <!-- Row 5: Biodata Singkat -->
+                <div class="form-row full">
+                    <div class="form-group @error('bio') error @enderror">
+                        <label for="bio">Biodata Singkat</label>
+                        <textarea id="bio" name="bio" rows="3" placeholder="Ceritakan tentang diri Anda secara singkat...">{{ auth()->user()->bio }}</textarea>
+                        <small>Opsional - untuk profil publik Anda</small>
                         @error('bio')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
+                </div>
 
-                    <!-- Submit Button -->
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <i class="fas fa-save"></i> Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i>Simpan Perubahan
+                </button>
+            </form>
         </div>
     </div>
 </div>

@@ -54,30 +54,43 @@
     }
 
     .teacher-sidebar-header {
-        padding: 2rem 1.5rem;
+        padding: 2.5rem 1.5rem;
         text-align: center;
-        border-bottom: 1px solid rgba(226, 236, 232, 0.2);
+        border-bottom: 2px solid rgba(226, 236, 232, 0.15);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .teacher-sidebar-avatar {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        margin: 0 auto 1rem;
-        border: 3px solid var(--emas);
+        margin: 0 auto 1.5rem;
+        border: 4px solid var(--emas);
         object-fit: cover;
         background-color: var(--hijau-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
 
     .teacher-sidebar-header h5 {
-        font-size: 1rem;
-        font-weight: 600;
-        margin: 0.5rem 0 0.25rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--putih);
+        letter-spacing: 0.3px;
+        line-height: 1.4;
     }
 
     .teacher-sidebar-header small {
-        color: rgba(226, 236, 232, 0.7);
-        font-size: 0.85rem;
+        color: var(--emas);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        font-weight: 500;
+        letter-spacing: 0.2px;
     }
 
     .teacher-sidebar-menu {
@@ -259,8 +272,8 @@
                 @if(optional(auth()->user())->profile_photo)
                     <img src="{{ asset('storage/' . optional(auth()->user())->profile_photo) }}" alt="{{ optional(auth()->user())->name }}" class="teacher-sidebar-avatar">
                 @else
-                    <div class="teacher-sidebar-avatar d-inline-flex align-items-center justify-content-center" style="background: var(--hijau-light);">
-                        <i class="fas fa-user" style="color: var(--putih); font-size: 2rem;"></i>
+                    <div class="teacher-sidebar-avatar">
+                        <i class="fas fa-user" style="color: var(--putih); font-size: 2.5rem;"></i>
                     </div>
                 @endif
                 <h5>{{ optional(auth()->user())->name ?? 'Guru' }}</h5>
