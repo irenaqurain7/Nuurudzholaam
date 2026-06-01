@@ -3,267 +3,255 @@
 @section('teacher-content')
 <style>
     :root {
-        --hijau-islam: #2D4438;
-        --hijau-light: #486E5A;
-        --emas: #709D88;
-        --emas-light: #E2ECE8;
-        --text-dark: #1C2D25;
-        --text-light: #5A7E6B;
-        --bg-light: #F4F7F5;
-        --putih: #ffffff;
+        --primary: #2d5016;
+        --text-primary: #1a1a1a;
+        --text-secondary: #666;
+        --text-muted: #999;
+        --border: #e5e5e5;
+        --bg-light: #f9f9f9;
     }
 
-    .upload-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-top: 30px;
+    .page-header {
+        margin-bottom: 2rem;
     }
 
-    .upload-card {
-        background: var(--putih);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
-        overflow: hidden;
-    }
-
-    .upload-card-header {
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
-        color: var(--putih);
-        padding: 20px;
+    .page-header h1 {
+        font-size: 1.75rem;
         font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
     }
 
-    .upload-card-header i {
-        margin-right: 10px;
+    .page-header p {
+        color: var(--text-secondary);
+        margin: 0.5rem 0 0 0;
+        font-size: 0.95rem;
     }
 
-    .upload-card-body {
-        padding: 30px;
+    .section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .form-group {
-        margin-bottom: 25px;
+    .section h5 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .form-group:last-child {
-        margin-bottom: 0;
+    .section i {
+        color: var(--primary);
+        font-size: 1.1rem;
     }
 
     .form-group label {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-dark);
-        margin-bottom: 8px;
         display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.3px;
+        margin-bottom: 0.5rem;
     }
 
-    .form-group small {
-        font-size: 13px;
-        color: var(--text-light);
-        display: block;
-        margin-top: 6px;
-    }
-
-    .form-group input[type="file"] {
-        display: block;
+    .form-control {
         width: 100%;
-        padding: 12px 15px;
-        border: 2px dashed var(--emas);
-        border-radius: 8px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background-color: rgba(226, 236, 232, 0.3);
+        padding: 0.6rem 0.875rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        background-color: white;
+        transition: border-color 0.2s;
     }
 
-    .form-group input[type="file"]:hover {
-        border-color: var(--hijau-light);
-        background-color: rgba(226, 236, 232, 0.5);
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.1);
+    }
+
+    .form-helper {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.3rem;
     }
 
     .preview-container {
-        margin-bottom: 25px;
-        text-align: center;
-        min-height: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--emas-light);
+        border: 2px dashed var(--border);
         border-radius: 8px;
-        overflow: hidden;
+        padding: 2rem;
+        text-align: center;
+        background-color: var(--bg-light);
+        margin: 1rem 0;
     }
 
-    #imagePreview {
+    .preview-image {
         max-width: 100%;
         max-height: 300px;
         border-radius: 8px;
-        object-fit: cover;
+        display: none;
     }
 
-    #noPreview {
-        color: var(--text-light);
-        text-align: center;
-        padding: 40px 20px;
-    }
-
-    .button-group {
-        display: flex;
-        gap: 12px;
+    .preview-placeholder {
+        color: var(--text-muted);
+        font-size: 0.9rem;
     }
 
     .btn {
-        flex: 1;
-        padding: 12px 20px;
+        padding: 0.6rem 1.5rem;
         border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-weight: 500;
         cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        text-align: center;
+        transition: all 0.2s;
         display: inline-flex;
         align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        width: 100%;
         justify-content: center;
-        gap: 8px;
+        margin-bottom: 0.75rem;
     }
 
-    .btn-upload {
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
-        color: var(--putih);
+    .btn-primary:hover {
+        background-color: #1f3a0f;
     }
 
-    .btn-upload:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(45, 68, 56, 0.2);
+    .btn-secondary {
+        background-color: white;
+        border: 1.5px solid var(--primary);
+        color: var(--primary);
+        width: 100%;
+        justify-content: center;
     }
 
-    .btn-cancel {
-        background: var(--emas-light);
-        color: var(--text-dark);
+    .btn-secondary:hover {
+        background-color: var(--primary);
+        color: white;
     }
 
-    .btn-cancel:hover {
-        background: var(--emas);
-        color: var(--text-dark);
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
     }
 
     .current-photo {
-        text-align: center;
-    }
-
-    .photo-display {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        margin: 0 auto 20px;
-        border: 4px solid var(--emas);
-        overflow: hidden;
-        background-color: var(--emas-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        border-radius: 8px;
         object-fit: cover;
+        max-width: 100%;
+        margin: 1rem 0;
     }
 
-    .no-photo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        gap: 15px;
-        color: var(--text-light);
+    .current-photo-placeholder {
+        background-color: var(--bg-light);
+        border-radius: 8px;
+        padding: 3rem;
+        text-align: center;
+        color: var(--text-muted);
     }
 
-    .no-photo i {
+    .current-photo-placeholder i {
         font-size: 3rem;
+        color: #ddd;
+        margin-bottom: 1rem;
     }
 
-    .page-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 30px;
+    .form-mb {
+        margin-bottom: 1.5rem;
     }
 
     @media (max-width: 768px) {
-        .upload-container {
-            grid-template-columns: 1fr;
+        .page-header h1 {
+            font-size: 1.5rem;
         }
 
-        .button-group {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
+        .section {
+            padding: 1.5rem;
         }
     }
 </style>
 
-<h1 class="page-title">Ubah Foto Profil</h1>
+<div class="page-header">
+    <h1>Ubah Foto Profil</h1>
+    <p>Pilih foto baru untuk profil Anda</p>
+</div>
 
-<div class="upload-container">
-    <!-- Upload Section -->
-    <div class="upload-card">
-        <div class="upload-card-header">
-            <i class="fas fa-cloud-upload-alt"></i>Unggah Foto Baru
-        </div>
-        <div class="upload-card-body">
-            <form action="{{ route('teacher.upload-photo.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+<div class="row">
+    <div class="col-lg-8">
+        <form action="{{ route('teacher.upload-photo.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-                <div class="form-group">
-                    <label for="photo">Pilih Foto <span style="color: #dc3545;">*</span></label>
+            <div class="section">
+                <h5><i class="fas fa-image"></i> Pilih Foto</h5>
+
+                <div class="form-group form-mb">
+                    <label for="photo">Foto (JPG, PNG, GIF)</label>
                     <input type="file" class="form-control @error('photo') is-invalid @enderror" id="photo" name="photo" accept="image/*" required onchange="previewImage(event)">
-                    <small>Format: JPG, PNG, GIF | Max: 2MB</small>
+                    <span class="form-helper">Maksimal 2MB</span>
                     @error('photo')
-                        <div style="color: #dc3545; font-size: 13px; margin-top: 8px;">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="form-group">
+                <div class="form-group form-mb">
                     <label>Preview Foto</label>
                     <div class="preview-container">
-                        <img id="imagePreview" src="" alt="Preview" style="display: none;">
-                        <div id="noPreview" class="no-photo">
-                            <i class="fas fa-image"></i>
-                            <span>Pratinjau akan ditampilkan di sini</span>
+                        <img id="imagePreview" src="" alt="Preview" class="preview-image">
+                        <div id="noPreview" class="preview-placeholder">
+                            <i class="fas fa-image fa-2x" style="color: #ddd;"></i>
+                            <p style="margin-top: 0.5rem;">Pratinjau akan ditampilkan di sini</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button type="submit" class="btn btn-upload">
-                        <i class="fas fa-upload"></i>Unggah Foto
+                <div style="display: flex; gap: 0.75rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Simpan Foto
                     </button>
-                    <a href="{{ route('teacher.profile') }}" class="btn btn-cancel">
-                        <i class="fas fa-times"></i>Batal
-                    </a>
                 </div>
-            </form>
-        </div>
+                <a href="{{ route('teacher.profile') }}" class="btn btn-secondary" style="margin-top: 0.75rem;">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
+        </form>
     </div>
 
-    <!-- Current Photo Section -->
-    <div class="upload-card">
-        <div class="upload-card-header">
-            <i class="fas fa-image"></i>Foto Profil Saat Ini
-        </div>
-        <div class="upload-card-body current-photo">
+    <div class="col-lg-4">
+        <div class="section">
+            <h5><i class="fas fa-camera"></i> Foto Saat Ini</h5>
+
             @if(auth()->user()->profile_photo)
-                <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Current Profile" class="photo-display">
-                <p style="color: var(--text-dark); font-weight: 600; margin-bottom: 10px;">Foto Aktif</p>
-                <p style="color: var(--text-light); font-size: 13px; margin: 0;">Upload foto baru untuk menggantinya</p>
+                <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Profile" class="current-photo" style="width: 100%; height: 200px;">
             @else
-                <div class="no-photo" style="padding: 40px 20px; height: 100%;">
+                <div class="current-photo-placeholder">
                     <i class="fas fa-user-circle"></i>
-                    <span style="text-align: center;">Belum ada foto profil<br><small>Upload foto pertama Anda</small></span>
+                    <p>Belum ada foto profil</p>
                 </div>
             @endif
+        </div>
+
+        <div class="section" style="background-color: #fafafa; border-color: var(--border);">
+            <h5><i class="fas fa-info-circle"></i> Tips</h5>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+                Gunakan foto yang jelas dan profesional. Format yang didukung: JPG, PNG, GIF dengan ukuran maksimal 2MB.
+            </p>
         </div>
     </div>
 </div>

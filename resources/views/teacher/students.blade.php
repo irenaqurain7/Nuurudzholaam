@@ -1,194 +1,278 @@
 @extends('teacher.layout')
 
 @section('teacher-content')
-<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-    <h1 class="h2 mb-0">Data Siswa Saya</h1>
+<style>
+    :root {
+        --primary: #2d5016;
+        --primary-light: rgba(45, 80, 22, 0.08);
+        --text-primary: #1a1a1a;
+        --text-secondary: #666;
+        --text-muted: #999;
+        --border: #e5e5e5;
+        --bg-light: #f9f9f9;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .page-header p {
+        color: var(--text-secondary);
+        margin: 0.5rem 0 0 0;
+        font-size: 0.95rem;
+    }
+
+    .section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Search Box Customization */
+    .search-container {
+        max-width: 380px;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .search-group {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.25rem 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .search-group:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.1);
+    }
+
+    .search-input {
+        border: none;
+        outline: none;
+        padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        width: 100%;
+    }
+
+    .search-icon {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
+
+    /* Dropdown Search Results */
+    #searchResults {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        width: 100%;
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 1000;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border);
+    }
+
+    /* Custom Clean Table */
+    .class-student-scroll {
+        max-height: clamp(320px, 60vh, 620px);
+        overflow: auto;
+    }
+
+    .class-student-table {
+        width: 100%;
+        min-width: 900px;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+    .class-student-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--bg-light);
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid var(--border);
+        text-align: left;
+    }
+
+    .class-student-table td {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+
+    .class-student-table tbody tr:hover:not(.class-divider-row) {
+        background-color: rgba(45, 80, 22, 0.01);
+    }
+
+    /* Class Group Divider Row */
+    .class-divider-row td {
+        padding: 0;
+        border: 0;
+    }
+
+    .class-divider {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(90deg, rgba(45, 80, 22, 0.06), rgba(45, 80, 22, 0.01));
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+
+    /* Buttons Style */
+    .btn-detail {
+        background-color: white;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.2s;
+    }
+
+    .btn-detail:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    /* Column Width Configuration */
+    .class-student-table td:nth-child(1), .class-student-table th:nth-child(1) { min-width: 120px; width: 120px; }
+    .class-student-table td:nth-child(2), .class-student-table th:nth-child(2) { min-width: 260px; }
+    .class-student-table td:nth-child(3), .class-student-table th:nth-child(3) { min-width: 130px; width: 150px; }
+    .class-student-table td:nth-child(4), .class-student-table th:nth-child(4) { min-width: 180px; width: 180px; }
+
+    /* Elegant Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state-icon {
+        background-color: var(--bg-light);
+        color: var(--text-muted);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        border: 1px solid var(--border);
+    }
+
+    .empty-state h3 {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .empty-state p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Data Siswa Saya</h1>
+    <p>Daftar informasi, rombongan belajar, dan data lengkap siswa Anda</p>
 </div>
 
-<!-- Search Box -->
-<div class="mb-4" style="position: relative;">
-    <div style="max-width: 380px;">
-        <div class="input-group" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-            <span class="input-group-text bg-white border-0" style="padding: 0.75rem 1rem;">
-                <i class="fas fa-search" style="color: #2D4438; font-size: 16px;"></i>
-            </span>
-            <input 
-                type="text" 
-                class="form-control border-0 ps-0" 
-                id="studentSearch"
-                placeholder="Cari nama atau NISN..." 
-                style="font-size: 14px; padding: 0.75rem 1rem 0.75rem 0.5rem;"
-            >
-        </div>
-        <!-- Dropdown Hasil Pencarian -->
-        <div id="searchResults" style="display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 100%; max-height: 450px; overflow-y: auto; z-index: 1000; background: white; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); border: 1px solid #e0e0e0;"></div>
+<div class="search-container">
+    <div class="search-group">
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+        <input type="text" id="studentSearch" class="search-input" placeholder="Cari nama atau NISN...">
     </div>
+    <div id="searchResults"></div>
 </div>
 
 @if($students->count() > 0)
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-users"></i> Total Siswa: <strong>{{ $students->count() }}</strong>
-                    </h5>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card mb-4 border-0 shadow-sm class-group-card">
-        <div class="card-header bg-light border-0 class-group-header">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <h5 class="mb-0">
-                    <i class="fas fa-users me-1"></i>Daftar Siswa per Kelas
-                </h5>
-                <span class="badge bg-success-subtle text-success-emphasis">{{ $students->count() }} siswa</span>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive class-student-scroll">
-                <table class="table table-hover align-middle mb-0 class-student-table">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="col-class-name">Kelas</th>
-                            <th>Nama Siswa</th>
-                            <th class="col-nisn">NISN</th>
-                            <th class="text-end col-actions">Aksi</th>
+    <div class="section" style="padding: 0; overflow: hidden;">
+        <div class="class-student-scroll">
+            <table class="class-student-table">
+                <thead>
+                    <tr>
+                        <th>Kelas</th>
+                        <th>Nama Siswa</th>
+                        <th>NISN</th>
+                        <th style="text-align: right;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($studentsByClass as $className => $classStudents)
+                        <tr class="class-divider-row">
+                            <td colspan="4">
+                                <div class="class-divider">
+                                    <span>Kelas {{ $className }}</span>
+                                    <span style="font-size: 0.8rem; background-color: var(--bg-light); padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid var(--border);">{{ $classStudents->count() }} Siswa</span>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($studentsByClass as $className => $classStudents)
-                            <tr class="class-divider-row">
-                                <td colspan="4">
-                                    <div class="class-divider">
-                                        <span>Kelas {{ $className }}</span>
-                                        <strong>{{ $classStudents->count() }} siswa</strong>
-                                    </div>
+
+                        @foreach($classStudents as $student)
+                            <tr>
+                                <td style="font-weight: 600; color: var(--text-secondary);">{{ $student->class }}</td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary);">{{ $student->user->name }}</div>
+                                </td>
+                                <td style="color: var(--text-secondary); font-family: monospace; font-size: 0.95rem;">{{ $student->nisn }}</td>
+                                <td style="text-align: right;">
+                                    <a href="{{ route('teacher.students.show', $student->id) }}" class="btn-detail">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
                                 </td>
                             </tr>
-                            @foreach($classStudents as $student)
-                                <tr>
-                                    <td class="text-muted fw-semibold">{{ $student->class }}</td>
-                                    <td>
-                                        <div class="fw-semibold">{{ $student->user->name }}</div>
-                                    </td>
-                                    <td>{{ $student->nisn }}</td>
-                                    <td class="text-end">
-                                        <div class="d-inline-flex flex-wrap gap-2 justify-content-end">
-                                            <a href="{{ route('teacher.students.show', $student->id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-eye me-1"></i>Lihat Detail
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
-
-    <style>
-        .hover-shadow:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
-            transform: translateY(-2px);
-        }
-
-        .class-group-card {
-            overflow: hidden;
-        }
-
-        .class-group-header {
-            padding: 1rem 1.25rem;
-        }
-
-        .class-student-scroll {
-            max-height: clamp(320px, 60vh, 620px);
-            overflow: auto;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .class-student-table {
-            width: 100%;
-            min-width: 900px;
-            table-layout: fixed;
-        }
-
-        .class-student-table th,
-        .class-student-table td {
-            padding: 1rem 1.25rem;
-            vertical-align: middle;
-        }
-
-        .class-student-table thead th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-            background: #f8f9fa;
-            box-shadow: inset 0 -1px 0 #e9ecef;
-        }
-
-        .class-divider-row td {
-            padding: 0;
-            border: 0;
-        }
-
-        .class-divider {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: .8rem 1.25rem;
-            background: linear-gradient(90deg, rgba(45, 68, 56, 0.08), rgba(45, 68, 56, 0.03));
-            color: #21312a;
-            font-weight: 700;
-            border-top: 1px solid #e9ecef;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .class-divider strong {
-            color: var(--hijau-islam);
-        }
-
-        .col-class-name {
-            width: 120px;
-        }
-
-        .class-student-table td:nth-child(1),
-        .class-student-table th:nth-child(1) {
-            min-width: 120px;
-        }
-
-        .class-student-table td:nth-child(2),
-        .class-student-table th:nth-child(2) {
-            min-width: 260px;
-        }
-
-        .class-student-table td:nth-child(3),
-        .class-student-table th:nth-child(3) {
-            min-width: 130px;
-        }
-
-        .class-student-table td:nth-child(4),
-        .class-student-table th:nth-child(4) {
-            min-width: 240px;
-        }
-
-        .class-student-table td:nth-child(1) {
-            word-break: break-word;
-        }
-
-        .class-student-table td:nth-child(4) .btn {
-            white-space: nowrap;
-        }
-    </style>
 @else
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i>
-        Belum ada data siswa yang tersedia.
+    <div class="section">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <h3>Belum Ada Data Siswa</h3>
+            <p>Data siswa di bawah bimbingan atau kelas mengajar Anda belum tersedia.</p>
+        </div>
     </div>
 @endif
 
@@ -203,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', function() {
         clearTimeout(debounceTimer);
         const query = this.value.trim();
-        
+
         if (query.length === 0) {
             searchResults.style.display = 'none';
             return;
@@ -214,9 +298,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
-    // Tutup dropdown saat klik di luar
+    // Tutup dropdown saat klik di luar kotak pencarian
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.mb-4')) {
+        if (!e.target.closest('.search-container')) {
             searchResults.style.display = 'none';
         }
     });
@@ -227,26 +311,26 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.length === 0) {
                     searchResults.innerHTML = `
-                        <div style="padding: 1.5rem; text-align: center; color: #999;">
-                            <i class="fas fa-search" style="font-size: 24px; display: block; margin-bottom: 0.5rem;"></i>
+                        <div style="padding: 1.5rem; text-align: center; color: var(--text-muted);">
+                            <i class="fas fa-search" style="font-size: 20px; display: block; margin-bottom: 0.5rem;"></i>
                             <div style="font-size: 13px;">Tidak ada hasil untuk "<strong>${query}</strong>"</div>
                         </div>
                     `;
                 } else {
                     searchResults.innerHTML = data.map((student, index) => `
-                        <a href="${student.url}" style="display: flex; align-items: center; padding: 0.875rem 1rem; text-decoration: none; color: #333; border-bottom: ${index < data.length - 1 ? '1px solid #f0f0f0' : 'none'}; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
-                            <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #2D4438 0%, #486E5A 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; margin-right: 0.875rem;">
+                        <a href="${student.url}" style="display: flex; align-items: center; padding: 0.85rem 1rem; text-decoration: none; color: var(--text-primary); border-bottom: ${index < data.length - 1 ? '1px solid var(--border)' : 'none'}; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='var(--bg-light)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <div style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background-color: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 13px; margin-right: 0.85rem;">
                                 ${student.name.charAt(0).toUpperCase()}
                             </div>
                             <div style="flex-grow: 1; min-width: 0;">
-                                <div style="font-weight: 600; font-size: 14px; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${student.name}</div>
-                                <div style="font-size: 12px; color: #666; display: flex; gap: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    <span><i class="fas fa-id-card" style="margin-right: 0.35rem; color: #2D4438;"></i>${student.nisn}</span>
-                                    <span style="color: #aaa;">|</span>
-                                    <span><i class="fas fa-home" style="margin-right: 0.35rem; color: #2D4438;"></i>${student.class}</span>
+                                <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${student.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); display: flex; gap: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <span><i class="fas fa-id-card" style="margin-right: 0.25rem; color: var(--text-muted);"></i>${student.nisn}</span>
+                                    <span style="color: var(--border);">|</span>
+                                    <span><i class="fas fa-home" style="margin-right: 0.25rem; color: var(--text-muted);"></i>${student.class}</span>
                                 </div>
                             </div>
-                            <i class="fas fa-chevron-right" style="color: #ccc; margin-left: 0.5rem; flex-shrink: 0;"></i>
+                            <i class="fas fa-chevron-right" style="color: #ccc; margin-left: 0.5rem; flex-shrink: 0; font-size: 0.8rem;"></i>
                         </a>
                     `).join('');
                 }
@@ -260,4 +344,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection
-

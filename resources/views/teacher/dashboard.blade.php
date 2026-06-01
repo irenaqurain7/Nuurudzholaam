@@ -5,386 +5,316 @@
     :root {
         --hijau-islam: #2D4438;
         --hijau-light: #486E5A;
+        --hijau-subtle: rgba(45, 68, 56, 0.04);
         --emas: #709D88;
         --emas-light: #E2ECE8;
         --text-dark: #1C2D25;
-        --text-light: #5A7E6B;
+        --text-muted: #667A70;
+        --border: #E2ECE8;
         --bg-light: #F4F7F5;
         --putih: #ffffff;
     }
 
+    /* Hero Section - Dibuat lebih modern dan anggun */
     .hero-card {
         background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
         color: var(--putih);
-        padding: 40px;
+        padding: 2.5rem;
         border-radius: 12px;
-        margin-bottom: 40px;
-        box-shadow: 0 4px 15px rgba(45, 68, 56, 0.15);
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(45, 68, 56, 0.12);
+        position: relative;
+        overflow: hidden;
     }
 
     .hero-card h1 {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 10px;
+        font-size: 1.85rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
     }
 
     .hero-card p {
-        font-size: 16px;
-        opacity: 0.95;
+        font-size: 0.95rem;
+        opacity: 0.85;
         margin: 0;
     }
 
     /* Dashboard Cards Grid */
     .dashboard-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
     }
 
     .stat-card {
         background-color: var(--putih);
         border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
-        transition: all 0.3s ease;
-        border-left: 5px solid;
+        padding: 1.5rem;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .stat-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 6px 20px rgba(45, 68, 56, 0.12);
+        box-shadow: 0 12px 24px rgba(45, 68, 56, 0.06);
     }
 
-    .stat-card.siswa {
-        border-left-color: #3498db;
-    }
-
-    .stat-card.nilai {
-        border-left-color: #2ecc71;
-    }
-
-    .stat-card.jadwal {
-        border-left-color: #f39c12;
-    }
-
-    .stat-card.profil {
-        border-left-color: #9b59b6;
+    .stat-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
     }
 
     .stat-card h6 {
-        font-size: 14px;
-        color: var(--text-light);
+        font-size: 0.8rem;
+        color: var(--text-muted);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0 0 15px 0;
+        letter-spacing: 0.75px;
+        margin: 0;
         font-weight: 600;
     }
 
     .stat-card .number {
-        font-size: 32px;
+        font-size: 2.25rem;
         font-weight: 700;
         color: var(--text-dark);
-        margin: 10px 0;
+        line-height: 1;
+        margin: 0.25rem 0 1rem 0;
     }
 
-    .stat-card .icon {
-        font-size: 32px;
-        margin-bottom: 10px;
-        opacity: 0.8;
+    /* Icon wrappers dengan warna pastel yang clean */
+    .icon-wrapper {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
     }
 
-    .stat-card .icon.siswa { color: #3498db; }
-    .stat-card .icon.nilai { color: #2ecc71; }
-    .stat-card .icon.jadwal { color: #f39c12; }
-    .stat-card .icon.profil { color: #9b59b6; }
+    .stat-card.siswa .icon-wrapper { background-color: rgba(52, 152, 219, 0.1); color: #2980b9; }
+    .stat-card.nilai .icon-wrapper { background-color: rgba(46, 204, 113, 0.1); color: #27ae60; }
+    .stat-card.jadwal .icon-wrapper { background-color: rgba(243, 156, 18, 0.1); color: #d35400; }
+    .stat-card.profil .icon-wrapper { background-color: rgba(155, 89, 182, 0.1); color: #8e44ad; }
 
     .stat-card a {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         color: var(--hijau-islam);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 0.85rem;
         font-weight: 600;
-        margin-top: 10px;
-        transition: all 0.3s ease;
+        transition: color 0.2s;
     }
 
     .stat-card a:hover {
         color: var(--hijau-light);
-        margin-left: 5px;
     }
 
-    /* Action Cards */
-    .action-card {
-        background-color: var(--putih);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .action-card:hover {
-        box-shadow: 0 6px 20px rgba(45, 68, 56, 0.12);
-        transform: translateY(-2px);
-    }
-
-    .action-card-header {
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
-        color: var(--putih);
-        padding: 20px 25px;
-    }
-
-    .action-card-header h5 {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .action-card-header i {
-        margin-right: 10px;
-    }
-
-    .action-card-body {
-        padding: 25px;
-    }
-
-    .action-btn {
-        display: block;
-        width: 100%;
-        padding: 12px 20px;
-        margin-bottom: 12px;
-        background-color: var(--hijau-islam);
-        color: var(--putih);
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        text-align: left;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .action-btn:last-child {
-        margin-bottom: 0;
-    }
-
-    .action-btn:hover {
-        background-color: var(--hijau-light);
-        color: var(--putih);
-        text-decoration: none;
-        padding-left: 25px;
-    }
-
-    .action-btn i {
-        margin-right: 10px;
-        width: 20px;
-    }
-
-    /* Info Card */
+    /* Info Card Profile - Dibuat clean tanpa tumpukan gradient kasar */
     .info-card {
         background-color: var(--putih);
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
+        border: 1px solid var(--border);
         overflow: hidden;
+        width: 100%;
     }
 
     .info-card-header {
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
-        color: var(--putih);
-        padding: 20px 25px;
+        background-color: var(--hijau-subtle);
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
 
     .info-card-header h5 {
-        font-size: 18px;
+        font-size: 1rem;
         font-weight: 600;
+        color: var(--text-dark);
         margin: 0;
     }
 
     .info-card-header i {
-        margin-right: 10px;
+        color: var(--hijau-islam);
+        font-size: 1.1rem;
     }
 
     .info-card-body {
-        padding: 30px 25px;
+        padding: 1.75rem 1.5rem;
     }
 
-    .info-row {
+    .info-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    .info-row:last-child {
-        margin-bottom: 0;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem 2rem;
     }
 
     .info-item {
-        border-bottom: 1px solid var(--emas-light);
-        padding-bottom: 15px;
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
+        border-bottom: 1px solid rgba(45, 68, 56, 0.06);
+        padding-bottom: 0.75rem;
     }
 
     .info-item strong {
         display: block;
-        color: var(--text-dark);
-        font-size: 13px;
+        color: var(--text-muted);
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-bottom: 5px;
+        margin-bottom: 0.25rem;
         font-weight: 600;
     }
 
     .info-item span {
-        color: var(--text-light);
-        font-size: 15px;
-        display: block;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        font-weight: 500;
     }
 
+    /* Action & Navigation Buttons */
     .edit-btn {
-        background: var(--hijau-islam);
+        background-color: var(--hijau-islam);
         color: var(--putih);
         border: none;
-        padding: 10px 20px;
+        padding: 0.6rem 1.25rem;
         border-radius: 6px;
-        font-size: 13px;
+        font-size: 0.85rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: background-color 0.2s;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
     }
 
     .edit-btn:hover {
-        background: var(--hijau-light);
+        background-color: var(--hijau-light);
         color: var(--putih);
-        text-decoration: none;
-    }
-
-    .cards-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 25px;
-        margin-bottom: 40px;
-        max-width: 600px;
     }
 
     @media (max-width: 768px) {
-        .dashboard-cards {
+        .info-grid {
             grid-template-columns: 1fr;
+            gap: 1.25rem;
         }
-
-        .cards-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .info-row {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
         .hero-card {
-            padding: 25px;
+            padding: 1.75rem;
         }
-
         .hero-card h1 {
-            font-size: 24px;
+            font-size: 1.5rem;
         }
     }
 </style>
 
-<!-- Hero Section -->
 <div class="hero-card">
     <h1>Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
-    <p>Kelola siswa, nilai, dan jadwal mengajar Anda dengan mudah melalui dashboard ini.</p>
+    <p>Kelola data siswa, nilai akademik, dan pantau jadwal mengajar Anda dari satu halaman terpusat.</p>
 </div>
 
-<!-- Dashboard Cards -->
 <div class="dashboard-cards">
     <div class="stat-card siswa">
-        <h6>Total Siswa</h6>
-        <div class="icon siswa">
-            <i class="fas fa-users"></i>
+        <div>
+            <div class="stat-card-header">
+                <h6>Total Siswa</h6>
+                <div class="icon-wrapper">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="number">{{ $totalStudents }}</div>
         </div>
-        <div class="number">{{ $totalStudents }}</div>
-        <a href="{{ route('teacher.students') }}">Lihat Siswa →</a>
+        <a href="{{ route('teacher.students') }}">Lihat Kelas Bimbingan <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
     </div>
 
     <div class="stat-card nilai">
-        <h6>Mata Pelajaran</h6>
-        <div class="icon nilai">
-            <i class="fas fa-book"></i>
+        <div>
+            <div class="stat-card-header">
+                <h6>Mata Pelajaran</h6>
+                <div class="icon-wrapper">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="number">{{ $totalClasses }}</div>
         </div>
-        <div class="number">{{ $totalClasses }}</div>
-        <a href="{{ route('teacher.grades') }}">Kelola Nilai →</a>
+        <a href="{{ route('teacher.grades') }}">Input & Kelola Nilai <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
     </div>
 
     <div class="stat-card jadwal">
-        <h6>Jadwal Mengajar</h6>
-        <div class="icon jadwal">
-            <i class="fas fa-calendar-alt"></i>
+        <div>
+            <div class="stat-card-header">
+                <h6>Jadwal Hari Ini</h6>
+                <div class="icon-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+            <div class="number" style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0; color: var(--text-dark);">
+                Buka Agenda
+            </div>
         </div>
-        <a href="{{ route('teacher.schedule') }}">Lihat Jadwal →</a>
+        <a href="{{ route('teacher.schedule') }}">Lihat Jadwal Mengajar <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
     </div>
 
     <div class="stat-card profil">
-        <h6>Profil Saya</h6>
-        <div class="icon profil">
-            <i class="fas fa-id-card"></i>
+        <div>
+            <div class="stat-card-header">
+                <h6>Akun Pengguna</h6>
+                <div class="icon-wrapper">
+                    <i class="fas fa-user-badge"></i>
+                </div>
+            </div>
+            <div class="number" style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0; color: var(--text-dark);">
+                Terverifikasi
+            </div>
         </div>
-        <a href="{{ route('teacher.profile') }}">Edit Profil →</a>
+        <a href="{{ route('teacher.profile') }}">Pengaturan Akun <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
     </div>
 </div>
 
-<!-- Main Content -->
-<div class="cards-grid">
-    <!-- Profile Info -->
-    <div class="info-card">
-        <div class="info-card-header">
-            <h5><i class="fas fa-user-tie"></i>Informasi Profil</h5>
-        </div>
-        <div class="info-card-body">
-            <div class="info-row">
-                <div class="info-item">
-                    <strong>Nama Lengkap</strong>
-                    <span>{{ auth()->user()->name }}</span>
-                </div>
-                <div class="info-item">
-                    <strong>Email</strong>
-                    <span>{{ auth()->user()->email }}</span>
-                </div>
+<div class="info-card">
+    <div class="info-card-header">
+        <i class="fas fa-user-circle"></i>
+        <h5>Informasi Profil Guru</h5>
+    </div>
+    <div class="info-card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Nama Lengkap</strong>
+                <span>{{ auth()->user()->name }}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <strong>NIP</strong>
-                    <span>{{ auth()->user()->nip ?? 'Belum diisi' }}</span>
-                </div>
-                <div class="info-item">
-                    <strong>Bidang Keahlian</strong>
-                    <span>{{ auth()->user()->teacher->specialization ?? 'Belum diisi' }}</span>
-                </div>
+            <div class="info-item">
+                <strong>Alamat Email</strong>
+                <span>{{ auth()->user()->email }}</span>
             </div>
-            <div class="info-row">
-                <div class="info-item">
-                    <strong>No. Telepon</strong>
-                    <span>{{ auth()->user()->phone ?? 'Belum diisi' }}</span>
-                </div>
-                <div class="info-item">
-                    <strong>Alamat</strong>
-                    <span>{{ auth()->user()->address ?? 'Belum diisi' }}</span>
-                </div>
+            <div class="info-item">
+                <strong>Nomor Induk Pegawai (NIP)</strong>
+                <span>{{ auth()->user()->nip ?? 'Belum diisi' }}</span>
             </div>
-            <div style="margin-top: 30px;">
-                <a href="{{ route('teacher.profile') }}" class="edit-btn">
-                    <i class="fas fa-edit"></i> Edit Profil
-                </a>
+            <div class="info-item">
+                <strong>Bidang Keahlian / Spesialisasi</strong>
+                <span>{{ auth()->user()->teacher->specialization ?? 'Belum diisi' }}</span>
+            </div>
+            <div class="info-item">
+                <strong>No. Telepon Aktif</strong>
+                <span>{{ auth()->user()->phone ?? 'Belum diisi' }}</span>
+            </div>
+            <div class="info-item">
+                <strong>Alamat Rumah</strong>
+                <span>{{ auth()->user()->address ?? 'Belum diisi' }}</span>
             </div>
         </div>
+
+        <a href="{{ route('teacher.profile') }}" class="edit-btn">
+            <i class="fas fa-edit"></i> Perbarui Profil Saya
+        </a>
     </div>
 </div>
 @endsection
