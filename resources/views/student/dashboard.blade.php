@@ -3,293 +3,301 @@
 @section('student-content')
 <style>
     :root {
-        --hijau-islam: #2D4438;
-        --hijau-light: #486E5A;
-        --emas: #709D88;
-        --emas-light: #E2ECE8;
-        --text-dark: #1C2D25;
-        --text-light: #5A7E6B;
-        --bg-light: #F4F7F5;
-        --putih: #ffffff;
+        --primary: #2d5016;
+        --text-primary: #1a1a1a;
+        --text-secondary: #666;
+        --text-muted: #999;
+        --border: #e5e5e5;
+        --bg-light: #f9f9f9;
+        --blue: #3498db;
+        --green: #2ecc71;
+        --purple: #9b59b6;
+        --red: #e74c3c;
     }
 
-    .hero-card {
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
-        color: var(--putih);
-        padding: 40px;
-        border-radius: 12px;
-        margin-bottom: 40px;
-        box-shadow: 0 4px 15px rgba(45, 68, 56, 0.15);
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
-    .hero-card h1 {
-        font-size: 32px;
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary) 0%, #3d6b1f 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .hero-section h1 {
+        font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
     }
 
-    .hero-card p {
-        font-size: 16px;
+    .hero-section p {
+        font-size: 0.95rem;
         opacity: 0.95;
         margin: 0;
+        line-height: 1.6;
     }
 
-    /* Dashboard Cards Grid */
-    .dashboard-cards {
+    /* Dashboard Grid */
+    .dashboard-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
     }
 
-    .stat-card {
-        background-color: var(--putih);
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
+    .dashboard-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1.25rem;
         transition: all 0.3s ease;
-        border-left: 5px solid;
+        border-left: 3px solid var(--primary);
+        cursor: pointer;
     }
 
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 20px rgba(45, 68, 56, 0.12);
+    .dashboard-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transform: translateY(-1px);
     }
 
-    .stat-card.jadwal {
-        border-left-color: #3498db;
-    }
+    .dashboard-card.blue { border-left-color: var(--blue); }
+    .dashboard-card.green { border-left-color: var(--green); }
+    .dashboard-card.purple { border-left-color: var(--purple); }
+    .dashboard-card.red { border-left-color: var(--red); }
 
-    .stat-card.nilai {
-        border-left-color: #2ecc71;
-    }
-
-    .stat-card.profil {
-        border-left-color: #9b59b6;
-    }
-
-    .stat-card.keamanan {
-        border-left-color: #e74c3c;
-    }
-
-    .stat-card h6 {
-        font-size: 14px;
-        color: var(--text-light);
+    .dashboard-card h6 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0 0 15px 0;
-        font-weight: 600;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.75rem;
     }
 
-    .stat-card .icon {
-        font-size: 32px;
-        margin-bottom: 10px;
-        opacity: 0.8;
+    .dashboard-card-icon {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+        display: block;
     }
 
-    .stat-card .icon.jadwal { color: #3498db; }
-    .stat-card .icon.nilai { color: #2ecc71; }
-    .stat-card .icon.profil { color: #9b59b6; }
-    .stat-card .icon.keamanan { color: #e74c3c; }
+    .dashboard-card.blue .dashboard-card-icon { color: var(--blue); }
+    .dashboard-card.green .dashboard-card-icon { color: var(--green); }
+    .dashboard-card.purple .dashboard-card-icon { color: var(--purple); }
+    .dashboard-card.red .dashboard-card-icon { color: var(--red); }
 
-    .stat-card a {
-        display: inline-block;
-        color: var(--hijau-islam);
+    .dashboard-card a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--primary);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 0.85rem;
         font-weight: 600;
-        margin-top: 10px;
-        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+        transition: all 0.2s;
     }
 
-    .stat-card a:hover {
-        color: var(--hijau-light);
-        margin-left: 5px;
+    .dashboard-card a:hover {
+        gap: 0.6rem;
+        color: #1f3a0f;
     }
 
     /* Info Card */
-    .info-card {
-        background-color: var(--putih);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(45, 68, 56, 0.08);
+    .info-section {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
         overflow: hidden;
     }
 
-    .info-card-header {
-        background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-light) 100%);
-        color: var(--putih);
-        padding: 20px 25px;
+    .info-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #3d6b1f 100%);
+        color: white;
+        padding: 1.25rem;
     }
 
-    .info-card-header h5 {
-        font-size: 18px;
+    .info-header h5 {
+        font-size: 1rem;
         font-weight: 600;
         margin: 0;
     }
 
-    .info-card-body {
-        padding: 30px 25px;
+    .info-body {
+        padding: 1.5rem;
     }
 
-    .info-row {
+    .info-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    .info-row:last-child {
+    .info-grid:last-of-type {
         margin-bottom: 0;
     }
 
     .info-item {
-        border-bottom: 1px solid var(--emas-light);
-        padding-bottom: 15px;
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
         padding-bottom: 0;
     }
 
-    .info-item strong {
+    .info-label {
         display: block;
-        color: var(--text-dark);
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
+        font-size: 0.8rem;
         font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.4rem;
     }
 
-    .info-item span {
-        color: var(--text-light);
-        font-size: 15px;
+    .info-value {
         display: block;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        font-weight: 500;
     }
 
-    .edit-btn {
-        background: var(--hijau-islam);
-        color: var(--putih);
+    .btn-edit {
+        background-color: var(--primary);
+        color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 0.6rem 1.5rem;
         border-radius: 6px;
-        font-size: 13px;
+        font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
     }
 
-    .edit-btn:hover {
-        background: var(--hijau-light);
-        color: var(--putih);
-        text-decoration: none;
+    .btn-edit:hover {
+        background-color: #1f3a0f;
+        color: white;
     }
 
     @media (max-width: 768px) {
-        .dashboard-cards {
+        .dashboard-grid {
             grid-template-columns: 1fr;
+            gap: 0.8rem;
         }
 
-        .info-row {
+        .info-grid {
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 1rem;
         }
 
-        .hero-card {
-            padding: 25px;
+        .hero-section {
+            padding: 1.5rem;
         }
 
-        .hero-card h1 {
-            font-size: 24px;
+        .hero-section h1 {
+            font-size: 1.5rem;
+        }
+
+        .info-body {
+            padding: 1.25rem;
         }
     }
 </style>
 
 <!-- Hero Section -->
-<div class="hero-card">
+<div class="hero-section">
     <h1>Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
     <p>Kelola data akademik dan profil Anda dengan mudah melalui dashboard ini.</p>
 </div>
 
 <!-- Dashboard Cards -->
-<div class="dashboard-cards">
-    <div class="stat-card jadwal">
+<div class="dashboard-grid">
+    <div class="dashboard-card blue">
         <h6>Jadwal Sekolah</h6>
-        <div class="icon jadwal">
-            <i class="fas fa-calendar-alt"></i>
-        </div>
-        <a href="{{ route('student.schedule') }}">Lihat Jadwal →</a>
+        <i class="fas fa-calendar-alt dashboard-card-icon"></i>
+        <a href="{{ route('student.schedule') }}">
+            <span>Lihat Jadwal</span>
+            <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
+        </a>
     </div>
 
-    <div class="stat-card nilai">
+    <div class="dashboard-card green">
         <h6>Nilai Saya</h6>
-        <div class="icon nilai">
-            <i class="fas fa-star"></i>
-        </div>
-        <a href="{{ route('student.grades') }}">Lihat Nilai →</a>
+        <i class="fas fa-star dashboard-card-icon"></i>
+        <a href="{{ route('student.grades') }}">
+            <span>Lihat Nilai</span>
+            <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
+        </a>
     </div>
 
-    <div class="stat-card profil">
+    <div class="dashboard-card purple">
         <h6>Data Saya</h6>
-        <div class="icon profil">
-            <i class="fas fa-user"></i>
-        </div>
-        <a href="{{ route('student.profile') }}">Lihat Data →</a>
+        <i class="fas fa-user dashboard-card-icon"></i>
+        <a href="{{ route('student.profile') }}">
+            <span>Lihat Data</span>
+            <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
+        </a>
     </div>
 
-    <div class="stat-card keamanan">
+    <div class="dashboard-card red">
         <h6>Keamanan</h6>
-        <div class="icon keamanan">
-            <i class="fas fa-lock"></i>
-        </div>
-        <a href="{{ route('student.change-password') }}">Ubah Password →</a>
+        <i class="fas fa-lock dashboard-card-icon"></i>
+        <a href="{{ route('student.change-password') }}">
+            <span>Ubah Password</span>
+            <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
+        </a>
     </div>
 </div>
 
 <!-- Profile Info Card -->
-<div class="info-card">
-    <div class="info-card-header">
+<div class="info-section">
+    <div class="info-header">
         <h5>Informasi Profil Anda</h5>
     </div>
-    <div class="info-card-body">
-        <div class="info-row">
+    <div class="info-body">
+        <div class="info-grid">
             <div class="info-item">
-                <strong>Nama Lengkap</strong>
-                <span>{{ auth()->user()->name }}</span>
+                <span class="info-label">Nama Lengkap</span>
+                <span class="info-value">{{ auth()->user()->name }}</span>
             </div>
             <div class="info-item">
-                <strong>Email</strong>
-                <span>{{ auth()->user()->email }}</span>
-            </div>
-        </div>
-        <div class="info-row">
-            <div class="info-item">
-                <strong>NISN</strong>
-                <span>{{ auth()->user()->nisn ?? 'Belum diisi' }}</span>
-            </div>
-            <div class="info-item">
-                <strong>Kelas</strong>
-                <span>{{ auth()->user()->class ?? 'Belum diisi' }}</span>
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ auth()->user()->email }}</span>
             </div>
         </div>
-        <div class="info-row">
+        <div class="info-grid">
             <div class="info-item">
-                <strong>No. Telepon</strong>
-                <span>{{ auth()->user()->phone ?? 'Belum diisi' }}</span>
+                <span class="info-label">NISN</span>
+                <span class="info-value">{{ auth()->user()->nisn ?? 'Belum diisi' }}</span>
             </div>
             <div class="info-item">
-                <strong>Alamat</strong>
-                <span>{{ auth()->user()->address ?? 'Belum diisi' }}</span>
+                <span class="info-label">Kelas</span>
+                <span class="info-value">{{ auth()->user()->class ?? 'Belum diisi' }}</span>
             </div>
         </div>
-        <div style="margin-top: 30px;">
-            <a href="{{ route('student.profile') }}" class="edit-btn">
-                <i class="fas fa-edit"></i> Edit Profil
-            </a>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">No. Telepon</span>
+                <span class="info-value">{{ auth()->user()->phone ?? 'Belum diisi' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Alamat</span>
+                <span class="info-value">{{ auth()->user()->address ?? 'Belum diisi' }}</span>
+            </div>
         </div>
+
+        <a href="{{ route('student.profile') }}" class="btn-edit">
+            <i class="fas fa-edit"></i>Edit Profil
+        </a>
     </div>
 </div>
 @endsection

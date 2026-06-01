@@ -312,7 +312,7 @@
             </li>
             <div class="sidebar-divider"></div>
             <li>
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <a href="{{ route('logout') }}" onclick="confirmLogout(event)">
                     <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
                 </a>
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -360,4 +360,14 @@
         </div>
     </div>
 </div>
+
+<script>
+    function confirmLogout(event) {
+        event.preventDefault();
+
+        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+            document.getElementById('logout-form').submit();
+        }
+    }
+</script>
 @endsection
