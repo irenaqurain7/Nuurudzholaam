@@ -168,7 +168,7 @@ class StudentDashboardController extends Controller
      */
     public function informasi()
     {
-        $announcements = Announcement::where('status', 'published')->orderBy('created_at', 'desc')->get();
+        $announcements = Announcement::where('status', 'aktif')->orderBy('created_at', 'desc')->get();
 
         return view('student.informasi', [
             'announcements' => $announcements,
@@ -180,7 +180,7 @@ class StudentDashboardController extends Controller
      */
     public function kegiatan()
     {
-        $activities = Activity::where('status', 'published')->orderBy('created_at', 'desc')->get();
+        $activities = Activity::where('visibility', 'publik')->orderBy('created_at', 'desc')->get();
 
         return view('student.kegiatan', [
             'activities' => $activities,
