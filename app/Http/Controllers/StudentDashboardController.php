@@ -30,7 +30,7 @@ class StudentDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $student = $user->student;
+        $student = Student::where('user_id', $user->id)->firstOrFail();
 
         return view('student.dashboard', [
             'user' => $user,
@@ -44,7 +44,7 @@ class StudentDashboardController extends Controller
     public function schedule()
     {
         $user = Auth::user();
-        $student = $user->student;
+        $student = Student::where('user_id', $user->id)->firstOrFail();
         $schedules = $student->schedule()->orderBy('day')->get();
 
         return view('student.schedule', [
@@ -58,7 +58,7 @@ class StudentDashboardController extends Controller
     public function grades()
     {
         $user = Auth::user();
-        $student = $user->student;
+        $student = Student::where('user_id', $user->id)->firstOrFail();
         $grades = $student->grades()->with('teacher.user')->get();
 
         return view('student.grades', [
@@ -72,7 +72,7 @@ class StudentDashboardController extends Controller
     public function profile()
     {
         $user = Auth::user();
-        $student = $user->student;
+        $student = Student::where('user_id', $user->id)->firstOrFail();
 
         return view('student.profile', [
             'user' => $user,

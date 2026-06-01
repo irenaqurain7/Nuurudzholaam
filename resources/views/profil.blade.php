@@ -384,7 +384,7 @@
         <h2>Tenaga Pendidik</h2>
         <p class="section-subtitle">Pilar utama kesuksesan Sekolah Nuurudzholaam adalah tenaga pendidik yang berdedikasi tinggi.</p>
 
-        <div class="grid-auto">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px;">
             @if($teachers->count() > 0)
                 @foreach($teachers as $teacher)
                     <div class="teacher-card">
@@ -401,8 +401,8 @@
                 @endforeach
             @else
                 @foreach($defaultTeachers as $teacher)
-                    <div class="teacher-card">
-                        <div class="teacher-photo">
+                    <div style="text-align: center;">
+                        <div style="width: 150px; height: 150px; border-radius: 18px; overflow: hidden; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(31, 127, 95, 0.15);">
                             @if($teacher->photo)
                                 @php
                                     $photoName = $teacher->photo;
@@ -425,16 +425,22 @@
                                         }
                                     }
                                 @endphp
-                                <img src="{{ asset('images/' . urlencode($photoName)) }}" alt="{{ $teacher->name }}">
+                                <img src="{{ asset('images/' . urlencode($photoName)) }}" alt="{{ $teacher->name }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             @else
-                                <i class="fas fa-user" style="color: white; font-size: 70px;"></i>
+                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
                             @endif
                         </div>
-                        <h4 class="teacher-name">{{ $teacher->name }}</h4>
-                        <p class="teacher-role">{{ $teacher->role }}</p>
+                        <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-weight: bold;">{{ $teacher->name }}</h4>
+                        <p style="color: var(--emas); font-weight: 600; font-size: 14px; margin: 0;">{{ $teacher->role }}</p>
                     </div>
                 @endforeach
             @endif
+
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

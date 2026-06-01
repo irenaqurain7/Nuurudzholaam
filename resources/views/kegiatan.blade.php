@@ -3,18 +3,10 @@
 @section('title', 'Kegiatan dan Dokumentasi')
 
 @section('content')
-<!-- Hero Section -->
-<div class="hero">
-    <div class="container">
-        <h1>Kegiatan dan Dokumentasi</h1>
-        <p>Ikuti perkembangan dan kegiatan menarik di sekolah kami</p>
-    </div>
-</div>
-
 <!-- Main Content -->
-<div class="section">
+<div class="section" style="padding-top: 20px;">
     <div class="container">
-        <h2 class="section-title">Kegiatan Sekolah</h2>
+        <h2 class="section-title">Dokumentasi Kegiatan Sekolah</h2>
 
         @if($activities->count() > 0)
         <div class="grid-responsive">
@@ -34,7 +26,7 @@
                     <p style="font-size: 13px; color: #999; margin: 0;">
                         <i class="fas fa-calendar"></i> {{ $activity->tanggal->format('d M Y') }}
                     </p>
-                    <a href="javascript:void(0);" style="color: var(--hijau-islam); font-weight: 600; text-decoration: none; transition: all 0.3s;">
+                    <a href="{{ route('kegiatan.show', $activity->id) }}" style="color: var(--hijau-islam); font-weight: 600; text-decoration: none; transition: all 0.3s;">
                         <i class="fas fa-arrow-right"></i> Lihat
                     </a>
                 </div>

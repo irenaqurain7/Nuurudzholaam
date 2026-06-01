@@ -63,6 +63,19 @@ class PublicController extends Controller
         return view('kegiatan', compact('school', 'activities'));
     }
 
+    public function showActivity($id)
+    {
+        $school = $this->schoolInfo();
+        $activity = Activity::where('visibility', 'publik')->findOrFail($id);
+        $relatedActivities = Activity::where('visibility', 'publik')
+            ->where('id', '!=', $id)
+            ->orderBy('tanggal', 'desc')
+            ->take(3)
+            ->get();
+
+        return view('kegiatan-detail', compact('school', 'activity', 'relatedActivities'));
+    }
+
     public function program()
     {
         $school = $this->schoolInfo();
@@ -90,8 +103,8 @@ class PublicController extends Controller
             'Rinda Maryani, S.Pd' => 'rinda-maryani-s-pd.jpeg',
             'Mochamad Fazhri Syamsi' => 'mochamad-fazhri-syamsi.jpeg',
             'Dinda Aulia Putri' => 'dinda-aulia-putri.jpeg',
-            'Kurnia Amelia' => 'Kurnia Amelia.jpeg',
-            'Ananda Jihan Kamilah' => 'Ananda Jihan Kamilah.jpeg',
+            'Kurnia Amelia' => 'kurnia-amelia.jpeg',
+            'Ananda Jihan Kamilah' => 'ananda-jihan-kamilah.jpeg',
         ];
 
         // Fallback data jika tidak ada guru di database
