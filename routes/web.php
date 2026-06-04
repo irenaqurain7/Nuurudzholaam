@@ -177,9 +177,11 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
     Route::put('/grades/{id}', [TeacherDashboardController::class, 'storeGrade'])->name('grades.update');
     Route::delete('/grades/{id}', [TeacherDashboardController::class, 'deleteGrade'])->name('grades.delete');
     Route::post('/grades/ajax/store', [TeacherDashboardController::class, 'storeGradeAjax'])->name('grades.ajax.store');
+    Route::post('/grades/ajax/batch-save', [TeacherDashboardController::class, 'batchSaveGrades'])->name('grades.ajax.batch');
     Route::post('/grades/import', [TeacherDashboardController::class, 'importGrades'])->name('grades.import');
     Route::get('/grades/export', [TeacherDashboardController::class, 'exportGrades'])->name('grades.export');
     Route::get('/grades/export-excel', [TeacherDashboardController::class, 'exportGradesExcel'])->name('grades.export-excel');
+    Route::get('/grades/students-by-class', [TeacherDashboardController::class, 'studentsByClass'])->name('grades.students-by-class');
 
     // Profile
     Route::get('/profile', [TeacherDashboardController::class, 'profile'])->name('profile');
@@ -243,12 +245,13 @@ if (app()->environment('local')) {
         $grades = $selectedStudent ? \App\Models\Grade::where('student_id', $selectedStudent)->get() : collect();
         $classes = ['1A','2A','3A','4A','5A','6A'];
 
-        return view('teacher.grades', [
+        return view('teacher.grades-simple', [
             'students' => $students,
             'grades' => $grades,
             'classes' => $classes,
             'selectedClass' => $selectedClass,
             'selectedStudent' => $selectedStudent,
+            'selectedStudentInfo' => $selectedStudentObj,
         ]);
     });
 }

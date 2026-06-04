@@ -12,6 +12,7 @@ use App\Models\SchoolInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class TeacherDashboardController extends Controller
 {
@@ -142,32 +143,65 @@ class TeacherDashboardController extends Controller
         $user = Auth::user();
         $teacher = $user->teacher;
 
-        $query = Grade::where('teacher_id', $teacher->id)->with('student.user');
+        $selectedStudentId = $request->query('student_id');
+        $selectedStudent = null;
+        $selectedClass = trim((string) $request->query('class', ''));
+        $selectedSubject = trim((string) $request->query('subject', ''));
 
-        if ($request->has('student_id')) {
-            $query->where('student_id', $request->student_id);
+        if ($selectedStudentId) {
+            $selectedStudent = Student::with('user')->find($selectedStudentId);
+            if ($selectedStudent && $selectedClass === '') {
+                $selectedClass = (string) ($selectedStudent->class ?? '');
+            }
         }
 
-        $grades = $query->get();
+        $defaultClasses = ['1A', '2A', '3A', '4A', '5A', '6A'];
+        $existingClasses = Student::query()
+            ->whereNotNull('class')
+            ->distinct()
+            ->orderBy('class')
+            ->pluck('class')
+            ->filter()
+            ->values()
+            ->toArray();
 
-        // Get students taught by this teacher
-        $students = Student::whereHas('grades', function ($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id);
-        })->with('user')->get();
+        $classes = collect($defaultClasses)
+            ->merge($existingClasses)
+            ->unique()
+            ->values();
 
-        // Derive class list from students and include default classes 1..6
-        $studentClasses = $students->pluck('class')->unique()->filter()->values()->toArray();
-        $defaultClasses = ['1A','2A','3A','4A','5A','6A'];
+        $subjects = Grade::where('teacher_id', $teacher->id)
+            ->whereNotNull('subject')
+            ->distinct()
+            ->orderBy('subject')
+            ->pluck('subject')
+            ->filter()
+            ->values();
 
-        // Merge preserving defaults order, then append any additional classes
-        $classes = collect($defaultClasses)->merge(array_values(array_diff($studentClasses, $defaultClasses)))->filter()->values();
+        $studentQuery = Student::with('user');
+        if ($selectedClass !== '') {
+            $studentQuery->where('class', $selectedClass);
+        }
 
-        return view('teacher.grades', [
+        $students = $studentQuery->orderBy('nisn')->get();
+
+        $grades = collect();
+        if ($selectedStudent) {
+            $grades = Grade::where('teacher_id', $teacher->id)
+                ->where('student_id', $selectedStudent->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('teacher.grades-simple', [
+            'subjects' => $subjects,
             'grades' => $grades,
             'students' => $students,
             'classes' => $classes,
-            'selectedStudent' => $request->student_id,
-            'selectedClass' => $request->class ?? null,
+            'selectedStudent' => $selectedStudentId,
+            'selectedClass' => $selectedClass,
+            'selectedSubject' => $selectedSubject,
+            'selectedStudentInfo' => $selectedStudent,
         ]);
     }
 
@@ -272,12 +306,21 @@ class TeacherDashboardController extends Controller
         ]);
 
         try {
-            $validated['teacher_id'] = $teacher->id;
-            $grade = Grade::create($validated);
+            $grade = Grade::updateOrCreate(
+                [
+                    'teacher_id' => $teacher->id,
+                    'student_id' => $validated['student_id'],
+                    'subject' => $validated['subject'],
+                ],
+                [
+                    'grade' => $validated['grade'],
+                    'notes' => $validated['notes'] ?? null,
+                ]
+            );
             
             return response()->json([
                 'success' => true,
-                'message' => 'Nilai berhasil ditambahkan',
+                'message' => $grade->wasRecentlyCreated ? 'Nilai berhasil ditambahkan' : 'Nilai berhasil diperbarui',
                 'grade' => [
                     'id' => $grade->id,
                     'subject' => $grade->subject,
@@ -295,6 +338,71 @@ class TeacherDashboardController extends Controller
     }
 
     /**
+     * Batch save grades (accepts array of grade objects)
+     */
+    public function batchSaveGrades(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $validated = $request->validate([
+            'grades' => 'required|array|min:1',
+            'grades.*.student_id' => 'required|exists:students,id',
+            'grades.*.subject' => 'required|string|max:255',
+            'grades.*.grade' => 'nullable|numeric|min:0|max:100',
+            'grades.*.notes' => 'nullable|string|max:500',
+        ]);
+
+        $results = [];
+        $saved = 0;
+        $failed = 0;
+
+        foreach ($validated['grades'] as $index => $g) {
+            try {
+                $gradeValue = isset($g['grade']) && $g['grade'] !== '' ? (float) $g['grade'] : null;
+
+                $grade = Grade::updateOrCreate(
+                    [
+                        'teacher_id' => $teacher->id,
+                        'student_id' => $g['student_id'],
+                        'subject' => $g['subject'],
+                    ],
+                    [
+                        'grade' => $gradeValue,
+                        'notes' => $g['notes'] ?? null,
+                    ]
+                );
+
+                $results[] = [
+                    'index' => $index,
+                    'student_id' => $g['student_id'],
+                    'subject' => $g['subject'],
+                    'success' => true,
+                    'grade_id' => $grade->id,
+                ];
+                $saved++;
+            } catch (\Exception $e) {
+                $results[] = [
+                    'index' => $index,
+                    'student_id' => $g['student_id'] ?? null,
+                    'subject' => $g['subject'] ?? null,
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ];
+                $failed++;
+            }
+        }
+
+        return response()->json([
+            'success' => $failed === 0,
+            'message' => $saved . ' tersimpan, ' . $failed . ' gagal',
+            'saved' => $saved,
+            'failed' => $failed,
+            'results' => $results,
+        ]);
+    }
+
+    /**
      * Import grades from CSV file (bulk import)
      */
     public function importGrades(Request $request)
@@ -309,57 +417,85 @@ class TeacherDashboardController extends Controller
         try {
             $file = $request->file('file');
             $path = $file->getRealPath();
+            $extension = strtolower($file->getClientOriginalExtension());
             
             $imported = 0;
             $failed = 0;
             $errors = [];
 
-            // Open and read CSV
-            if (($handle = fopen($path, 'r')) !== false) {
-                $header = fgetcsv($handle);
-                
-                while (($row = fgetcsv($handle)) !== false) {
-                    if (count($row) < 4) continue;
+            $rows = [];
 
-                    try {
-                        $nisn = trim($row[0]);
-                        $subject = trim($row[1]);
-                        $grade = (float) trim($row[2]);
-                        $notes = isset($row[3]) ? trim($row[3]) : null;
+            if (in_array($extension, ['xlsx', 'xls'], true)) {
+                $spreadsheet = IOFactory::load($path);
+                $worksheet = $spreadsheet->getActiveSheet();
+                foreach ($worksheet->getRowIterator() as $rowIndex => $row) {
+                    $cellIterator = $row->getCellIterator();
+                    $cellIterator->setIterateOnlyExistingCells(false);
 
-                        // Validate data
-                        if (empty($nisn) || empty($subject) || $grade < 0 || $grade > 100) {
-                            $failed++;
-                            continue;
-                        }
+                    $rowData = [];
+                    foreach ($cellIterator as $cell) {
+                        $rowData[] = trim((string) $cell->getFormattedValue());
+                    }
 
-                        // Find student by NISN
-                        $student = Student::where('nisn', $nisn)
-                            ->whereHas('grades', function ($q) use ($teacher) {
-                                $q->where('teacher_id', $teacher->id);
-                            })
-                            ->first();
+                    $rows[] = $rowData;
+                }
+            } else {
+                if (($handle = fopen($path, 'r')) !== false) {
+                    $sample = fgets($handle);
+                    $delimiter = (substr_count((string) $sample, ';') > substr_count((string) $sample, ',')) ? ';' : ',';
+                    rewind($handle);
 
-                        if (!$student) {
-                            $failed++;
-                            continue;
-                        }
+                    while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+                        $rows[] = $row;
+                    }
 
-                        // Create grade
-                        Grade::create([
-                            'student_id' => $student->id,
-                            'teacher_id' => $teacher->id,
-                            'subject' => $subject,
-                            'grade' => $grade,
-                            'notes' => $notes,
-                        ]);
+                    fclose($handle);
+                }
+            }
 
-                        $imported++;
-                    } catch (\Exception $e) {
-                        $failed++;
+            foreach ($rows as $index => $row) {
+                if (count($row) < 3) {
+                    $failed++;
+                    continue;
+                }
+
+                $nisn = trim((string) ($row[0] ?? ''));
+                $subject = trim((string) ($row[1] ?? ''));
+                $grade = (float) trim((string) ($row[2] ?? ''));
+                $notes = isset($row[3]) ? trim((string) $row[3]) : null;
+
+                if ($index === 0) {
+                    $firstCell = strtolower($nisn);
+                    if (str_contains($firstCell, 'nisn') || str_contains($firstCell, 'nis')) {
+                        continue;
                     }
                 }
-                fclose($handle);
+
+                try {
+                    if (empty($nisn) || empty($subject) || $grade < 0 || $grade > 100) {
+                        $failed++;
+                        continue;
+                    }
+
+                    $student = Student::where('nisn', $nisn)->first();
+
+                    if (!$student) {
+                        $failed++;
+                        continue;
+                    }
+
+                    Grade::create([
+                        'student_id' => $student->id,
+                        'teacher_id' => $teacher->id,
+                        'subject' => $subject,
+                        'grade' => $grade,
+                        'notes' => $notes,
+                    ]);
+
+                    $imported++;
+                } catch (\Exception $e) {
+                    $failed++;
+                }
             }
 
             return response()->json([
@@ -375,6 +511,61 @@ class TeacherDashboardController extends Controller
                 'message' => 'Gagal import file: ' . $e->getMessage()
             ], 422);
         }
+    }
+
+    /**
+     * Filter students by class and keyword via AJAX.
+     */
+    public function studentsByClass(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $validated = $request->validate([
+            'class' => 'required|string|max:20',
+            'search' => 'nullable|string|max:100',
+            'subject' => 'nullable|string|max:255',
+        ]);
+
+        $search = trim((string) ($validated['search'] ?? ''));
+        $subject = trim((string) ($validated['subject'] ?? ''));
+
+        $studentsQuery = Student::with('user')
+            ->where('class', $validated['class'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%');
+                    })->orWhere('nisn', 'like', '%' . $search . '%');
+                });
+            });
+
+        $students = $studentsQuery->orderBy('nisn')->limit(50)->get()->map(function ($student) use ($teacher, $subject) {
+            $grade = null;
+
+            if ($subject !== '') {
+                $grade = Grade::where('teacher_id', $teacher->id)
+                    ->where('student_id', $student->id)
+                    ->where('subject', $subject)
+                    ->first();
+            }
+
+            return [
+                'id' => $student->id,
+                'name' => $student->user->name ?? '-',
+                'nisn' => $student->nisn ?? '-',
+                'class' => $student->class ?? '-',
+                'grade_id' => $grade->id ?? null,
+                'grade' => $grade ? $grade->grade : null,
+                'notes' => $grade->notes ?? '',
+                'updated_at' => $grade ? $grade->updated_at->format('d M Y H:i') : null,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'students' => $students,
+        ]);
     }
 
     /**
