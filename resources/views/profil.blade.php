@@ -67,7 +67,7 @@
     .grid-auto {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 28px;
+        gap: 28px;php
     }
 
     .teacher-card {

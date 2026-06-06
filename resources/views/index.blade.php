@@ -196,18 +196,18 @@
     <div class="container">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;">
             <div>
-                <div style="width: 100%; height: 350px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img src="{{ asset('images/testimonial-placeholder.jpg') }}" alt="Kepala Sekolah" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: visible; padding: 20px;">
+                    <img src="{{ asset('images/wiwi-suherti-s-pd.jpeg') }}" alt="Wiwi Suherti, S.Pd" style="max-width: 100%; max-height: 500px; width: auto; height: auto; object-fit: contain; border-radius: 12px;">
                 </div>
             </div>
             <div>
-                <h2 style="font-size: 32px; margin-bottom: 20px; font-weight: bold;">Selamat Datang di Al-Hikmah Academy</h2>
+                <h2 style="font-size: 32px; margin-bottom: 20px; font-weight: bold;">Selamat Datang di Nuurudzholaam</h2>
                 <p style="font-size: 16px; line-height: 1.8; margin-bottom: 20px; opacity: 0.95;">
-                    "Assalamu alaikum wa rahmatullahi wa barakatuh. Pal syukur semua akum atas kehadiran Anda di Al-Hikmah Academy. Sekolah kami adalah tempat di mana nilai-nilai keagamaan dan pendidikan akademik berpadu sempurna untuk menciptakan generasi yang tidak hanya cerdas secara intelektual, tetapi juga kuat dalam iman dan akhlak."
+                    "Assalamu alaikum wa rahmatullahi wa barakatuh. Pal syukur semua akum atas kehadiran Anda di Sekolah Nuurudzholaam. Sekolah kami adalah tempat di mana nilai-nilai keagamaan dan pendidikan akademik berpadu sempurna untuk menciptakan generasi yang tidak hanya cerdas secara intelektual, tetapi juga kuat dalam iman dan akhlak."
                 </p>
                 <div>
-                    <p style="font-weight: bold; margin-bottom: 5px;">Ugi. H. Ahmad Farwuz, M.Pd</p>
-                    <p style="opacity: 0.9; font-size: 14px;">Kepala Sekolah Al-Hikmah Academy</p>
+                    <p style="font-weight: bold; margin-bottom: 5px;">Wiwi Suherti, S.Pd</p>
+                    <p style="opacity: 0.9; font-size: 14px;">Kepala Sekolah Nuurudzholaam</p>
                 </div>
             </div>
         </div>
