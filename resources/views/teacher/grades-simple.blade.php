@@ -152,6 +152,216 @@
         border-bottom: 1px solid rgba(27, 67, 50, 0.05);
     }
 
+    /* Report Filter Modal */
+    .report-filter-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .report-filter-modal-overlay.show {
+        display: flex;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .report-filter-modal {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 450px;
+        width: 90%;
+        animation: slideUp 0.3s ease;
+        overflow: hidden;
+    }
+
+    .report-filter-modal-header {
+        padding: 24px;
+        border-bottom: 1px solid rgba(27, 67, 50, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .report-filter-modal-header h3 {
+        margin: 0;
+        color: var(--school-primary);
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .report-filter-modal-close {
+        background: none;
+        border: none;
+        color: var(--school-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.15s ease;
+    }
+
+    .report-filter-modal-close:hover {
+        background: rgba(27, 67, 50, 0.08);
+        color: var(--school-primary);
+    }
+
+    .report-filter-modal-body {
+        padding: 24px;
+    }
+
+    .report-filter-form-group {
+        margin-bottom: 20px;
+    }
+
+    .report-filter-form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .report-filter-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--school-primary);
+    }
+
+    .report-filter-select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid rgba(27, 67, 50, 0.2);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background: #fff;
+        color: var(--school-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-height: 44px;
+    }
+
+    .report-filter-select:hover {
+        border-color: rgba(27, 67, 50, 0.3);
+    }
+
+    .report-filter-select:focus {
+        outline: none;
+        border-color: var(--school-secondary);
+        box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
+    }
+
+    .report-filter-message {
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+        display: none;
+        animation: slideUp 0.2s ease;
+    }
+
+    .report-filter-message.show {
+        display: block;
+    }
+
+    .report-filter-message.error {
+        background: #fff0f1;
+        color: #b42318;
+        border: 1px solid #f4c8cc;
+        border-left: 4px solid #d64545;
+    }
+
+    .report-filter-footer {
+        padding: 20px 24px;
+        border-top: 1px solid rgba(27, 67, 50, 0.1);
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .report-filter-btn {
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px 24px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .report-filter-btn-cancel {
+        background: #f0f0f0;
+        color: var(--school-primary);
+    }
+
+    .report-filter-btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .report-filter-btn-submit {
+        background: linear-gradient(135deg, var(--school-primary), #133026);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(27, 67, 50, 0.15);
+    }
+
+    .report-filter-btn-submit:hover:not(:disabled) {
+        background: linear-gradient(135deg, #16382a, #0f241c);
+        box-shadow: 0 6px 16px rgba(27, 67, 50, 0.20);
+        transform: translateY(-1px);
+    }
+
+    .report-filter-btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 640px) {
+        .report-filter-modal {
+            max-width: 95%;
+            width: 95%;
+        }
+
+        .report-filter-modal-header,
+        .report-filter-modal-body,
+        .report-filter-footer {
+            padding: 16px;
+        }
+
+        .report-filter-modal-header h3 {
+            font-size: 1.1rem;
+        }
+    }
+
     .card-school {
         border: 1px solid var(--school-border);
         border-radius: 12px;
@@ -404,9 +614,9 @@
         </div>
         <div class="action-group">
             <button type="button" id="saveAllBtn" class="btn btn-school">Simpan Perubahan</button>
-            <a href="{{ route('teacher.report-summary') }}" class="btn btn-outline-school" title="Lihat laporan ringkasan">
+            <button type="button" id="reportBtn" class="btn btn-outline-school" title="Lihat laporan ringkasan">
                 <i class="fas fa-chart-bar"></i> Laporan
-            </a>
+            </button>
             <div class="export-dropdown-wrapper">
                 <button type="button" class="btn btn-outline-school" id="exportBtn">
                     <i class="fas fa-download"></i> Export
@@ -534,6 +744,43 @@
 
                 <div id="importMessage" class="alert d-none mt-3 message-box" role="alert"></div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Filter Modal -->
+<div class="report-filter-modal-overlay" id="reportFilterOverlay">
+    <div class="report-filter-modal">
+        <div class="report-filter-modal-header">
+            <h3><i class="fas fa-filter"></i> Filter Laporan</h3>
+            <button type="button" class="report-filter-modal-close" id="reportFilterClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="report-filter-modal-body">
+            <div id="reportFilterMessage" class="report-filter-message"></div>
+            <form id="reportFilterForm">
+                <div class="report-filter-form-group">
+                    <label for="reportClassSelect" class="report-filter-label">Kelas</label>
+                    <select id="reportClassSelect" class="report-filter-select" required>
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="1A">1A</option>
+                        <option value="2A">2A</option>
+                        <option value="3A">3A</option>
+                        <option value="4A">4A</option>
+                        <option value="5A">5A</option>
+                        <option value="6A">6A</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="report-filter-footer">
+            <button type="button" class="report-filter-btn report-filter-btn-cancel" id="reportFilterCancel">
+                Batal
+            </button>
+            <button type="button" class="report-filter-btn report-filter-btn-submit" id="reportFilterSubmit" disabled>
+                Tampilkan Laporan
+            </button>
         </div>
     </div>
 </div>
@@ -1029,6 +1276,85 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Report Filter Modal Handler
+    const reportBtn = document.getElementById('reportBtn');
+    const reportFilterOverlay = document.getElementById('reportFilterOverlay');
+    const reportFilterClose = document.getElementById('reportFilterClose');
+    const reportFilterCancel = document.getElementById('reportFilterCancel');
+    const reportFilterSubmit = document.getElementById('reportFilterSubmit');
+    const reportClassSelect = document.getElementById('reportClassSelect');
+    const reportFilterMessage = document.getElementById('reportFilterMessage');
+    const reportFilterForm = document.getElementById('reportFilterForm');
+
+    // Open modal when Laporan button is clicked
+    if (reportBtn) {
+        reportBtn.addEventListener('click', function() {
+            reportFilterOverlay.classList.add('show');
+            reportClassSelect.focus();
+        });
+    }
+
+    // Close modal
+    function closeReportModal() {
+        reportFilterOverlay.classList.remove('show');
+        reportFilterMessage.classList.remove('show', 'error');
+        reportClassSelect.value = '';
+        reportFilterSubmit.disabled = true;
+    }
+
+    if (reportFilterClose) {
+        reportFilterClose.addEventListener('click', closeReportModal);
+    }
+
+    if (reportFilterCancel) {
+        reportFilterCancel.addEventListener('click', closeReportModal);
+    }
+
+    // Close modal when clicking outside
+    if (reportFilterOverlay) {
+        reportFilterOverlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReportModal();
+            }
+        });
+    }
+
+    // Handle class selection
+    if (reportClassSelect) {
+        reportClassSelect.addEventListener('change', function() {
+            if (this.value) {
+                reportFilterSubmit.disabled = false;
+                reportFilterMessage.classList.remove('show');
+            } else {
+                reportFilterSubmit.disabled = true;
+                reportFilterMessage.classList.remove('show');
+            }
+        });
+    }
+
+    // Handle form submission
+    if (reportFilterSubmit) {
+        reportFilterSubmit.addEventListener('click', function() {
+            const selectedClass = reportClassSelect.value;
+            
+            if (!selectedClass) {
+                reportFilterMessage.textContent = 'Silakan pilih kelas terlebih dahulu';
+                reportFilterMessage.classList.add('show', 'error');
+                return;
+            }
+
+            // Redirect to report page with selected class
+            window.location.href = '{{ route("teacher.report-summary") }}?class=' + encodeURIComponent(selectedClass);
+        });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && reportFilterOverlay.classList.contains('show')) {
+            closeReportModal();
+        }
+    });
 });
 </script>
 @endsection
