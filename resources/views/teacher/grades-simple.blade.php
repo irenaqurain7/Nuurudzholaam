@@ -45,27 +45,36 @@
 
     .action-group {
         display: flex;
-        gap: 0.75rem;
+        gap: 10px;
         flex-wrap: wrap;
+        align-items: center;
     }
 
     .btn-school,
     .btn-outline-school {
-        border-radius: 12px;
-        font-weight: 700;
-        padding: 0.7rem 1rem;
-        box-shadow: 0 6px 16px rgba(27, 67, 50, 0.10);
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px 20px;
+        box-shadow: 0 2px 6px rgba(27, 67, 50, 0.06);
+        line-height: 1.4;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+        width: fit-content;
+        transition: all 0.2s ease;
     }
 
     .btn-school {
         background: linear-gradient(135deg, var(--school-primary), #133026);
         color: #fff;
-        border: none;
     }
 
     .btn-school:hover {
         color: #fff;
         background: linear-gradient(135deg, #16382a, #0f241c);
+        box-shadow: 0 4px 10px rgba(27, 67, 50, 0.12);
+        transform: translateY(-1px);
     }
 
     .btn-outline-school {
@@ -77,6 +86,70 @@
     .btn-outline-school:hover {
         background: rgba(82, 183, 136, 0.08);
         color: var(--school-primary);
+        border-color: rgba(27, 67, 50, 0.30);
+        box-shadow: 0 2px 8px rgba(27, 67, 50, 0.08);
+    }
+
+    /* Custom Dropdown */
+    .export-dropdown-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .export-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #fff;
+        border: 1px solid rgba(27, 67, 50, 0.15);
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(27, 67, 50, 0.12);
+        min-width: 200px;
+        margin-top: 8px;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .export-dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .export-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        color: var(--school-primary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        transition: all 0.15s ease;
+    }
+
+    .export-dropdown-item:hover {
+        background: rgba(82, 183, 136, 0.08);
+        padding-left: 20px;
+    }
+
+    .export-dropdown-item i {
+        width: 18px;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .export-dropdown-item:not(:last-child) {
+        border-bottom: 1px solid rgba(27, 67, 50, 0.05);
     }
 
     .card-school {
@@ -112,16 +185,18 @@
 
     .label-soft {
         display: block;
-        margin-bottom: 0.45rem;
-        font-weight: 700;
+        margin-bottom: 0.35rem;
+        font-weight: 600;
+        font-size: 0.9rem;
         color: var(--school-primary);
     }
 
     .form-control,
     .form-select {
-        border-radius: 12px;
+        border-radius: 10px;
         border-color: #cfdcd5;
-        min-height: 46px;
+        min-height: 40px;
+        font-size: 0.9rem;
     }
 
     .form-control:focus,
@@ -296,16 +371,28 @@
             font-size: 1.55rem;
         }
 
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
         .summary-grid {
             display: none;
         }
 
         .action-group {
-            width: 100%;
+            gap: 8px;
         }
 
-        .action-group .btn {
-            flex: 1 1 auto;
+        .btn-school,
+        .btn-outline-school {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .export-dropdown-menu {
+            right: 0;
+            left: auto;
         }
     }
 </style>
@@ -317,6 +404,24 @@
         </div>
         <div class="action-group">
             <button type="button" id="saveAllBtn" class="btn btn-school">Simpan Perubahan</button>
+            <a href="{{ route('teacher.report-summary') }}" class="btn btn-outline-school" title="Lihat laporan ringkasan">
+                <i class="fas fa-chart-bar"></i> Laporan
+            </a>
+            <div class="export-dropdown-wrapper">
+                <button type="button" class="btn btn-outline-school" id="exportBtn">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <div class="export-dropdown-menu" id="exportDropdown">
+                    <a href="{{ route('teacher.export-grades-excel') }}" class="export-dropdown-item">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Export Excel</span>
+                    </a>
+                    <button type="button" class="export-dropdown-item" onclick="exportToPDF(); return false;">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Export PDF</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -875,6 +980,54 @@ document.addEventListener('DOMContentLoaded', function() {
         loadStudents();
     } else {
         renderEmptyRow('Pilih kelas dan mapel untuk menampilkan tabel siswa.');
+    }
+
+    // Export functions
+    window.exportToPDF = function() {
+        const selectedClass = classSelect.value;
+        if (!selectedClass) {
+            alert('Pilih kelas terlebih dahulu');
+            return;
+        }
+        window.location.href = '{{ route("teacher.export-report-pdf") }}?class=' + selectedClass;
+    };
+
+    window.exportToExcel = function() {
+        const selectedClass = classSelect.value;
+        if (!selectedClass) {
+            alert('Pilih kelas terlebih dahulu');
+            return;
+        }
+        window.location.href = '{{ route("teacher.export-grades-excel") }}?class=' + selectedClass;
+    };
+
+    // Custom Export Dropdown Handler
+    const exportBtn = document.getElementById('exportBtn');
+    const exportDropdown = document.getElementById('exportDropdown');
+
+    if (exportBtn && exportDropdown) {
+        // Toggle dropdown when button is clicked
+        exportBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            exportDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!exportBtn.contains(e.target) && !exportDropdown.contains(e.target)) {
+                exportDropdown.classList.remove('show');
+            }
+        });
+
+        // Close dropdown after clicking on an item
+        const exportItems = exportDropdown.querySelectorAll('.export-dropdown-item');
+        exportItems.forEach(item => {
+            item.addEventListener('click', function() {
+                setTimeout(() => {
+                    exportDropdown.classList.remove('show');
+                }, 100);
+            });
+        });
     }
 });
 </script>

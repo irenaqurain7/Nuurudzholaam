@@ -201,7 +201,13 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
     Route::post('/grades/import', [TeacherDashboardController::class, 'importGrades'])->name('grades.import');
     Route::get('/grades/export', [TeacherDashboardController::class, 'exportGrades'])->name('grades.export');
     Route::get('/grades/export-excel', [TeacherDashboardController::class, 'exportGradesExcel'])->name('grades.export-excel');
+    Route::get('/grades/export-proper', [TeacherDashboardController::class, 'exportGradesExcelProper'])->name('export-grades-excel');
     Route::get('/grades/students-by-class', [TeacherDashboardController::class, 'studentsByClass'])->name('grades.students-by-class');
+
+    // Reports
+    Route::get('/report-summary', [TeacherDashboardController::class, 'getReportSummary'])->name('report-summary');
+    Route::get('/report/export-excel', [TeacherDashboardController::class, 'exportGradesExcelProper'])->name('export-report-excel');
+    Route::get('/report/export-pdf', [TeacherDashboardController::class, 'exportReportPDF'])->name('export-report-pdf');
 
     // Profile
     Route::get('/profile', [TeacherDashboardController::class, 'profile'])->name('profile');

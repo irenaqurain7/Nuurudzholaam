@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class TeacherDashboardController extends Controller
 {
@@ -673,6 +677,221 @@ class TeacherDashboardController extends Controller
         echo '</Workbook>';
 
         exit;
+    }
+
+    /**
+     * Export grades to Excel using PhpSpreadsheet (Improved)
+     */
+    public function exportGradesExcelProper(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $selectedClass = $request->query('class');
+        $selectedStudent = $request->query('student_id');
+
+        $query = Grade::where('teacher_id', $teacher->id)
+            ->with(['student' => function ($q) {
+                $q->with('user');
+            }]);
+
+        if ($selectedClass) {
+            $query->whereHas('student', function ($q) use ($selectedClass) {
+                $q->where('class', $selectedClass);
+            });
+        }
+
+        if ($selectedStudent) {
+            $query->where('student_id', $selectedStudent);
+        }
+
+        $grades = $query->orderBy('subject')->orderBy('created_at', 'desc')->get();
+
+        // Create spreadsheet using PhpSpreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Laporan Nilai');
+
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(12);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(12);
+        $sheet->getColumnDimension('D')->setWidth(25);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setWidth(30);
+        $sheet->getColumnDimension('G')->setWidth(15);
+
+        // Add header
+        $sheet->setCellValue('A1', 'LAPORAN NILAI SISWA');
+        $sheet->mergeCells('A1:G1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+
+        $sheet->setCellValue('A2', 'Guru: ' . $user->name);
+        $sheet->mergeCells('A2:G2');
+        $sheet->getStyle('A2')->getFont()->setSize(10);
+
+        $sheet->setCellValue('A3', 'Tanggal: ' . date('d-m-Y H:i:s'));
+        $sheet->mergeCells('A3:G3');
+        $sheet->getStyle('A3')->getFont()->setSize(10);
+
+        // Column headers
+        $headers = ['NISN', 'Nama Siswa', 'Kelas', 'Mata Pelajaran', 'Nilai', 'Keterangan', 'Tanggal'];
+        foreach ($headers as $col => $header) {
+            $sheet->setCellValueByColumnAndRow($col + 1, 5, $header);
+            $sheet->getStyle('A5:G5')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+            $sheet->getStyle('A5:G5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FF2D4438'); // Green color
+        }
+
+        // Add data
+        $row = 6;
+        foreach ($grades as $grade) {
+            $sheet->setCellValueByColumnAndRow(1, $row, $grade->student->nisn ?? '-');
+            $sheet->setCellValueByColumnAndRow(2, $row, $grade->student->user->name ?? '-');
+            $sheet->setCellValueByColumnAndRow(3, $row, $grade->student->class ?? '-');
+            $sheet->setCellValueByColumnAndRow(4, $row, $grade->subject);
+            $sheet->setCellValueByColumnAndRow(5, $row, $grade->grade);
+            $sheet->setCellValueByColumnAndRow(6, $row, $grade->notes ?? '-');
+            $sheet->setCellValueByColumnAndRow(7, $row, $grade->created_at->format('d-m-Y'));
+
+            // Number format for grade column
+            $sheet->getStyle('E' . $row)->getNumberFormat()->setFormatCode('0.00');
+
+            $row++;
+        }
+
+        // Add totals/stats row
+        if ($grades->count() > 0) {
+            $avgRow = $row + 1;
+            $sheet->setCellValue('A' . $avgRow, 'Statistik:');
+            $sheet->setCellValue('D' . $avgRow, 'Rata-rata Nilai:');
+            $sheet->setCellValue('E' . $avgRow, $grades->avg('grade'));
+            $sheet->getStyle('E' . $avgRow)->getNumberFormat()->setFormatCode('0.00');
+            $sheet->getStyle('D' . $avgRow . ':E' . $avgRow)->getFont()->setBold(true);
+        }
+
+        // Output file
+        $filename = 'Laporan_Nilai_' . ($selectedClass ? $selectedClass : 'Semua') . '_' . date('Y-m-d_His') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Get report summary data for a class
+     */
+    public function getReportSummary(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $selectedClass = $request->query('class');
+
+        if (!$selectedClass) {
+            return view('teacher.report-summary', [
+                'classes' => collect(),
+                'selectedClass' => null,
+                'students' => collect(),
+                'summary' => null,
+            ]);
+        }
+
+        // Get all students in the class
+        $students = Student::where('class', $selectedClass)
+            ->with('user')
+            ->orderBy('nisn')
+            ->get();
+
+        // Get all grades for these students from this teacher
+        $studentIds = $students->pluck('id');
+        $grades = Grade::where('teacher_id', $teacher->id)
+            ->whereIn('student_id', $studentIds)
+            ->get();
+
+        // Group by student and calculate stats
+        $studentSummary = [];
+        foreach ($students as $student) {
+            $studentGrades = $grades->where('student_id', $student->id);
+            $avg = $studentGrades->avg('grade') ?? 0;
+            $totalSubjects = $studentGrades->count();
+
+            $studentSummary[] = [
+                'student' => $student,
+                'grades' => $studentGrades,
+                'average' => $avg,
+                'total_subjects' => $totalSubjects,
+                'status' => $avg >= 70 ? 'Lulus' : 'Butuh Remediasi',
+            ];
+        }
+
+        $classStudents = Student::where('class', $selectedClass)->distinct('class')->get();
+        $classes = ['1A', '2A', '3A', '4A', '5A', '6A'];
+
+        return view('teacher.report-summary', [
+            'classes' => collect($classes),
+            'selectedClass' => $selectedClass,
+            'students' => $students,
+            'studentSummary' => $studentSummary,
+            'averageClass' => collect($studentSummary)->avg('average'),
+        ]);
+    }
+
+    /**
+     * Export report summary to PDF
+     */
+    public function exportReportPDF(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $selectedClass = $request->query('class');
+
+        if (!$selectedClass) {
+            return redirect()->route('teacher.grades')->with('error', 'Pilih kelas terlebih dahulu');
+        }
+
+        $students = Student::where('class', $selectedClass)
+            ->with('user')
+            ->orderBy('nisn')
+            ->get();
+
+        $studentIds = $students->pluck('id');
+        $grades = Grade::where('teacher_id', $teacher->id)
+            ->whereIn('student_id', $studentIds)
+            ->get();
+
+        $studentSummary = [];
+        foreach ($students as $student) {
+            $studentGrades = $grades->where('student_id', $student->id);
+            $avg = $studentGrades->avg('grade') ?? 0;
+            $totalSubjects = $studentGrades->count();
+
+            $studentSummary[] = [
+                'student' => $student,
+                'average' => $avg,
+                'total_subjects' => $totalSubjects,
+                'status' => $avg >= 70 ? 'Lulus' : 'Butuh Remediasi',
+            ];
+        }
+
+        // Use dompdf if available, otherwise return view for manual PDF generation
+        $html = view('teacher.report-pdf', [
+            'teacher' => $teacher,
+            'user' => $user,
+            'selectedClass' => $selectedClass,
+            'studentSummary' => $studentSummary,
+            'averageClass' => collect($studentSummary)->avg('average'),
+        ])->render();
+
+        $filename = 'Laporan_Kelas_' . $selectedClass . '_' . date('Y-m-d_His') . '.html';
+        header('Content-Type: text/html; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        return $html;
     }
 
     /**
