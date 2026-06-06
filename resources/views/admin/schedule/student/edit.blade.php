@@ -36,45 +36,28 @@
             <div class="form-section">
                 <h2 class="section-title">Informasi Jadwal Siswa</h2>
 
-                <!-- Student Info Display -->
+                <!-- Class Info Display -->
                 <div class="info-box">
                     <div class="info-item">
-                        <span class="info-label">Nama Siswa:</span>
-                        <span class="info-value">{{ $schedule->student->user->name }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">NISN:</span>
-                        <span class="info-value">{{ $schedule->student->nisn }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Kelas:</span>
-                        <span class="info-value">{{ $schedule->student->class }}</span>
+                        <span class="info-label">Kelas Saat Ini:</span>
+                        <span class="info-value">{{ $schedule->class }}</span>
                     </div>
                 </div>
 
-                <!-- Student Selection (can be changed) -->
+                <!-- Class Selection -->
                 <div class="form-group">
-                    <label for="student_id" class="form-label">
-                        Ganti Siswa <span class="optional">(Opsional)</span>
+                    <label for="class" class="form-label">
+                        Ubah Kelas <span class="optional">(Opsional)</span>
                     </label>
-                    <select name="student_id" id="student_id" class="form-control">
-                        @foreach($students as $student)
-                            @php
-                                $classLevel = substr($student->class, 0, 1);
-                                $level = 'SD';
-                                if ($classLevel >= 4 && $classLevel <= 6) {
-                                    $level = 'SMP';
-                                } elseif ($classLevel >= 7) {
-                                    $level = 'SMA';
-                                }
-                            @endphp
-                            <option value="{{ $student->id }}" {{ $schedule->student_id == $student->id ? 'selected' : '' }}
-                                    data-level="{{ $level }}" data-class="{{ $student->class }}">
-                                {{ $student->user->name }} - Kelas {{ $student->class }} ({{ $level }})
+                    <select name="class" id="class" class="form-control" required>
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach($classes as $classItem)
+                            <option value="{{ $classItem }}" {{ $schedule->class == $classItem ? 'selected' : '' }}>
+                                {{ $classItem }}
                             </option>
                         @endforeach
                     </select>
-                    @error('student_id')
+                    @error('class')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>

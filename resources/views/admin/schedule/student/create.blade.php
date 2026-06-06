@@ -35,48 +35,20 @@
             <div class="form-section">
                 <h2 class="section-title">Informasi Jadwal Siswa</h2>
 
-                <!-- Student Selection with Level Filter -->
+                <!-- Class Selection -->
                 <div class="form-group">
-                    <label for="student_level" class="form-label">
-                        Pilih Level <span class="required">*</span>
+                    <label for="class" class="form-label">
+                        Pilih Kelas <span class="required">*</span>
                     </label>
-                    <div class="level-buttons">
-                        <button type="button" class="level-btn" data-level="SD" onclick="filterByLevel('SD')">
-                            <i class="fas fa-book"></i> SD
-                        </button>
-                        <button type="button" class="level-btn" data-level="SMP" onclick="filterByLevel('SMP')">
-                            <i class="fas fa-book"></i> SMP
-                        </button>
-                        <button type="button" class="level-btn" data-level="SMA" onclick="filterByLevel('SMA')">
-                            <i class="fas fa-book"></i> SMA
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Student Selection -->
-                <div class="form-group">
-                    <label for="student_id" class="form-label">
-                        Pilih Siswa <span class="required">*</span>
-                    </label>
-                    <select name="student_id" id="student_id" class="form-control" required>
-                        <option value="">-- Pilih Siswa --</option>
-                        @foreach($students as $student)
-                            @php
-                                $classLevel = substr($student->class, 0, 1);
-                                $level = 'SD';
-                                if ($classLevel >= 4 && $classLevel <= 6) {
-                                    $level = 'SMP';
-                                } elseif ($classLevel >= 7) {
-                                    $level = 'SMA';
-                                }
-                            @endphp
-                            <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}
-                                    data-level="{{ $level }}" data-class="{{ $student->class }}">
-                                {{ $student->user->name }} - Kelas {{ $student->class }} ({{ $level }})
+                    <select name="class" id="class" class="form-control" required>
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach($classes as $classItem)
+                            <option value="{{ $classItem }}" {{ old('class') == $classItem ? 'selected' : '' }}>
+                                {{ $classItem }}
                             </option>
                         @endforeach
                     </select>
-                    @error('student_id')
+                    @error('class')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
@@ -437,42 +409,17 @@
 </style>
 
 <script>
-function filterByLevel(level) {
-    const buttons = document.querySelectorAll('.level-btn');
-    const select = document.getElementById('student_id');
-    const options = select.querySelectorAll('option');
-
-    // Update button states
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.level === level) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Filter and show relevant students
-    options.forEach(opt => {
-        if (opt.value === '') return; // Skip placeholder
-        if (opt.dataset.level === level) {
-            opt.style.display = '';
-        } else {
-            opt.style.display = 'none';
-        }
-    });
-
-    // Reset selection
-    select.value = '';
-}
-
-// Initialize on page load
+// Form validation and initialization
 document.addEventListener('DOMContentLoaded', function() {
-    const select = document.getElementById('student_id');
-    const options = select.querySelectorAll('option');
-    
-    // Show all options initially
-    options.forEach(opt => {
-        if (opt.value !== '') {
-            opt.style.display = '';
+    const classSelect = document.getElementById('class');
+    const form = document.querySelector('.schedule-form');
+
+    // Basic form validation
+    form?.addEventListener('submit', function(e) {
+        const classValue = classSelect.value;
+        if (!classValue) {
+            e.preventDefault();
+            alert('Pilih kelas terlebih dahulu');
         }
     });
 });

@@ -8,7 +8,7 @@
     <div class="page-header">
         <div>
             <h1>Kelola Jadwal Siswa</h1>
-            <p class="subtitle">Atur jadwal pelajaran untuk semua siswa (SD, SMP, SMA)</p>
+            <p class="subtitle">Atur jadwal pelajaran untuk setiap kelas (SD, SMP, SMA)</p>
         </div>
         <a href="{{ route('admin.schedule.student.create') }}" class="btn-add-new">
             <i class="fas fa-plus"></i> Jadwal Baru
@@ -36,13 +36,13 @@
     <div class="management-toolbar">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Cari berdasarkan nama siswa atau kelas..." class="search-input">
+            <input type="text" id="searchInput" placeholder="Cari berdasarkan kelas atau mata pelajaran..." class="search-input">
         </div>
         <div class="filter-group">
             <select id="classFilter" class="filter-select">
                 <option value="">Semua Kelas</option>
                 @php
-                    $uniqueClasses = $schedules->pluck('student.class')->unique()->sort();
+                    $uniqueClasses = $schedules->pluck('class')->unique()->sort();
                 @endphp
                 @foreach($uniqueClasses as $class)
                     <option value="{{ $class }}">{{ $class }}</option>
@@ -66,13 +66,12 @@
             <thead>
                 <tr>
                     <th style="width: 5%;">No</th>
-                    <th style="width: 18%;">Nama Siswa</th>
-                    <th style="width: 10%;">Kelas</th>
-                    <th style="width: 15%;">Mata Pelajaran</th>
+                    <th style="width: 15%;">Kelas</th>
+                    <th style="width: 20%;">Mata Pelajaran</th>
                     <th style="width: 12%;">Hari</th>
                     <th style="width: 15%;">Waktu</th>
                     <th style="width: 10%;">Ruang</th>
-                    <th style="width: 15%;">Aksi</th>
+                    <th style="width: 23%;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,13 +86,72 @@
                             'Saturday' => 'Sabtu'
                         ];
                         $dayName = $daysIndonesia[$schedule->day] ?? $schedule->day;
-                        $classLevel = substr($schedule->student->class, 0, 1); // Get first digit for level
+                        $classLevel = substr($schedule->class, 0, 1);
                     @endphp
                     <tr class="schedule-row" 
-                        data-student="{{ strtolower($schedule->student->user->name) }}" 
-                        data-class="{{ $schedule->student->class }}"
+                        data-class="{{ $schedule->class }}"
                         data-day="{{ $schedule->day }}" 
+                        data-subject="{{ strtolower($schedule->subject) }}"
                         data-level="{{ $classLevel }}">
+                        <td>{{ ($schedules->currentPage() - 1) * $schedules->perPage() + $index + 1 }}</td>
+                        <td>
+                            <span class="class-badge" data-level="{{ $classLevel }}">
+                                {{ $schedule->class }}
+                            </span>
+                        </td>
+                        <td><span class="badge-subject">{{ $schedule->subject }}</span></td>
+                        <td>{{ $dayName }}</td>
+                        <td>
+                            <span class="time-badge">
+                                {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
+                            </span>
+                        </td>
+                        <td>{{ $schedule->room ?? '-' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ route('admin.schedule.student.edit', $schedule->id) }}" class="btn-action btn-edit" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.schedule.student.destroy', $schedule->id) }}" method="POST" class="delete-form" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-action btn-delete" title="Hapus" onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="text-center no-data">
+                            <i class="fas fa-inbox"></i>
+                            <p>Belum ada jadwal siswa</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if($schedules->hasPages())
+        <div class="pagination-container">
+            {{ $schedules->links() }}
+        </div>
+    @endif
+
+    <!-- Stats Box -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <i class="fas fa-calendar-check"></i>
+            <div class="stat-content">
+                <span class="stat-label">Total Jadwal</span>
+                <span class="stat-value">{{ $schedules->total() }}</span>
+            </div>
+        </div>
+    </div>
+</div>
                         <td>{{ ($schedules->currentPage() - 1) * $schedules->perPage() + $index + 1 }}</td>
                         <td>
                             <div class="student-info">
@@ -552,11 +610,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedDay = dayFilter.value;
 
         rows.forEach(row => {
-            const student = row.dataset.student.toLowerCase();
             const rowClass = row.dataset.class;
             const day = row.dataset.day;
+            const subject = row.dataset.subject;
 
-            const matchesSearch = student.includes(searchTerm);
+            const matchesSearch = rowClass.toLowerCase().includes(searchTerm) || subject.includes(searchTerm);
             const matchesClass = !selectedClass || rowClass === selectedClass;
             const matchesDay = !selectedDay || day === selectedDay;
 

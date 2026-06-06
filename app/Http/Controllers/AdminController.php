@@ -664,8 +664,8 @@ class AdminController extends Controller
     // STUDENT SCHEDULES
     public function scheduleStudentIndex()
     {
-        $schedules = Schedule::whereNotNull('student_id')
-            ->with(['student.user'])
+        $schedules = Schedule::whereNotNull('class')
+            ->orderBy('class')
             ->orderBy('day')
             ->paginate(15);
         
@@ -674,24 +674,27 @@ class AdminController extends Controller
 
     public function scheduleStudentCreate()
     {
-        $students = Student::with('user')->orderBy('class')->get();
+        // Get unique classes from students
+        $classes = Student::distinct()
+            ->orderBy('class')
+            ->pluck('class')
+            ->toArray();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         
-        return view('admin.schedule.student.create', compact('students', 'days'));
+        return view('admin.schedule.student.create', compact('classes', 'days'));
     }
 
     public function scheduleStudentStore(Request $request)
     {
         $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
+            'class' => 'required|string',
             'subject' => 'required|string',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'room' => 'nullable|string',
         ], [
-            'student_id.required' => 'Siswa harus dipilih',
-            'student_id.exists' => 'Siswa tidak ditemukan',
+            'class.required' => 'Kelas harus dipilih',
             'subject.required' => 'Mata pelajaran harus diisi',
             'day.required' => 'Hari harus dipilih',
             'start_time.required' => 'Waktu mulai harus diisi',
@@ -705,27 +708,29 @@ class AdminController extends Controller
 
     public function scheduleStudentEdit($id)
     {
-        $schedule = Schedule::whereNotNull('student_id')->findOrFail($id);
-        $students = Student::with('user')->orderBy('class')->get();
+        $schedule = Schedule::whereNotNull('class')->findOrFail($id);
+        $classes = Student::distinct()
+            ->orderBy('class')
+            ->pluck('class')
+            ->toArray();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         
-        return view('admin.schedule.student.edit', compact('schedule', 'students', 'days'));
+        return view('admin.schedule.student.edit', compact('schedule', 'classes', 'days'));
     }
 
     public function scheduleStudentUpdate(Request $request, $id)
     {
-        $schedule = Schedule::whereNotNull('student_id')->findOrFail($id);
+        $schedule = Schedule::whereNotNull('class')->findOrFail($id);
         
         $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
+            'class' => 'required|string',
             'subject' => 'required|string',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'room' => 'nullable|string',
         ], [
-            'student_id.required' => 'Siswa harus dipilih',
-            'student_id.exists' => 'Siswa tidak ditemukan',
+            'class.required' => 'Kelas harus dipilih',
             'subject.required' => 'Mata pelajaran harus diisi',
             'day.required' => 'Hari harus dipilih',
             'start_time.required' => 'Waktu mulai harus diisi',
@@ -739,7 +744,7 @@ class AdminController extends Controller
 
     public function scheduleStudentDestroy($id)
     {
-        $schedule = Schedule::whereNotNull('student_id')->findOrFail($id);
+        $schedule = Schedule::whereNotNull('class')->findOrFail($id);
         $schedule->delete();
         return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
     }
