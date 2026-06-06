@@ -130,11 +130,9 @@
             <div>
                 <div style="position: relative;">
                     @if($school && $school->gambar_utama)
-                        <img src="{{ asset('storage/' . $school->gambar_utama) }}" alt="Al-Hikmah Academy" style="width: 100%; border-radius: 12px; box-shadow: 0 12px 40px rgba(31, 127, 95, 0.15);">
+                        <img src="{{ asset('storage/' . $school->gambar_utama) }}" alt="Sekolah Nuurudzholaam" style="width: 100%; border-radius: 12px; box-shadow: 0 12px 40px rgba(31, 127, 95, 0.15);">
                     @else
-                        <div style="width: 100%; height: 400px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 80px; box-shadow: 0 12px 40px rgba(31, 127, 95, 0.15);">
-                            <i class="fas fa-school"></i>
-                        </div>
+                        <img src="{{ asset('images/foto sekolah.jpeg') }}" alt="Sekolah Nuurudzholaam" style="width: 100%; height: 400px; object-fit: cover; border-radius: 12px; box-shadow: 0 12px 40px rgba(31, 127, 95, 0.15);">
                     @endif
                 </div>
             </div>
