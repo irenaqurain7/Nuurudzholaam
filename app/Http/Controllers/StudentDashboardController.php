@@ -168,7 +168,10 @@ class StudentDashboardController extends Controller
      */
     public function informasi()
     {
-        $announcements = Announcement::where('status', 'aktif')->orderBy('created_at', 'desc')->get();
+        $announcements = Announcement::where('status', 'aktif')
+            ->where('tipe', 'penting')
+            ->orderBy('tanggal_mulai', 'desc')
+            ->get();
 
         return view('student.informasi', [
             'announcements' => $announcements,
