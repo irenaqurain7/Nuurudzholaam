@@ -552,6 +552,10 @@
                 <li><a href="{{ route('admin.ppdb.index') }}" class="{{ request()->routeIs('admin.ppdb.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Formulir PPDB</a></li>
                 <li><a href="{{ route('admin.ppdb.settings') }}" class="{{ request()->routeIs('admin.ppdb.settings') ? 'active' : '' }}"><i class="fas fa-cog"></i> Pengaturan PPDB</a></li>
 
+                <div class="nav-label">JADWAL</div>
+                <li><a href="{{ route('admin.schedule.teacher.index') }}" class="{{ request()->routeIs('admin.schedule.teacher.*') ? 'active' : '' }}"><i class="fas fa-chalkboard-user"></i> Jadwal Guru</a></li>
+                <li><a href="{{ route('admin.schedule.student.index') }}" class="{{ request()->routeIs('admin.schedule.student.*') ? 'active' : '' }}"><i class="fas fa-calendar-days"></i> Jadwal Siswa</a></li>
+
                 <div class="nav-label">BERITA & INFORMASI</div>
                 <li><a href="{{ route('admin.announcement.index') }}" class="{{ request()->routeIs('admin.announcement.*') ? 'active' : '' }}"><i class="fas fa-bullhorn"></i> Pengumuman</a></li>
 

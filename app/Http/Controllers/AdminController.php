@@ -12,6 +12,7 @@ use App\Models\SchoolInfo;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -575,6 +576,172 @@ class AdminController extends Controller
         $user->update(['password' => Hash::make($tempPassword)]);
 
         return redirect()->back()->with('success', 'Password telah direset ke: ' . $tempPassword . ' (harap segera ubah password saat login pertama)');
+    }
+
+    // TEACHER SCHEDULES
+    public function scheduleTeacherIndex()
+    {
+        $schedules = Schedule::whereNotNull('teacher_id')
+            ->with(['teacher.user'])
+            ->orderBy('day')
+            ->paginate(15);
+        
+        return view('admin.schedule.teacher.index', compact('schedules'));
+    }
+
+    public function scheduleTeacherCreate()
+    {
+        $teachers = Teacher::with('user')->get();
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        return view('admin.schedule.teacher.create', compact('teachers', 'days'));
+    }
+
+    public function scheduleTeacherStore(Request $request)
+    {
+        $validated = $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+            'subject' => 'required|string',
+            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'room' => 'nullable|string',
+        ], [
+            'teacher_id.required' => 'Guru harus dipilih',
+            'teacher_id.exists' => 'Guru tidak ditemukan',
+            'subject.required' => 'Mata pelajaran harus diisi',
+            'day.required' => 'Hari harus dipilih',
+            'start_time.required' => 'Waktu mulai harus diisi',
+            'end_time.required' => 'Waktu selesai harus diisi',
+            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
+        ]);
+
+        Schedule::create($validated);
+        return redirect()->route('admin.schedule.teacher.index')->with('success', 'Jadwal guru berhasil ditambahkan.');
+    }
+
+    public function scheduleTeacherEdit($id)
+    {
+        $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
+        $teachers = Teacher::with('user')->get();
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        return view('admin.schedule.teacher.edit', compact('schedule', 'teachers', 'days'));
+    }
+
+    public function scheduleTeacherUpdate(Request $request, $id)
+    {
+        $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
+        
+        $validated = $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+            'subject' => 'required|string',
+            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'room' => 'nullable|string',
+        ], [
+            'teacher_id.required' => 'Guru harus dipilih',
+            'teacher_id.exists' => 'Guru tidak ditemukan',
+            'subject.required' => 'Mata pelajaran harus diisi',
+            'day.required' => 'Hari harus dipilih',
+            'start_time.required' => 'Waktu mulai harus diisi',
+            'end_time.required' => 'Waktu selesai harus diisi',
+            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
+        ]);
+
+        $schedule->update($validated);
+        return redirect()->route('admin.schedule.teacher.index')->with('success', 'Jadwal guru berhasil diperbarui.');
+    }
+
+    public function scheduleTeacherDestroy($id)
+    {
+        $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
+        $schedule->delete();
+        return redirect()->back()->with('success', 'Jadwal guru berhasil dihapus.');
+    }
+
+    // STUDENT SCHEDULES
+    public function scheduleStudentIndex()
+    {
+        $schedules = Schedule::whereNotNull('student_id')
+            ->with(['student.user'])
+            ->orderBy('day')
+            ->paginate(15);
+        
+        return view('admin.schedule.student.index', compact('schedules'));
+    }
+
+    public function scheduleStudentCreate()
+    {
+        $students = Student::with('user')->orderBy('class')->get();
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        return view('admin.schedule.student.create', compact('students', 'days'));
+    }
+
+    public function scheduleStudentStore(Request $request)
+    {
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject' => 'required|string',
+            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'room' => 'nullable|string',
+        ], [
+            'student_id.required' => 'Siswa harus dipilih',
+            'student_id.exists' => 'Siswa tidak ditemukan',
+            'subject.required' => 'Mata pelajaran harus diisi',
+            'day.required' => 'Hari harus dipilih',
+            'start_time.required' => 'Waktu mulai harus diisi',
+            'end_time.required' => 'Waktu selesai harus diisi',
+            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
+        ]);
+
+        Schedule::create($validated);
+        return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil ditambahkan.');
+    }
+
+    public function scheduleStudentEdit($id)
+    {
+        $schedule = Schedule::whereNotNull('student_id')->findOrFail($id);
+        $students = Student::with('user')->orderBy('class')->get();
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        
+        return view('admin.schedule.student.edit', compact('schedule', 'students', 'days'));
+    }
+
+    public function scheduleStudentUpdate(Request $request, $id)
+    {
+        $schedule = Schedule::whereNotNull('student_id')->findOrFail($id);
+        
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'subject' => 'required|string',
+            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'room' => 'nullable|string',
+        ], [
+            'student_id.required' => 'Siswa harus dipilih',
+            'student_id.exists' => 'Siswa tidak ditemukan',
+            'subject.required' => 'Mata pelajaran harus diisi',
+            'day.required' => 'Hari harus dipilih',
+            'start_time.required' => 'Waktu mulai harus diisi',
+            'end_time.required' => 'Waktu selesai harus diisi',
+            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
+        ]);
+
+        $schedule->update($validated);
+        return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil diperbarui.');
+    }
+
+    public function scheduleStudentDestroy($id)
+    {
+        $schedule = Schedule::whereNotNull('student_id')->findOrFail($id);
+        $schedule->delete();
+        return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
     }
 
 }
