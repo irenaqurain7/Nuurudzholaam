@@ -158,32 +158,32 @@
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
                     <i class="fas fa-book"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Program Tahfidz Terpadu</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Program menghafal Al-Qur'an dengan metode talaqi dan muroja'ah, didampingi oleh asatidz berpengalaman.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Tahfidz Zuz Amma</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Program menghafal Juz Amma (juz terakhir Al-Qur'an) dengan metode setor hafalan dan muroja'ah intensif, dibimbing oleh para guru.</p>
             </div>
 
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--emas-light);">
-                <div style="font-size: 48px; color: var(--emas-light); margin-bottom: 20px;">
-                    <i class="fas fa-heart"></i>
+            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
+                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
+                    <i class="fas fa-leaf"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Pembinaan Karakter</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Pembangunan akhlak mulia, kedisiplinan, dan kepemimpinan sejak dini untuk masa depan yang cerah.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">TDBA (Tatanen di bale atikan)</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">TDBA (Tatanen di Bale Atikan) adalah program pembelajaran berbasis lingkungan yang mengajarkan peserta didik untuk bercocok tanam, peduli alam, dan membangun karakter yang mandiri serta bertanggung jawab.</p>
             </div>
 
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam-light);">
-                <div style="font-size: 48px; color: var(--hijau-islam-light); margin-bottom: 20px;">
+            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
+                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
+                    <i class="fas fa-hands-praying"></i>
+                </div>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Sholat duha berjama'ah</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Sholat Dhuha Berjamaah merupakan kegiatan ibadah yang dilaksanakan bersama untuk menanamkan kedisiplinan, meningkatkan keimanan, serta membiasakan peserta didik mendekatkan diri kepada Allah SWT dalam kehidupan sehari-hari.</p>
+            </div>
+
+            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
+                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Kurikulum Integratif</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Perpaduan kurikulum nasional dengan kearifan lokal dan standar internasional untuk pembelajaran berkelanjutan.</p>
-            </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--text-dark);">
-                <div style="font-size: 48px; color: var(--text-dark); margin-bottom: 20px;">
-                    <i class="fas fa-dumbbell"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Pengembangan Bakat</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Program ekstrakurikuler beragam untuk mengasah bakat, minat, dan potensi unik setiap siswa.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Kurikulum berbasis pesantren dan formal</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Kurikulum Berbasis Pesantren dan Formal mengintegrasikan pendidikan umum dan keagamaan untuk membentuk peserta didik yang berilmu, berakhlak mulia, dan berkarakter Islami.</p>
             </div>
         </div>
     </div>
