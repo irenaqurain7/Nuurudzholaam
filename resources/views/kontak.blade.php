@@ -64,21 +64,25 @@
                         <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Social media</h3>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-left: 47px;">
-                        <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
+
+                        <a href="https://www.facebook.com/share/1NoBMULdSX/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
                             <i class="fab fa-facebook-f" style="width: 18px; text-align: center;"></i> Ponpes Nuurudzholaam
                         </a>
-                        <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
+
+                        <a href="https://www.instagram.com/ponpes_nuurudzholaam?igsh=OGxzdXAwdHUzcmhm" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
                             <i class="fab fa-instagram" style="width: 18px; text-align: center;"></i> Ponpes_Nuurudzholaam
                         </a>
-                        <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
+
+                        <a href="https://youtube.com/@nuzotv512?si=2qczakQK_rskbbBk" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
                             <i class="fab fa-youtube" style="width: 18px; text-align: center;"></i> Nuzo TV
                         </a>
-                        <a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
-                            <i class="fab fa-tiktok" style="width: 18px; text-align: center;"></i>Media Nuzo
+
+                        <a href="https://www.tiktok.com/@ponpes_nuurudzholaam?_r=1&_t=ZS-96VuElyQSP7" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 10px; color: var(--hijau-islam); text-decoration: none; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 0.95rem;">
+                            <i class="fab fa-tiktok" style="width: 18px; text-align: center;"></i> Media Nuzo
                         </a>
+
                     </div>
                 </div>
-            </div>
 
             <!-- Contact Form Column -->
             <div>

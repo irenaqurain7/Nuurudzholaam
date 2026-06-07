@@ -637,10 +637,19 @@
             <div class="footer-section">
                 <h3><i class="fas fa-share-alt"></i> Media Sosial</h3>
                 <div style="display: flex; flex-direction: column; gap: 2px; font-size: 18px;">
-                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-facebook"></i> Ponpes Nuurudzholaam</a>
-                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-instagram"></i> ponpes_nuurudzholaam</a>
-                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-youtube"></i> Nuzo TV</a>
-                    <a href="#" style="display: flex; align-items: center; gap: 6px; color: var(--emas); transition: all 0.3s;"><i class="fab fa-tiktok"></i> Media Nuzo</a>
+                    <a href="https://www.facebook.com/share/1NoBMULdSX/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 6px; color: ; transition: all 0.3s; text-decoration: none;">
+                        <i class="fab fa-facebook"></i> Ponpes Nuurudzholaam
+                    </a>
+                    <a href="https://www.instagram.com/ponpes_nuurudzholaam?igsh=OGxzdXAwdHUzcmhm" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 6px; color: ; transition: all 0.3s; text-decoration: none;">
+                        <i class="fab fa-instagram"></i> ponpes_nuurudzholaam
+                    </a>
+                    <a href="https://youtube.com/@nuzotv512?si=2qczakQK_rskbbBk" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 6px; color: ; transition: all 0.3s; text-decoration: none;">
+                        <i class="fab fa-youtube"></i> Nuzo TV
+                    </a>
+                    <a href="https://www.tiktok.com/@ponpes_nuurudzholaam?_r=1&_t=ZS-96VuElyQSP7" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 6px; color: ; transition: all 0.3s; text-decoration: none;">
+                        <i class="fab fa-tiktok"></i> Media Nuzo
+                    </a>
+
                 </div>
             </div>
         </div>
