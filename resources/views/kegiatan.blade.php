@@ -3,10 +3,25 @@
 @section('title', 'Kegiatan dan Dokumentasi')
 
 @section('content')
-<!-- Main Content -->
-<div class="section" style="padding-top: 20px;">
+<div style="background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%); position: relative; overflow: hidden; min-height: 300px; display: flex; align-items: center; justify-content: center;">
+    <div style="position: absolute; top: -50%; right: -10%; width: 600px; height: 600px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; z-index: 0;"></div>
+    <div style="position: absolute; bottom: -30%; left: 0; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; z-index: 0;"></div>
+
+    <div class="container" style="text-align: center; z-index: 10; position: relative;">
+        <h1 style="font-size: 48px; color: white; margin-bottom: 15px; font-weight: bold;">Dokumentasi Kegiatan</h1>
+        <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95);">
+            Dokumentasi dan galeri seputar agenda resmi serta kegiatan di Sekolah Islam Nuurudzholaam
+        </p>
+    </div>
+</div>
+
+<div style="background-color: #f8f9fa; padding: 60px 0;">
     <div class="container">
-        <h2 class="section-title">Dokumentasi Kegiatan Sekolah</h2>
+
+        <div style="margin: 0 0 40px 0; text-align: left;">
+            <h2 style="font-size: 28px; margin: 0 0 6px 0; font-weight: 700; color: var(--hijau-islam);">Galeri Kegiatan</h2>
+            <p style="margin: 0; color: var(--text-light);">Arsip foto dan dokumentasi kegiatan sekolah terbaru</p>
+        </div>
 
         @if($activities->count() > 0)
         <div class="grid-responsive">
@@ -27,28 +42,26 @@
                         <i class="fas fa-calendar"></i> {{ $activity->tanggal->format('d M Y') }}
                     </p>
                     <a href="{{ route('kegiatan.show', $activity->id) }}" style="color: var(--hijau-islam); font-weight: 600; text-decoration: none; transition: all 0.3s;">
-                        <i class="fas fa-arrow-right"></i> Lihat
+                        <i class="fas fa-arrow-right"></i> Lihat <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
             </div>
             @endforeach
         </div>
 
-        <!-- Pagination -->
         <div style="display: flex; justify-content: center; gap: 10px; margin-top: 50px;">
             {{ $activities->links() }}
         </div>
         @else
-        <div style="text-align: center; padding: 80px 20px;">
-            <i class="fas fa-inbox" style="font-size: 64px; color: var(--hijau-islam-lighter); margin-bottom: 20px; opacity: 0.5;"></i>
-            <h3 style="color: var(--text-light); margin-bottom: 10px;">Belum ada kegiatan</h3>
-            <p style="color: var(--text-light);">Kegiatan dan dokumentasi akan ditampilkan di sini. Silakan kembali lagi kemudian.</p>
+        <div style="background: white; border-radius: 12px; padding: 60px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);">
+            <i class="fas fa-inbox" style="font-size: 64px; color: #ccc; margin-bottom: 20px; display: block;"></i>
+            <h3 style="color: var(--hijau-islam); margin-bottom: 10px; font-size: 22px;">Belum Ada Kegiatan</h3>
+            <p style="color: var(--text-light); font-size: 16px;">Kegiatan dan dokumentasi akan ditampilkan di sini. Silakan kembali lagi kemudian.</p>
         </div>
         @endif
     </div>
 </div>
 
-<!-- Lightbox Modal -->
 <div id="lightbox" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.9); z-index: 10000; align-items: center; justify-content: center;">
     <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 30px; background: none; border: none; color: white; font-size: 28px; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
         <i class="fas fa-times"></i>
