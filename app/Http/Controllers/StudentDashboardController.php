@@ -32,9 +32,16 @@ class StudentDashboardController extends Controller
         $user = Auth::user();
         $student = Student::where('user_id', $user->id)->firstOrFail();
 
+        // Tambahkan query ini untuk mengambil pengumuman aktif terbaru
+        $announcements = Announcement::where('status', 'aktif')
+            ->orderBy('tanggal_mulai', 'desc')
+            ->take(5) // Mengambil 5 pengumuman terbaru untuk dashboard
+            ->get();
+
         return view('student.dashboard', [
             'user' => $user,
             'student' => $student,
+            'announcements' => $announcements, // Kirim variabel ke view blade
         ]);
     }
 
