@@ -145,6 +145,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::put('/{id}', [AdminController::class, 'usersUpdate'])->name('update');
         Route::delete('/{id}', [AdminController::class, 'usersDelete'])->name('delete');
         Route::post('/{id}/reset-password', [AdminController::class, 'usersResetPassword'])->name('reset-password');
+
+    Route::get('/download-template', [AdminController::class, 'usersDownloadTemplate'])->name('download-template');
+    Route::post('/import', [AdminController::class, 'usersImport'])->name('import');
     });
 });
 

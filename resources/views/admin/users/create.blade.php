@@ -175,6 +175,41 @@
             </a>
         </div>
     </form>
+
+    <div class="admin-form-card">
+        <div class="role-panel-header" style="margin-bottom: 14px;">
+            <i class="fas fa-file-excel"></i>
+            <div>
+                <h3>Tambah Sekaligus via Excel / CSV</h3>
+                <p class="import-kicker">IMPORT MASSAL</p>
+            </div>
+        </div>
+
+        <p class="import-subtitle">
+            Fitur ini digunakan untuk memasukkan data siswa atau guru dalam jumlah banyak secara bersamaan. Silakan unduh template format berkas terlebih dahulu agar struktur data sesuai.
+        </p>
+
+        <div class="form-grid two-col alignment-stretch" style="margin-bottom: 0; margin-top: 20px;">
+            <div class="field-group">
+                <label>1. Unduh Format Contoh</label>
+                <a href="{{ route('admin.users.download-template') }}" class="btn-secondary btn-full-height">
+                    <i class="fas fa-download" style="color: #3d5a4c;"></i>
+                    Download Template Format CSV
+                </a>
+            </div>
+
+            <form action="{{ route('admin.users.import') }}" method="POST" enctype="multipart/form-data" class="field-group">
+                @csrf
+                <label for="file_excel">2. Pilih & Upload Berkas</label>
+                <div class="import-upload-group">
+                    <input type="file" id="file_excel" name="file_excel" required accept=".csv, text/csv">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-upload"></i> Proses Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -208,16 +243,32 @@
         opacity: 0.82;
     }
 
+    .import-kicker {
+        margin: 2px 0 0;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 11px;
+        font-weight: 700;
+        color: #6c8b7c;
+    }
+
     .form-hero h1 {
         margin: 0;
         font-size: clamp(28px, 3vw, 42px);
         line-height: 1.08;
     }
 
-    .form-subtitle {
+    .form-subtitle, .import-subtitle {
         margin: 14px 0 0;
         max-width: 62ch;
         color: rgba(255, 255, 255, 0.84);
+    }
+
+    .import-subtitle {
+        color: #556b60;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-top: 6px;
     }
 
     .form-back-link {
@@ -360,8 +411,7 @@
     .role-panel-header {
         display: flex;
         gap: 14px;
-        align-items: flex-start;
-        margin-bottom: 18px;
+        align-items: center;
     }
 
     .role-panel-header i {
@@ -378,13 +428,14 @@
     }
 
     .role-panel-header h3 {
-        margin: 0 0 4px;
+        margin: 0;
         color: #1c2d25;
         font-size: 18px;
+        font-weight: 700;
     }
 
     .role-panel-header p {
-        margin: 0;
+        margin: 4px 0 0;
         color: #6c8b7c;
         font-size: 14px;
     }
@@ -409,6 +460,7 @@
         font-weight: 700;
         border: none;
         cursor: pointer;
+        font-size: 14px;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
 
@@ -430,6 +482,31 @@
         border: 1px solid #dbe7e1;
     }
 
+    /* Penyelaras Komponen Download & Upload */
+    .btn-full-height {
+        padding: 13px 16px;
+        height: 48px;
+        box-sizing: border-box;
+    }
+
+    .import-upload-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .import-upload-group input[type="file"] {
+        padding: 11px 16px;
+        height: 48px;
+        box-sizing: border-box;
+    }
+
+    .import-upload-group .btn-primary {
+        height: 48px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
     @media (max-width: 900px) {
         .form-hero {
             flex-direction: column;
@@ -437,6 +514,15 @@
 
         .form-grid.two-col {
             grid-template-columns: 1fr;
+        }
+
+        .import-upload-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .import-upload-group .btn-primary, .btn-full-height {
+            width: 100%;
         }
     }
 

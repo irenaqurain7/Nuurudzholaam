@@ -585,7 +585,7 @@ class AdminController extends Controller
             ->with(['teacher.user'])
             ->orderBy('day')
             ->paginate(15);
-        
+
         return view('admin.schedule.teacher.index', compact('schedules'));
     }
 
@@ -593,7 +593,7 @@ class AdminController extends Controller
     {
         $teachers = Teacher::with('user')->get();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
+
         return view('admin.schedule.teacher.create', compact('teachers', 'days'));
     }
 
@@ -625,14 +625,14 @@ class AdminController extends Controller
         $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
         $teachers = Teacher::with('user')->get();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
+
         return view('admin.schedule.teacher.edit', compact('schedule', 'teachers', 'days'));
     }
 
     public function scheduleTeacherUpdate(Request $request, $id)
     {
         $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
-        
+
         $validated = $request->validate([
             'teacher_id' => 'required|exists:teachers,id',
             'subject' => 'required|string',
@@ -668,7 +668,7 @@ class AdminController extends Controller
             ->orderBy('class')
             ->orderBy('day')
             ->paginate(15);
-        
+
         return view('admin.schedule.student.index', compact('schedules'));
     }
 
@@ -680,7 +680,7 @@ class AdminController extends Controller
             ->pluck('class')
             ->toArray();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
+
         return view('admin.schedule.student.create', compact('classes', 'days'));
     }
 
@@ -714,14 +714,14 @@ class AdminController extends Controller
             ->pluck('class')
             ->toArray();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
+
         return view('admin.schedule.student.edit', compact('schedule', 'classes', 'days'));
     }
 
     public function scheduleStudentUpdate(Request $request, $id)
     {
         $schedule = Schedule::whereNotNull('class')->findOrFail($id);
-        
+
         $validated = $request->validate([
             'class' => 'required|string',
             'subject' => 'required|string',
@@ -747,6 +747,64 @@ class AdminController extends Controller
         $schedule = Schedule::whereNotNull('class')->findOrFail($id);
         $schedule->delete();
         return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
+    }
+
+    // 1. Fungsi Download Template CSV
+public function usersDownloadTemplate()
+{
+    $headers = [
+        "Content-type"        => "text/csv",
+        "Content-Disposition" => "attachment; filename=template_siswa_guru.csv",
+        "Pragma"              => "no-cache",
+        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+        "Expires"             => "0"
+    ];
+
+    $columns = ['Nama Lengkap', 'Email', 'Password', 'Role (siswa/guru)', 'No Telepon', 'Alamat'];
+
+    $callback = function() use($columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+        fputcsv($file, ['Ahmad Fauzi', 'ahmad@nuurudzholaam.sch.id', 'rahasia123', 'siswa', '08123456789', 'Purwakarta']);
+        fputcsv($file, ['Siti Aminah', 'siti@nuurudzholaam.sch.id', 'passwordguru', 'guru', '08987654321', 'Bungursari']);
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+    }
+    // 2. Fungsi Proses File CSV
+    public function usersImport(Request $request)
+    {
+        $request->validate([
+            'file_excel' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file_excel');
+        $handle = fopen($file->getRealPath(), "r");
+        fgetcsv($handle); // Lewati header kolom
+
+        $suksesCount = 0;
+
+        while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            if (empty($row[0]) || empty($row[1])) {
+                continue;
+            }
+
+            User::create([
+                'name'     => $row[0],
+                'email'    => $row[1],
+                'password' => Hash::make($row[2]),
+                'role'     => strtolower($row[3]), // Menyimpan sebagai 'siswa' atau 'guru'
+                'phone'    => $row[4] ?? null,
+                'address'  => $row[5] ?? null,
+            ]);
+
+            $suksesCount++;
+        }
+
+        fclose($handle);
+
+        return redirect()->back()->with('success', "Berhasil menambahkan $suksesCount data secara massal!");
     }
 
 }
