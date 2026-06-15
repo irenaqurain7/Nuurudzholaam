@@ -40,12 +40,11 @@
                     <label for="teacher_id" class="form-label">
                         Pilih Guru <span class="required">*</span>
                     </label>
-                    <select name="teacher_id" id="teacher_id" class="form-control" required onchange="updateTeacherInfo()">
+                    <select name="teacher_id" id="teacher_id" class="form-control" required>
                         <option value="">-- Pilih Guru --</option>
-                        @foreach($teachers as $teacher)
-                            <option value="{{ $teacher->id }}" {{ old('teacher_id') == $teacher->id ? 'selected' : '' }}
-                                    data-specialization="{{ $teacher->specialization }}">
-                                {{ $teacher->user->name }} ({{ $teacher->specialization }})
+                        @foreach($teachers as $teacherId => $teacherName)
+                            <option value="{{ $teacherId }}" {{ old('teacher_id') == $teacherId ? 'selected' : '' }}>
+                                {{ $teacherName }}
                             </option>
                         @endforeach
                     </select>

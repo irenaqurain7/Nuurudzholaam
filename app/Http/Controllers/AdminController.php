@@ -15,6 +15,7 @@ use App\Models\Teacher;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -579,19 +580,37 @@ class AdminController extends Controller
     }
 
     // TEACHER SCHEDULES
+    private function getTemporaryTeacherNames(): array
+    {
+        return [
+            1 => 'A. Dede Ali, S.Pd',
+            2 => 'Ade Royani, S.Pd',
+            3 => 'Ananda Jihan Kamilah',
+            4 => 'Dinda Aulia Putri',
+            5 => 'Kurnia Amelia',
+            6 => 'Mochamad Fazhri Syamsi',
+            7 => 'Rinda Maryani, S.Pd',
+            8 => 'Siti Aminah',
+            9 => 'Siti Rokayah',
+            10 => 'Warnengsih',
+            11 => 'Wiwi Suherti, S.Pd',
+        ];
+    }
+
     public function scheduleTeacherIndex()
     {
         $schedules = Schedule::whereNotNull('teacher_id')
-            ->with(['teacher.user'])
             ->orderBy('day')
             ->paginate(15);
 
-        return view('admin.schedule.teacher.index', compact('schedules'));
+        $teacherNames = $this->getTemporaryTeacherNames();
+
+        return view('admin.schedule.teacher.index', compact('schedules', 'teacherNames'));
     }
 
     public function scheduleTeacherCreate()
     {
-        $teachers = Teacher::with('user')->get();
+        $teachers = $this->getTemporaryTeacherNames();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         return view('admin.schedule.teacher.create', compact('teachers', 'days'));
@@ -599,8 +618,9 @@ class AdminController extends Controller
 
     public function scheduleTeacherStore(Request $request)
     {
+        $teachers = $this->getTemporaryTeacherNames();
         $validated = $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
+            'teacher_id' => ['required', Rule::in(array_keys($teachers))],
             'subject' => 'required|string',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
             'start_time' => 'required|date_format:H:i',
@@ -608,7 +628,7 @@ class AdminController extends Controller
             'room' => 'nullable|string',
         ], [
             'teacher_id.required' => 'Guru harus dipilih',
-            'teacher_id.exists' => 'Guru tidak ditemukan',
+            'teacher_id.in' => 'Guru tidak ditemukan',
             'subject.required' => 'Mata pelajaran harus diisi',
             'day.required' => 'Hari harus dipilih',
             'start_time.required' => 'Waktu mulai harus diisi',
@@ -623,7 +643,7 @@ class AdminController extends Controller
     public function scheduleTeacherEdit($id)
     {
         $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
-        $teachers = Teacher::with('user')->get();
+        $teachers = $this->getTemporaryTeacherNames();
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         return view('admin.schedule.teacher.edit', compact('schedule', 'teachers', 'days'));
@@ -632,9 +652,10 @@ class AdminController extends Controller
     public function scheduleTeacherUpdate(Request $request, $id)
     {
         $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
+        $teachers = $this->getTemporaryTeacherNames();
 
         $validated = $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
+            'teacher_id' => ['required', Rule::in(array_keys($teachers))],
             'subject' => 'required|string',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
             'start_time' => 'required|date_format:H:i',
@@ -642,7 +663,7 @@ class AdminController extends Controller
             'room' => 'nullable|string',
         ], [
             'teacher_id.required' => 'Guru harus dipilih',
-            'teacher_id.exists' => 'Guru tidak ditemukan',
+            'teacher_id.in' => 'Guru tidak ditemukan',
             'subject.required' => 'Mata pelajaran harus diisi',
             'day.required' => 'Hari harus dipilih',
             'start_time.required' => 'Waktu mulai harus diisi',

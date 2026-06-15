@@ -78,12 +78,11 @@
                         ];
                         $dayName = $daysIndonesia[$schedule->day] ?? $schedule->day;
                     @endphp
-                    <tr class="schedule-row" data-teacher="{{ $schedule->teacher->user->name }}" data-day="{{ $schedule->day }}" data-subject="{{ strtolower($schedule->subject) }}">
+                    <tr class="schedule-row" data-teacher="{{ $teacherNames[$schedule->teacher_id] ?? '' }}" data-day="{{ $schedule->day }}" data-subject="{{ strtolower($schedule->subject) }}">
                         <td>{{ ($schedules->currentPage() - 1) * $schedules->perPage() + $index + 1 }}</td>
                         <td>
                             <div class="teacher-info">
-                                <span class="teacher-name">{{ $schedule->teacher->user->name }}</span>
-                                <span class="teacher-spec">{{ $schedule->teacher->specialization }}</span>
+                                <span class="teacher-name">{{ $teacherNames[$schedule->teacher_id] ?? 'Guru Tidak Diketahui' }}</span>
                             </div>
                         </td>
                         <td><span class="badge-subject">{{ $schedule->subject }}</span></td>
