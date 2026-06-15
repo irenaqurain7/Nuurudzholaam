@@ -167,10 +167,6 @@
             color: var(--putih);
             padding: 100px 20px;
             text-align: center;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
             overflow: hidden;
         }
@@ -188,16 +184,16 @@
         }
 
         .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            font-weight: bold;
+            font-size: 40px;
+            margin-bottom: 15px;
+            font-weight: 700;
             position: relative;
             z-index: 1;
         }
 
         .hero p {
-            font-size: 20px;
-            margin-bottom: 30px;
+            font-size: 16px;
+            margin-bottom: 0px;
             position: relative;
             z-index: 1;
             opacity: 0.95;

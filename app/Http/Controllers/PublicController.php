@@ -16,7 +16,11 @@ class PublicController extends Controller
 {
     protected function schoolInfo(): SchoolInfo
     {
-        return SchoolInfo::first() ?? new SchoolInfo();
+        try {
+            return SchoolInfo::first() ?? new SchoolInfo();
+        } catch (\Exception $e) {
+            return new SchoolInfo();
+        }
     }
 
     public function index()
@@ -191,7 +195,11 @@ class PublicController extends Controller
     public function faq()
     {
         $school = $this->schoolInfo();
-        $faqs = FAQ::orderBy('urutan')->get();
+        try {
+            $faqs = FAQ::orderBy('urutan')->get();
+        } catch (\Exception $e) {
+            $faqs = collect();
+        }
 
         return view('faq', compact('school', 'faqs'));
     }
