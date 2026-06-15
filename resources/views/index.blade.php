@@ -139,7 +139,7 @@
             <div>
                 <h2 style="font-size: 36px; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Selamat Datang di <br><span style="color: var(--emas);">Sekolah Nuurudzholaam</span></h2>
                 <p style="color: var(--text-light); line-height: 1.8; font-size: 16px; margin-bottom: 30px;">
-                    Pondok pesantren Nuurudzholaam didirikan oleh A Dede Ali Asy'ari, S.Pd. Pada tahun 2012 dengan menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.
+                    Nuurudzholaam didirikan oleh A Dede Ali Asy'ari, S.Pd. Pada tahun 2012 dengan menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.
                 </p>
                 <a href="{{ route('profil') }}" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;">Pelajari Lebih Lanjut →</a>
             </div>

@@ -83,6 +83,7 @@
 
                     </div>
                 </div>
+            </div>
 
             <!-- Contact Form Column -->
             <div>
@@ -153,7 +154,6 @@
                         <strong>Catatan:</strong> Kami merespons dalam waktu kurang dari 24 jam. Terima kasih!
                     </p>
                 </div>
-            </div>
         </div>
     </div>
 </div>

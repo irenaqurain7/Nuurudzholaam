@@ -146,54 +146,6 @@
     </div>
 </div>
 
-<!-- Submit a Question Form Section -->
-<div style="background-color: #f7fafc; padding: 60px 20px; border-top: 1px solid #e2e8f0;">
-    <div class="container" style="max-width: 700px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h2 style="color: var(--hijau-islam); font-size: 28px; margin-bottom: 15px; font-weight: bold;">Punya Pertanyaan Lain?</h2>
-            <p style="color: var(--text-light); font-size: 15px;">Kirimkan pertanyaan Anda langsung kepada kami. Kami akan merespons melalui email Anda sesegera mungkin.</p>
-        </div>
-
-        @if(session('success'))
-            <div style="background-color: #c6f6d5; border-left: 4px solid #38a169; color: #22543d; padding: 15px 20px; border-radius: 6px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
-                <span><i class="fas fa-check-circle" style="margin-right: 10px;"></i> {{ session('success') }}</span>
-                <button type="button" onclick="this.parentElement.style.display='none'" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #22543d;">&times;</button>
-            </div>
-        @endif
-
-        <form action="{{ route('kontak.send') }}" method="POST" style="background-color: white; padding: 35px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); border: 1px solid #edf2f7;">
-            @csrf
-            <input type="hidden" name="subjek" value="Pertanyaan dari FAQ">
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;" class="form-grid-mobile">
-                <div>
-                    <label for="nama" style="display: block; font-weight: 600; color: var(--text-light); margin-bottom: 8px; font-size: 14px;">Nama Lengkap</label>
-                    <input type="text" name="nama" id="nama" required placeholder="Masukkan nama Anda" style="width: 100%; padding: 12px 16px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--hijau-islam)'" onblur="this.style.borderColor='#cbd5e0'">
-                </div>
-                <div>
-                    <label for="email" style="display: block; font-weight: 600; color: var(--text-light); margin-bottom: 8px; font-size: 14px;">Alamat Email</label>
-                    <input type="email" name="email" id="email" required placeholder="name@example.com" style="width: 100%; padding: 12px 16px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--hijau-islam)'" onblur="this.style.borderColor='#cbd5e0'">
-                </div>
-            </div>
-
-            <div style="margin-bottom: 25px;">
-                <label for="pesan" style="display: block; font-weight: 600; color: var(--text-light); margin-bottom: 8px; font-size: 14px;">Pertanyaan Anda</label>
-                <textarea name="pesan" id="pesan" rows="5" required placeholder="Tuliskan pertanyaan lengkap Anda di sini..." style="width: 100%; padding: 12px 16px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.2s; resize: vertical; font-family: inherit;" onfocus="this.style.borderColor='var(--hijau-islam)'" onblur="this.style.borderColor='#cbd5e0'"></textarea>
-            </div>
-
-            <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background-color 0.2s;">Kirim Pertanyaan</button>
-        </form>
-    </div>
-</div>
-
-<style>
-    @media (max-width: 600px) {
-        .form-grid-mobile {
-            grid-template-columns: 1fr !important;
-            gap: 15px !important;
-        }
-    }
-</style>
 @endsection
 
 @push('scripts')
