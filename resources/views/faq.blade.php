@@ -21,19 +21,19 @@
                     $displayFaqs = collect([
                         (object)[
                             'pertanyaan' => 'Apa itu Nuurudzholaam (Nuzo)?',
-                            'jawaban' => 'Nuurudzholaam (Nuzo) adalah lembaga pendidikan Islam terpadu yang menyelenggarakan program pendidikan mulai dari TK, SD, SMP, hingga SMK dengan memadukan kurikulum nasional dan nilai-nilai kepesantrenan.',
+                            'jawaban' => 'Nuurudzholaam (Nuzo) adalah pondok pesantren dan lembaga pendidikan Islam terpadu yang menyelenggarakan program pendidikan mulai dari TK, SD, SMP, SMK hingga pondok pesantren dengan memadukan kurikulum berbasis pesantren dan formal.',
                             'kategori' => 'umum',
                             'urutan' => 1
                         ],
                         (object)[
                             'pertanyaan' => 'Di mana lokasi sekolah Nuurudzholaam?',
-                            'jawaban' => 'Sekolah Nuurudzholaam berlokasi di Jl. Masjid Nurul Dhalam, Karawang, Jawa Barat. Anda dapat melihat peta lokasi dan petunjuk arah selengkapnya di halaman Kontak kami.',
+                            'jawaban' => 'Sekolah Nuurudzholaam berlokasi di Kp, Jl. Sindang reret, Dangdeur, Kec. Bungursari, Kab. Purwakarta, Jawa Barat 41181.',
                             'kategori' => 'umum',
                             'urutan' => 2
                         ],
                         (object)[
-                            'pertanyaan' => 'Apakah sekolah menyediakan layanan antar-jemput?',
-                            'jawaban' => 'Saat ini sekolah menyediakan fasilitas transportasi jemputan khusus untuk siswa jenjang TK dan SD dengan rute tertentu. Informasi rute dan tarif dapat ditanyakan ke bagian administrasi sekolah.',
+                            'pertanyaan' => 'Berapa biaya pendidikan untuk sekolah?',
+                            'jawaban' => 'Mengenai biaya pendidikan anda bisa langsung tanyakan kepada admin dengan cara menghubungi nomor yang tertera dan untuk anak yatim dan piatu biaya pendidikan gratis atau di tanggung oleh lembaga (yayasan).',
                             'kategori' => 'umum',
                             'urutan' => 3
                         ],
@@ -63,7 +63,7 @@
                         ],
                         (object)[
                             'pertanyaan' => 'Bagaimana sistem pembelajaran sehari-hari?',
-                            'jawaban' => 'Pembelajaran dilaksanakan dengan sistem Full Day School dari hari Senin hingga Jumat/Sabtu (sesuai jenjang), yang mengintegrasikan kurikulum dinas pendidikan dan program pembiasaan keagamaan seperti shalat dhuha, tadarus, serta tahfidz Al-Qur\'an.',
+                            'jawaban' => 'Pembelajaran dilaksanakan dengan sistem Full Day School dari hari Senin hingga Jumat  yang mengintegrasikan kurikulum dinas pendidikan dan program pembiasaan keagamaan seperti shalat dhuha berjama\'ah setiap hari, Apel pagi setiap hari senin, hapalan zuz amma setiap hari selasa, senam gembira setiap hari rabu, kegiatan literasi setiap hari kamis serta olahraga bersama setiap hari jumat dan seluruh kegiatan di laksanakan sebelum pembelajaran dimulai.',
                             'kategori' => 'akademik',
                             'urutan' => 2
                         ],
@@ -75,13 +75,13 @@
                         ],
                         (object)[
                             'pertanyaan' => 'Fasilitas apa saja yang disediakan untuk menunjang pembelajaran?',
-                            'jawaban' => 'Fasilitas pendukung di Nuurudzholaam meliputi ruang kelas yang nyaman, laboratorium komputer untuk praktek TIK, perpustakaan, masjid/mushola sekolah, lapangan olahraga, area bermain khusus TK, serta lingkungan sekolah yang asri dan aman.',
+                            'jawaban' => 'Fasilitas pendukung di Nuurudzholaam meliputi ruang kelas yang nyaman, lab komputer untuk praktek TIK, perpustakaan, masjid sekolah, lapangan olahraga, area bermain khusus TK, Kantin sekolah, BLK (Balai latihan kerja), asrama putra putri atau pondok pesantren serta lingkungan sekolah yang asri dan aman.',
                             'kategori' => 'fasilitas',
                             'urutan' => 1
                         ],
                         (object)[
                             'pertanyaan' => 'Apakah tersedia asrama/pondok bagi siswa?',
-                            'jawaban' => 'Ya, kami menyediakan fasilitas asrama (pondok pesantren) bagi siswa jenjang SMP dan SMK yang ingin mukim/mondok sambil bersekolah umum. Pembinaan asrama dilakukan oleh ustadz/ustadzah yang berpengalaman.',
+                            'jawaban' => 'Ya, kami menyediakan fasilitas asrama (pondok pesantren) bagi siswa dan siswi yang ingin mondok sambil bersekolah umum. Pembinaan asrama dilakukan oleh ustadz/ustadzah yang berpengalaman.',
                             'kategori' => 'fasilitas',
                             'urutan' => 2
                         ]
@@ -124,8 +124,8 @@
                                 </h3>
                                 <i class="fas fa-chevron-down" style="color: var(--emas); transition: transform 0.3s ease; font-size: 16px; margin-left: 15px;"></i>
                             </div>
-                            <div class="accordion-content" style="padding: 0; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;">
-                                <div style="padding: 20px; background-color: var(--putih); border-top: 1px solid #e2e8f0; color: var(--text-light); line-height: 1.8; font-size: 15px;">
+                            <div class="accordion-content" style="padding: 0; max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                                <div style="padding: 15px 20px 20px 20px; background-color: var(--putih); color: var(--text-light); line-height: 1.8; font-size: 15px;">
                                     {{ $faq->jawaban }}
                                 </div>
                             </div>
@@ -214,7 +214,6 @@
                 const elH3 = elHeader.querySelector('h3');
                 
                 elContent.style.maxHeight = '0px';
-                elContent.style.padding = '0px';
                 elHeader.style.backgroundColor = '#f7fafc';
                 elHeader.style.color = '';
                 elH3.style.color = 'var(--hijau-islam)';
@@ -226,7 +225,6 @@
         // Toggle current item
         if(isActive) {
             content.style.maxHeight = '0px';
-            content.style.padding = '0px';
             header.style.backgroundColor = '#f7fafc';
             header.style.color = '';
             header.querySelector('h3').style.color = 'var(--hijau-islam)';
@@ -234,7 +232,6 @@
             icon.style.transform = 'rotate(0deg)';
         } else {
             content.style.maxHeight = content.scrollHeight + 'px';
-            content.style.padding = '20px';
             header.style.backgroundColor = 'var(--hijau-islam)';
             header.style.color = 'white';
             header.querySelector('h3').style.color = 'white';

@@ -16,19 +16,19 @@ class FAQSeeder extends Seeder
             // Kategori: Umum
             [
                 'pertanyaan' => 'Apa itu Nuurudzholaam (Nuzo)?',
-                'jawaban' => 'Nuurudzholaam (Nuzo) adalah lembaga pendidikan Islam terpadu yang menyelenggarakan program pendidikan mulai dari TK, SD, SMP, hingga SMK dengan memadukan kurikulum nasional dan nilai-nilai kepesantrenan.',
+                'jawaban' => 'Nuurudzholaam (Nuzo) adalah pondok pesantren dan lembaga pendidikan Islam terpadu yang menyelenggarakan program pendidikan mulai dari TK, SD, SMP, SMK hingga pondok pesantren dengan memadukan kurikulum berbasis pesantren dan formal.',
                 'kategori' => 'umum',
                 'urutan' => 1,
             ],
             [
                 'pertanyaan' => 'Di mana lokasi sekolah Nuurudzholaam?',
-                'jawaban' => 'Sekolah Nuurudzholaam berlokasi di Jl. Masjid Nurul Dhalam, Karawang, Jawa Barat. Anda dapat melihat peta lokasi dan petunjuk arah selengkapnya di halaman Kontak kami.',
+                'jawaban' => 'Sekolah Nuurudzholaam berlokasi di Kp, Jl. Sindang reret, Dangdeur, Kec. Bungursari, Kab. Purwakarta, Jawa Barat 41181.',
                 'kategori' => 'umum',
                 'urutan' => 2,
             ],
             [
-                'pertanyaan' => 'Apakah sekolah menyediakan layanan antar-jemput?',
-                'jawaban' => 'Saat ini sekolah menyediakan fasilitas transportasi jemputan khusus untuk siswa jenjang TK dan SD dengan rute tertentu. Informasi rute dan tarif dapat ditanyakan ke bagian administrasi sekolah.',
+                'pertanyaan' => 'Berapa biaya pendidikan untuk sekolah?',
+                'jawaban' => 'Mengenai biaya pendidikan anda bisa langsung tanyakan kepada admin dengan cara menghubungi nomor yang tertera dan untuk anak yatim dan piatu biaya pendidikan gratis atau di tanggung oleh lembaga (yayasan).',
                 'kategori' => 'umum',
                 'urutan' => 3,
             ],
@@ -62,7 +62,7 @@ class FAQSeeder extends Seeder
             ],
             [
                 'pertanyaan' => 'Bagaimana sistem pembelajaran sehari-hari?',
-                'jawaban' => 'Pembelajaran dilaksanakan dengan sistem Full Day School dari hari Senin hingga Jumat/Sabtu (sesuai jenjang), yang mengintegrasikan kurikulum dinas pendidikan dan program pembiasaan keagamaan seperti shalat dhuha, tadarus, serta tahfidz Al-Qur\'an.',
+                'jawaban' => 'Pembelajaran dilaksanakan dengan sistem Full Day School dari hari Senin hingga Jumat  yang mengintegrasikan kurikulum dinas pendidikan dan program pembiasaan keagamaan seperti shalat dhuha berjama\'ah setiap hari, Apel pagi setiap hari senin, hapalan zuz amma setiap hari selasa, senam gembira setiap hari rabu, kegiatan literasi setiap hari kamis serta olahraga bersama setiap hari jumat dan seluruh kegiatan di laksanakan sebelum pembelajaran dimulai.',
                 'kategori' => 'akademik',
                 'urutan' => 2,
             ],
@@ -76,13 +76,13 @@ class FAQSeeder extends Seeder
             // Kategori: Fasilitas
             [
                 'pertanyaan' => 'Fasilitas apa saja yang disediakan untuk menunjang pembelajaran?',
-                'jawaban' => 'Fasilitas pendukung di Nuurudzholaam meliputi ruang kelas yang nyaman, laboratorium komputer untuk praktek TIK, perpustakaan, masjid/mushola sekolah, lapangan olahraga, area bermain khusus TK, serta lingkungan sekolah yang asri dan aman.',
+                'jawaban' => 'Fasilitas pendukung di Nuurudzholaam meliputi ruang kelas yang nyaman, lab komputer untuk praktek TIK, perpustakaan, masjid sekolah, lapangan olahraga, area bermain khusus TK, Kantin sekolah, BLK (Balai latihan kerja), asrama putra putri atau pondok pesantren serta lingkungan sekolah yang asri dan aman.',
                 'kategori' => 'fasilitas',
                 'urutan' => 1,
             ],
             [
                 'pertanyaan' => 'Apakah tersedia asrama/pondok bagi siswa?',
-                'jawaban' => 'Ya, kami menyediakan fasilitas asrama (pondok pesantren) bagi siswa jenjang SMP dan SMK yang ingin mukim/mondok sambil bersekolah umum. Pembinaan asrama dilakukan oleh ustadz/ustadzah yang berpengalaman.',
+                'jawaban' => 'Ya, kami menyediakan fasilitas asrama (pondok pesantren) bagi siswa dan siswi yang ingin mondok sambil bersekolah umum. Pembinaan asrama dilakukan oleh ustadz/ustadzah yang berpengalaman.',
                 'kategori' => 'fasilitas',
                 'urutan' => 2,
             ],

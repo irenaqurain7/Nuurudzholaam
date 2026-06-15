@@ -197,6 +197,28 @@ class PublicController extends Controller
         $school = $this->schoolInfo();
         try {
             $faqs = FAQ::orderBy('urutan')->get();
+            // Paksa alamat Purwakarta jika data ditarik dari database
+            foreach ($faqs as $faq) {
+                if (str_contains(strtolower($faq->pertanyaan), 'lokasi sekolah')) {
+                    $faq->jawaban = 'Sekolah Nuurudzholaam berlokasi di Kp, Jl. Sindang reret, Dangdeur, Kec. Bungursari, Kab. Purwakarta, Jawa Barat 41181.';
+                }
+                if (str_contains(strtolower($faq->pertanyaan), 'apa itu nuurudzholaam')) {
+                    $faq->jawaban = 'Nuurudzholaam (Nuzo) adalah pondok pesantren dan lembaga pendidikan Islam terpadu yang menyelenggarakan program pendidikan mulai dari TK, SD, SMP, SMK hingga pondok pesantren dengan memadukan kurikulum berbasis pesantren dan formal.';
+                }
+                if (str_contains(strtolower($faq->pertanyaan), 'antar-jemput') || str_contains(strtolower($faq->pertanyaan), 'biaya pendidikan')) {
+                    $faq->pertanyaan = 'Berapa biaya pendidikan untuk sekolah?';
+                    $faq->jawaban = 'Mengenai biaya pendidikan anda bisa langsung tanyakan kepada admin dengan cara menghubungi nomor yang tertera dan untuk anak yatim dan piatu biaya pendidikan gratis atau di tanggung oleh lembaga (yayasan).';
+                }
+                if (str_contains(strtolower($faq->pertanyaan), 'sistem pembelajaran')) {
+                    $faq->jawaban = 'Pembelajaran dilaksanakan dengan sistem Full Day School dari hari Senin hingga Jumat  yang mengintegrasikan kurikulum dinas pendidikan dan program pembiasaan keagamaan seperti shalat dhuha berjama\'ah setiap hari, Apel pagi setiap hari senin, hapalan zuz amma setiap hari selasa, senam gembira setiap hari rabu, kegiatan literasi setiap hari kamis serta olahraga bersama setiap hari jumat dan seluruh kegiatan di laksanakan sebelum pembelajaran dimulai.';
+                }
+                if (str_contains(strtolower($faq->pertanyaan), 'fasilitas apa saja')) {
+                    $faq->jawaban = 'Fasilitas pendukung di Nuurudzholaam meliputi ruang kelas yang nyaman, lab komputer untuk praktek TIK, perpustakaan, masjid sekolah, lapangan olahraga, area bermain khusus TK, Kantin sekolah, BLK (Balai latihan kerja), asrama putra putri atau pondok pesantren serta lingkungan sekolah yang asri dan aman.';
+                }
+                if (str_contains(strtolower($faq->pertanyaan), 'tersedia asrama') || str_contains(strtolower($faq->pertanyaan), 'tersedia pondok')) {
+                    $faq->jawaban = 'Ya, kami menyediakan fasilitas asrama (pondok pesantren) bagi siswa dan siswi yang ingin mondok sambil bersekolah umum. Pembinaan asrama dilakukan oleh ustadz/ustadzah yang berpengalaman.';
+                }
+            }
         } catch (\Exception $e) {
             $faqs = collect();
         }
