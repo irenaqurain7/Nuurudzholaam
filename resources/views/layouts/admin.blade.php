@@ -609,7 +609,7 @@
                 <a href="{{ url('/') }}" class="admin-topbar-action" style="text-decoration: none; display: flex; align-items: center; gap: 5px; color: #6b7280; font-weight: 600;" target="_blank">
                     <i class="fas fa-globe"></i> Website
                 </a>
-                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
                     @csrf
                     <button type="submit" class="admin-topbar-action logout" style="background:none; border:none; display: flex; align-items: center; gap: 5px; color: #ef4444; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-sign-out-alt"></i> Logout

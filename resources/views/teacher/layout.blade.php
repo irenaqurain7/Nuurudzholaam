@@ -324,11 +324,13 @@
             </li>
             <div class="sidebar-divider"></div>
             <li>
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
                     @csrf
+                    <button type="submit" style="background: none; border: none; cursor: pointer; color: inherit; width: 100%; text-align: left; padding: 0;">
+                        <a href="#" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                        </a>
+                    </button>
                 </form>
             </li>
         </ul>

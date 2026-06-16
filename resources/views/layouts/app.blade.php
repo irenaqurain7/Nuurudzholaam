@@ -599,9 +599,9 @@
                 @auth
                     @if(!auth()->user()->isAdmin())
                         <li>
-                            <form action="{{ route('logout') }}" method="POST" class="nav-form">
+                            <form action="{{ route('logout') }}" method="POST" class="nav-form" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
                                 @csrf
-                                <button type="submit" class="nav-btn logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                                <button type="submit" class="nav-btn logout" style="background: none; border: none; cursor: pointer;"><i class="fas fa-sign-out-alt"></i> Logout</button>
                             </form>
                         </li>
                     @endif
