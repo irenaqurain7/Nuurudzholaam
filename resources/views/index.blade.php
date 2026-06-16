@@ -150,40 +150,40 @@
 <!-- Four Pillars Section -->
 <div class="section" style="background-color: #f7fafc;">
     <div class="container">
-        <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 50px; font-weight: bold;">Pilar Pendidikan Utama</h2>
-        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Kami mengintegrasikan empat pilar fundamental untuk menciptakan pendidikan yang seimbang dan holistik.</p>
+        <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Pilar Pendidikan Utama</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 25px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Kami mengintegrasikan empat pilar fundamental untuk menciptakan pendidikan yang seimbang dan holistik.</p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
             <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-book"></i>
+                    <i class="fas fa-brain"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Tahfidz Zuz Amma</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Program menghafal Juz Amma (juz terakhir Al-Qur'an) dengan metode setor hafalan dan muroja'ah intensif, dibimbing oleh para guru.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Pikir (Literasi)</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Mengasah daya pikir dan intelektual agar peserta didik memiliki pemikiran kritis, luas dan tajam.</p>
             </div>
 
             <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-leaf"></i>
+                    <i class="fas fa-heart"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">TDBA (Tatanen di bale atikan)</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">TDBA (Tatanen di Bale Atikan) adalah program pembelajaran berbasis lingkungan yang mengajarkan peserta didik untuk bercocok tanam, peduli alam, dan membangun karakter yang mandiri serta bertanggung jawab.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Hati (Etika/Spiritual)</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Membina akhlak, moral dan budi pekerti luhur sehingga peserta didik menjadi individu yang berkarakter dan berintegritas.</p>
             </div>
 
             <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-hands-praying"></i>
+                    <i class="fas fa-palette"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Sholat duha berjama'ah</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Sholat Dhuha Berjamaah merupakan kegiatan ibadah yang dilaksanakan bersama untuk menanamkan kedisiplinan, meningkatkan keimanan, serta membiasakan peserta didik mendekatkan diri kepada Allah SWT dalam kehidupan sehari-hari.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Rasa (Estetika)</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Menumbuhkan kepekaan perasaan, welas asih dan apresiasi terhadap keindahan serta seni.</p>
             </div>
 
             <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-graduation-cap"></i>
+                    <i class="fas fa-bolt"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Kurikulum berbasis pesantren dan formal</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Kurikulum Berbasis Pesantren dan Formal mengintegrasikan pendidikan umum dan keagamaan untuk membentuk peserta didik yang berilmu, berakhlak mulia, dan berkarakter Islami.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Karsa (Kinestetik/Kemauan)</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">Mengembangkan kemauan keras, semangat juang, kreativitas dan inovasi.</p>
             </div>
         </div>
     </div>
@@ -211,41 +211,6 @@
         </div>
     </div>
 </div>
-
-<!-- Programs Preview Section -->
-@if($programs->count() > 0)
-<div class="section" style="background-color: white;">
-    <div class="container">
-        <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Program Pendidikan Unggulan</h2>
-        <p style="text-align: center; color: var(--text-light); margin-bottom: 40px; font-size: 16px;">Membentuk generasi Qur'ani yang berakhlak mulia, cerdas, dan tangguh melalui perpadian kurikulum nasional dengan nilai-nilai Islam yang komprehensif.</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-            @foreach($programs->take(3) as $program)
-            <div class="card" style="overflow: hidden; transition: all 0.3s;">
-                @if($program->gambar)
-                    <img src="{{ asset('storage/' . $program->gambar) }}" alt="{{ $program->nama_program }}" style="width: 100%; height: 200px; object-fit: cover;">
-                @else
-                    <div style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
-                        <i class="fas fa-book"></i>
-                    </div>
-                @endif
-                <div style="padding: 25px;">
-                    <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 10px; font-weight: bold;">{{ $program->nama_program }}</h3>
-                    <p style="color: var(--text-light); line-height: 1.6; margin-bottom: 15px;">{{ Str::limit($program->deskripsi, 80) }}</p>
-                    <p style="color: var(--hijau-islam); font-weight: 600; font-size: 14px;">
-                        <i class="fas fa-users"></i> Target Lulusan: {{ $program->kuota }} siswa
-                    </p>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="{{ route('program') }}" style="background-color: var(--hijau-islam); color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;">Lihat Semua Program →</a>
-        </div>
-    </div>
-</div>
-@endif
 
 <!-- Gallery Section -->
 @if($galleries->count() > 0)
