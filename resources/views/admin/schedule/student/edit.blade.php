@@ -62,19 +62,6 @@
                     @enderror
                 </div>
 
-                <!-- Subject -->
-                <div class="form-group">
-                    <label for="subject" class="form-label">
-                        Mata Pelajaran <span class="required">*</span>
-                    </label>
-                    <input type="text" name="subject" id="subject" class="form-control" 
-                           placeholder="Contoh: Matematika, Bahasa Indonesia, IPA" required
-                           value="{{ old('subject', $schedule->subject) }}">
-                    @error('subject')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
-                </div>
-
                 <!-- Day Selection -->
                 <div class="form-group">
                     <label for="day" class="form-label">
@@ -103,39 +90,30 @@
                     @enderror
                 </div>
 
-                <!-- Time Row -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="start_time" class="form-label">
-                            Waktu Mulai <span class="required">*</span>
-                        </label>
-                        <input type="time" name="start_time" id="start_time" class="form-control" required
-                               value="{{ old('start_time', $schedule->start_time) }}">
-                        @error('start_time')
-                            <span class="error-message">{{ $message }}</span>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="end_time" class="form-label">
-                            Waktu Selesai <span class="required">*</span>
-                        </label>
-                        <input type="time" name="end_time" id="end_time" class="form-control" required
-                               value="{{ old('end_time', $schedule->end_time) }}">
-                        @error('end_time')
-                            <span class="error-message">{{ $message }}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Room -->
+                <!-- Activities List -->
                 <div class="form-group">
-                    <label for="room" class="form-label">
-                        Ruang Kelas <span class="optional">(Opsional)</span>
-                    </label>
-                    <input type="text" name="room" id="room" class="form-control" 
-                           placeholder="Contoh: Ruang 1, Lab Komputer" value="{{ old('room', $schedule->room) }}">
-                    @error('room')
+                    <label class="form-label">Daftar Kegiatan <span class="required">*</span></label>
+                    <div id="activitiesList">
+                        @php
+                            $activities = is_array($schedule->activities) ? $schedule->activities : json_decode($schedule->activities ?? '[]', true);
+                        @endphp
+                        @forelse($activities as $act)
+                            <div class="activity-row">
+                                <input type="text" name="activities[]" class="form-control activity-input" value="{{ $act }}" required>
+                                <button type="button" class="btn-remove-activity" style="margin-top:0.5rem;">Hapus</button>
+                            </div>
+                        @empty
+                            <div class="activity-row">
+                                <input type="text" name="activities[]" class="form-control activity-input" placeholder="Contoh: Sholat Dhuha" required>
+                                <button type="button" class="btn-remove-activity" style="margin-top:0.5rem;">Hapus</button>
+                            </div>
+                        @endforelse
+                    </div>
+                    <button type="button" id="addActivity" class="btn-add-activity" style="margin-top:0.75rem;">Tambah Kegiatan</button>
+                    @error('activities')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                    @error('activities.*')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
@@ -404,4 +382,32 @@
     }
 }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const activitiesList = document.getElementById('activitiesList');
+    const addActivityBtn = document.getElementById('addActivity');
+
+    // Add activity row
+    addActivityBtn?.addEventListener('click', function() {
+        const row = document.createElement('div');
+        row.className = 'activity-row';
+        row.innerHTML = `\n+            <input type="text" name="activities[]" class="form-control activity-input" placeholder="Contoh: Sholat Dhuha" required>\n+            <button type="button" class="btn-remove-activity" style="margin-top:0.5rem;">Hapus</button>`;
+        activitiesList.appendChild(row);
+    });
+
+    // Remove activity (event delegation)
+    activitiesList?.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('btn-remove-activity')) {
+            const row = e.target.closest('.activity-row');
+            if (!row) return;
+            if (activitiesList.querySelectorAll('.activity-row').length === 1) {
+                const input = row.querySelector('input');
+                if (input) input.value = '';
+            } else {
+                row.remove();
+            }
+        }
+    });
+});
+</script>
 @endsection

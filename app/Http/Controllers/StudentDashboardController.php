@@ -52,10 +52,15 @@ class StudentDashboardController extends Controller
     {
         $user = Auth::user();
         $student = Student::where('user_id', $user->id)->firstOrFail();
-        $schedules = $student->schedule()->orderBy('day')->get();
+
+        $schedules = \App\Models\StudentSchedule::where('class', $student->class)
+            ->orderBy('day')
+            ->get()
+            ->groupBy('day');
 
         return view('student.schedule', [
             'schedules' => $schedules,
+            'student' => $student,
         ]);
     }
 

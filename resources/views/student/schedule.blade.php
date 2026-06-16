@@ -139,39 +139,41 @@
     <p>Lihat jadwal pelajaran Anda untuk minggu ini</p>
 </div>
 
-@if($schedules->count() > 0)
+@php
+    $daysIndonesia = [
+        'Monday' => 'Senin',
+        'Tuesday' => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday' => 'Kamis',
+        'Friday' => 'Jumat',
+        'Saturday' => 'Sabtu',
+    ];
+    $allDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+@endphp
+
+@if(count($schedules) > 0)
     <div class="table-container">
         <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Hari</th>
-                        <th>Mata Pelajaran</th>
-                        <th>Jam Mulai</th>
-                        <th>Jam Selesai</th>
-                        <th>Ruangan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($schedules as $schedule)
-                        <tr>
-                            <td>
-                                <span class="badge">{{ $schedule->day }}</span>
-                            </td>
-                            <td>{{ $schedule->subject }}</td>
-                            <td>{{ \Carbon\Carbon::createFromFormat('H:i:s', $schedule->start_time)->format('H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::createFromFormat('H:i:s', $schedule->end_time)->format('H:i') }}</td>
-                            <td>{{ $schedule->room ?? '-' }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            @foreach($allDays as $day)
+                @if(isset($schedules[$day]))
+                    <div style="padding:1rem;border-bottom:1px solid #eee;">
+                        <h3>{{ $daysIndonesia[$day] ?? $day }}</h3>
+                        <ul>
+                            @foreach($schedules[$day] as $entry)
+                                @foreach($entry->activities as $activity)
+                                    <li>{{ $activity }}</li>
+                                @endforeach
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            @endforeach
         </div>
     </div>
 @else
     <div class="empty-state">
         <i class="fas fa-calendar-times"></i>
-        <p>Belum ada jadwal yang tersedia untuk Anda</p>
+        <p>Belum ada jadwal yang tersedia untuk kelas {{ $student->class ?? '' }}</p>
     </div>
 @endif
 @endsection

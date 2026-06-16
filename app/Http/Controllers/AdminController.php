@@ -682,13 +682,10 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Jadwal guru berhasil dihapus.');
     }
 
-    // STUDENT SCHEDULES
+    // STUDENT SCHEDULES (SD-friendly: activities list per class & day)
     public function scheduleStudentIndex()
     {
-        $schedules = Schedule::whereNotNull('class')
-            ->orderBy('class')
-            ->orderBy('day')
-            ->paginate(15);
+        $schedules = \App\Models\StudentSchedule::orderBy('class')->orderBy('day')->get();
 
         return view('admin.schedule.student.index', compact('schedules'));
     }
@@ -709,27 +706,27 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'class' => 'required|string',
-            'subject' => 'required|string',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'room' => 'nullable|string',
+            'activities' => 'required|array|min:1',
+            'activities.*' => 'required|string',
         ], [
             'class.required' => 'Kelas harus dipilih',
-            'subject.required' => 'Mata pelajaran harus diisi',
             'day.required' => 'Hari harus dipilih',
-            'start_time.required' => 'Waktu mulai harus diisi',
-            'end_time.required' => 'Waktu selesai harus diisi',
-            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
+            'activities.required' => 'Daftar kegiatan harus diisi',
         ]);
 
-        Schedule::create($validated);
+        \App\Models\StudentSchedule::create([
+            'class' => $validated['class'],
+            'day' => $validated['day'],
+            'activities' => $validated['activities'],
+        ]);
+
         return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil ditambahkan.');
     }
 
     public function scheduleStudentEdit($id)
     {
-        $schedule = Schedule::whereNotNull('class')->findOrFail($id);
+        $schedule = \App\Models\StudentSchedule::findOrFail($id);
         $classes = Student::distinct()
             ->orderBy('class')
             ->pluck('class')
@@ -741,31 +738,31 @@ class AdminController extends Controller
 
     public function scheduleStudentUpdate(Request $request, $id)
     {
-        $schedule = Schedule::whereNotNull('class')->findOrFail($id);
+        $schedule = \App\Models\StudentSchedule::findOrFail($id);
 
         $validated = $request->validate([
             'class' => 'required|string',
-            'subject' => 'required|string',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'room' => 'nullable|string',
+            'activities' => 'required|array|min:1',
+            'activities.*' => 'required|string',
         ], [
             'class.required' => 'Kelas harus dipilih',
-            'subject.required' => 'Mata pelajaran harus diisi',
             'day.required' => 'Hari harus dipilih',
-            'start_time.required' => 'Waktu mulai harus diisi',
-            'end_time.required' => 'Waktu selesai harus diisi',
-            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
+            'activities.required' => 'Daftar kegiatan harus diisi',
         ]);
 
-        $schedule->update($validated);
+        $schedule->update([
+            'class' => $validated['class'],
+            'day' => $validated['day'],
+            'activities' => $validated['activities'],
+        ]);
+
         return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil diperbarui.');
     }
 
     public function scheduleStudentDestroy($id)
     {
-        $schedule = Schedule::whereNotNull('class')->findOrFail($id);
+        $schedule = \App\Models\StudentSchedule::findOrFail($id);
         $schedule->delete();
         return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
     }

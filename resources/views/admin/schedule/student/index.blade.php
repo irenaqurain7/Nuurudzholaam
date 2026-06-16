@@ -59,90 +59,71 @@
     </div>
 
     <div class="table-responsive-container">
-        <table class="admin-table" id="scheduleTable">
-            <thead>
-                <tr>
-                    <th style="width: 5%;">No</th>
-                    <th style="width: 15%;">Kelas</th>
-                    <th style="width: 20%;">Mata Pelajaran</th>
-                    <th style="width: 12%;">Hari</th>
-                    <th style="width: 15%;">Waktu</th>
-                    <th style="width: 10%;">Ruang</th>
-                    <th style="width: 23%;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($schedules as $index => $schedule)
-                    @php
-                        $daysIndonesia = [
-                            'Monday' => 'Senin',
-                            'Tuesday' => 'Selasa',
-                            'Wednesday' => 'Rabu',
-                            'Thursday' => 'Kamis',
-                            'Friday' => 'Jumat',
-                            'Saturday' => 'Sabtu'
-                        ];
-                        $dayName = $daysIndonesia[$schedule->day] ?? $schedule->day;
-                        $classLevel = substr($schedule->class, 0, 1);
-                    @endphp
-                    <tr class="schedule-row"
-                        data-class="{{ $schedule->class }}"
-                        data-day="{{ $schedule->day }}"
-                        data-subject="{{ strtolower($schedule->subject) }}"
-                        data-level="{{ $classLevel }}">
-                        <td>{{ ($schedules->currentPage() - 1) * $schedules->perPage() + $index + 1 }}</td>
-                        <td>
-                            <span class="class-badge" data-level="{{ $classLevel }}">
-                                {{ $schedule->class }}
-                            </span>
-                        </td>
-                        <td><span class="badge-subject">{{ $schedule->subject }}</span></td>
-                        <td>{{ $dayName }}</td>
-                        <td>
-                            <span class="time-badge">
-                                {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
-                            </span>
-                        </td>
-                        <td>{{ $schedule->room ?? '-' }}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{{ route('admin.schedule.student.edit', $schedule->id) }}" class="btn-action btn-edit" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.schedule.student.destroy', $schedule->id) }}" method="POST" class="delete-form" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete" title="Hapus" onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center no-data">
-                            <i class="fas fa-inbox"></i>
-                            <p>Belum ada jadwal siswa</p>
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+        @php
+            $grouped = $schedules->groupBy('class');
+            $daysIndonesia = [
+                'Monday' => 'Senin',
+                'Tuesday' => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis',
+                'Friday' => 'Jumat',
+                'Saturday' => 'Sabtu'
+            ];
+        @endphp
 
-    @if($schedules->hasPages())
-        <div class="pagination-container">
-            {{ $schedules->links() }}
-        </div>
-    @endif
+        @if($grouped->isEmpty())
+            <div class="no-data" style="padding:2rem;text-align:center;">
+                <i class="fas fa-inbox" style="font-size:2rem;color:#7f8c8d"></i>
+                <p>Belum ada jadwal siswa</p>
+            </div>
+        @else
+            @foreach($grouped as $className => $items)
+                <div class="class-block" style="margin-bottom:1.5rem;background:white;padding:1rem;border-radius:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <h3 style="margin:0">Kelas {{ $className }}</h3>
+                        <div>
+                            <a href="{{ route('admin.schedule.student.create') }}?class={{ urlencode($className) }}" class="btn-add-new">Tambah Jadwal</a>
+                        </div>
+                    </div>
+
+                    @php $byDay = $items->groupBy('day'); @endphp
+                    @foreach($byDay as $day => $entries)
+                        <div style="padding:0.75rem 0;border-top:1px solid #f1f1f1;">
+                            <strong>{{ $daysIndonesia[$day] ?? $day }}</strong>
+                            <ul style="margin:0.5rem 0 0 1rem;padding:0;">
+                                @foreach($entries as $entry)
+                                    <li style="margin-bottom:0.5rem;">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+                                            <div>
+                                                @foreach($entry->activities as $act)
+                                                    <div>{{ $act }}</div>
+                                                @endforeach
+                                            </div>
+                                            <div style="display:flex;gap:0.5rem;">
+                                                <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
+                                                <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn-action btn-delete" type="submit"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endforeach
+                </div>
+            @endforeach
+        @endif
+    </div>
 
     <div class="stats-container">
         <div class="stat-card">
             <i class="fas fa-calendar-check"></i>
             <div class="stat-content">
                 <span class="stat-label">Total Jadwal</span>
-                <span class="stat-value">{{ $schedules->total() }}</span>
+                <span class="stat-value">{{ $schedules->count() }}</span>
             </div>
         </div>
     </div>
