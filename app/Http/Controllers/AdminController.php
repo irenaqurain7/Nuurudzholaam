@@ -183,6 +183,27 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Kegiatan berhasil dihapus.');
     }
 
+    // Update activity descriptions
+    public function activityUpdateDescriptions()
+    {
+        $descriptions = [
+            'Buka Bersama (Iftar Bersama)' => 'Kegiatan buka bersama atau iftar bersama merupakan salah satu program rutin sekolah untuk mempererat hubungan antar warga sekolah. Kegiatan ini dilakukan untuk membangun kebersamaan dan saling berbagi dalam suasana yang hangat.',
+            'Hari Santri Nasional' => 'Peringatan Hari Santri Nasional merupakan momentum untuk mengenang jasa para santri dalam mempertahankan kemerdekaan Indonesia. Sekolah mengadakan berbagai kegiatan edukatif untuk memahami peran santri dalam sejarah bangsa.',
+            'Maulid Nabi Muhammad' => 'Peringatan Maulid Nabi Muhammad SAW adalah tradisi tahunan untuk merayakan kelahiran Nabi Muhammad. Sekolah menyelenggarakan rangkaian acara yang penuh makna untuk meningkatkan penghayatan nilai-nilai Islam.',
+            'Memperingati Hari Guru' => 'Peringatan Hari Guru Nasional adalah momen apresiasi kepada seluruh guru yang telah berdedikasi dalam pendidikan. Sekolah mengadakan berbagai kegiatan untuk menghargai jasa-jasa guru.',
+            'Memperingati Hari Kartini' => 'Peringatan Hari Kartini adalah upaya untuk mengenang semangat perjuangan R.A. Kartini dalam memperjuangkan pendidikan wanita. Kegiatan ini menginspirasi siswa siswi untuk terus berkontribusi bagi bangsa.',
+            'Memperingati Hari Pramuka' => 'Hari Pramuka merupakan hari bersejarah bagi gerakan kepramukaan di Indonesia. Sekolah merayakan dengan mengadakan berbagai aktivitas outdoor dan pelatihan kepramukaan.',
+            'Pentas Seni (Perpisahan Sekolah)' => 'Pentas seni perpisahan sekolah adalah ajang apresiasi atas karya seni siswa selama menuntut ilmu di sekolah. Acara ini menampilkan berbagai pertunjukan seni dari musik, tari, dan drama.',
+            'Santunan Anak Yatim dan Piatu' => 'Program santunan anak yatim dan piatu adalah wujud kepedulian sekolah terhadap sesama. Kegiatan ini mengajarkan siswa tentang pentingnya berbagi dan membantu mereka yang membutuhkan.'
+        ];
+
+        foreach ($descriptions as $title => $desc) {
+            Activity::where('judul', $title)->update(['deskripsi' => $desc]);
+        }
+
+        return redirect()->route('admin.activity.index')->with('success', 'Deskripsi kegiatan berhasil diperbarui.');
+    }
+
     // GALLERIES
     public function galleryIndex()
     {

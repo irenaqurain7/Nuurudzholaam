@@ -359,4 +359,20 @@
         }
     }
 </style>
+
+<form id="deleteForm" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<script>
+function deleteActivity(id) {
+    if (confirm('Yakin ingin menghapus kegiatan ini?')) {
+        const form = document.getElementById('deleteForm');
+        form.action = '{{ route("admin.activity.index") }}/' + id;
+        form.submit();
+    }
+}
+</script>
+
 @endsection

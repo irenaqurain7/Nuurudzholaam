@@ -82,6 +82,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/activity', [AdminController::class, 'activityIndex'])->name('activity.index');
     Route::get('/activity/create', [AdminController::class, 'activityCreate'])->name('activity.create');
     Route::post('/activity', [AdminController::class, 'activityStore'])->name('activity.store');
+    Route::get('/activity/update-descriptions', [AdminController::class, 'activityUpdateDescriptions'])->name('activity.update.descriptions');
     Route::get('/activity/{id}/edit', [AdminController::class, 'activityEdit'])->name('activity.edit');
     Route::put('/activity/{id}', [AdminController::class, 'activityUpdate'])->name('activity.update');
     Route::delete('/activity/{id}', [AdminController::class, 'activityDestroy'])->name('activity.destroy');
