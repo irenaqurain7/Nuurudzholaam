@@ -312,14 +312,9 @@
             </li>
             <div class="sidebar-divider"></div>
             <li>
-                <form action="{{ route('logout') }}" method="POST" style="display: inline;" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
-                    @csrf
-                    <button type="submit" style="background: none; border: none; cursor: pointer; color: inherit; width: 100%; text-align: left; padding: 0;">
-                        <a href="#" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                        </a>
-                    </button>
-                </form>
+                <a href="#" onclick="showLogoutModal(event)" style="text-decoration: none;">
+                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
+                </a>
             </li>
         </ul>
     </aside>
@@ -363,13 +358,97 @@
     </div>
 </div>
 
-<script>
-    function confirmLogout(event) {
-        event.preventDefault();
+<!-- Logout Modal -->
+<div id="logoutModal" class="logout-modal" style="display: none;">
+    <div class="logout-modal-content">
+        <h3>Apakah Anda yakin ingin keluar?</h3>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+        <div class="logout-modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Batal</button>
+            <button type="button" class="btn-logout" onclick="confirmLogout()">Keluar</button>
+        </div>
+    </div>
+</div>
 
-        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-            document.getElementById('logout-form').submit();
-        }
+<style>
+    .logout-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .logout-modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        min-width: 300px;
+    }
+
+    .logout-modal-content h3 {
+        margin: 0 0 25px;
+        font-size: 18px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .logout-modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .logout-modal-buttons button {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel {
+        background-color: #e5e7eb;
+        color: #333;
+    }
+
+    .btn-cancel:hover {
+        background-color: #d1d5db;
+    }
+
+    .btn-logout {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .btn-logout:hover {
+        background-color: #dc2626;
+    }
+</style>
+
+<script>
+    function showLogoutModal(event) {
+        event.preventDefault();
+        document.getElementById('logoutModal').style.display = 'flex';
+    }
+
+    function closeLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'none';
+    }
+
+    function confirmLogout() {
+        document.getElementById('logout-form').submit();
     }
 </script>
 @endsection
