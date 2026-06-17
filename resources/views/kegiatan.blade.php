@@ -28,11 +28,27 @@
             @foreach($activities as $activity)
             <div class="card">
                 @if($activity->gambar)
-                <img src="{{ asset('storage/' . $activity->gambar) }}" alt="{{ $activity->judul }}" class="card-img" style="cursor: pointer;" onclick="openLightbox(this.src, '{{ addslashes($activity->judul) }}')">
+                    @php
+                        $storagePath = public_path('storage/' . $activity->gambar);
+                        $publicImgPath = public_path('images/kegiatan/' . $activity->gambar);
+                        $imgUrl = null;
+                        if (file_exists($storagePath)) {
+                            $imgUrl = asset('storage/' . $activity->gambar);
+                        } elseif (file_exists($publicImgPath)) {
+                            $imgUrl = asset('images/kegiatan/' . $activity->gambar);
+                        }
+                    @endphp
+                    @if($imgUrl)
+                    <img src="{{ $imgUrl }}" alt="{{ $activity->judul }}" class="card-img" style="cursor: pointer;" onclick="openLightbox(this.src, '{{ addslashes($activity->judul) }}')">
+                    @else
+                    <div style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--hijau-islam-light), var(--emas-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; margin-bottom: 20px;">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    @endif
                 @else
-                <div style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--hijau-islam-light), var(--emas-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; margin-bottom: 20px;">
-                    <i class="fas fa-camera"></i>
-                </div>
+                    <div style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--hijau-islam-light), var(--emas-light)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; margin-bottom: 20px;">
+                        <i class="fas fa-camera"></i>
+                    </div>
                 @endif
                 <span class="badge">{{ ucfirst($activity->kategori) }}</span>
                 <h3 class="card-title">{{ $activity->judul }}</h3>
