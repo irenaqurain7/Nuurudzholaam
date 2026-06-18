@@ -76,31 +76,90 @@ class TeacherDashboardController extends Controller
         $teacher = $user->teacher;
         $search = $request->input('search', '');
 
-        // Get unique students taught by this teacher
-        $query = Student::whereHas('grades', function ($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id);
-        })->with('user');
+        // NOTE: Replaced dynamic student loading with a static, provided list
+        // to remove previous dummy data and show the requested names.
+        $provided = [
+            '1' => [
+                'Rehan',
+                'Nurul hidayah',
+                'Yunita kanesha ayra',
+                'Salman',
+                'Ratna gumilar',
+                'Muhammad Ali',
+            ],
+            '2' => [
+                'Rahma gustiani',
+                'Vani',
+                'M. Azmi ar rosyid',
+                'Ajeng ayu',
+                'Eti sumiati',
+            ],
+            '3' => [
+                'Neng Anita',
+                'Shelia indah Nugraha',
+                "Syaidah Muthi'ah ali",
+                'Muhammad Alfian',
+                'Muhammad Arka',
+                'Nur Muhammad firdaus',
+                'Rizki Ridho Maulana',
+            ],
+            '4' => [
+                'Mega rindiani',
+                'Dea Nadia',
+                'Widya selawati',
+                'M Amir',
+                'Muhammad Dapa Fitriyana',
+            ],
+            '5' => [
+                'Farhan musthofa',
+            ],
+            '6' => [
+                'Ayu Fatimah',
+                'Siti Nur Amaliyah',
+                'Ikbal Nurhakim',
+                'Wildan Al Farizi',
+            ],
+            '7' => [
+                'Mela puspita',
+                'Novi putri yudiani',
+                'Bagas arka',
+            ],
+            '8' => [
+                'M. Raja syahputra',
+                'M. Tamam',
+                'Siti sagiva hijrina rijayani',
+                'M. Rizky maulana',
+                'M. Farid nursyamsi',
+                'M. Rafi santika',
+                'Suryani',
+            ],
+            '9' => [
+                'Iwan kurniawan',
+            ],
+            '10' => [
+                'Ade selva',
+                'Asti ismania sita',
+            ],
+            '11' => [
+                'Alwi ajiz',
+            ],
+        ];
 
-        // Apply search filter if search query is provided
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('user', function ($userQuery) use ($search) {
-                    $userQuery->where('name', 'like', '%' . $search . '%');
-                })->orWhere('nisn', 'like', '%' . $search . '%');
+        $studentsByClass = collect($provided)->map(function ($names, $class) {
+            return collect($names)->map(function ($name) use ($class) {
+                $student = new \stdClass();
+                $student->class = $class;
+                $user = new \stdClass();
+                $user->name = $name;
+                $student->user = $user;
+                $student->nisn = '';
+                $student->id = null; // static entries have no DB id
+                return $student;
             });
-        }
+        });
 
-        $students = $query->get();
-
-        $classOrder = ['1A', '2A', '3A', '4A', '5A', '6A'];
-        $studentsByClass = $students
-            ->sortBy(function ($student) use ($classOrder) {
-                $classIndex = array_search($student->class, $classOrder, true);
-                $classIndex = $classIndex === false ? PHP_INT_MAX : $classIndex;
-
-                return [$classIndex, strtolower($student->user->name ?? ''), $student->nisn ?? ''];
-            })
-            ->groupBy('class');
+        // Provide a flat students collection for views expecting $students
+        $students = $studentsByClass->flatten(1);
 
         return view('teacher.students', [
             'students' => $students,

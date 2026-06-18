@@ -253,9 +253,15 @@
                                 </td>
                                 <td style="color: var(--text-secondary); font-family: monospace; font-size: 0.95rem;">{{ $student->nisn }}</td>
                                 <td style="text-align: right;">
-                                    <a href="{{ route('teacher.students.show', $student->id) }}" class="btn-detail">
-                                        <i class="fas fa-eye"></i> Detail
-                                    </a>
+                                    @if($student->id)
+                                        <a href="{{ route('teacher.students.show', $student->id) }}" class="btn-detail">
+                                            <i class="fas fa-eye"></i> Detail
+                                        </a>
+                                    @else
+                                        <span class="btn-detail" style="border-color: #ccc; color: #666; cursor: default;">
+                                            <i class="fas fa-eye" style="opacity:0.6"></i> Detail
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
