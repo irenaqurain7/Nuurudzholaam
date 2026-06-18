@@ -225,57 +225,48 @@
     <div class="stat-card siswa">
         <div>
             <div class="stat-card-header">
-                <h6>Total Siswa</h6>
+                <h6>@if(!empty($homeroomClass)) Wali Kelas @else Tanggal & Waktu @endif</h6>
                 <div class="icon-wrapper">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-chalkboard-teacher"></i>
                 </div>
             </div>
-            <div class="number">{{ $totalStudents }}</div>
+            @if(!empty($homeroomClass))
+                <div class="number">Wali Kelas: {{ $homeroomClass }}</div>
+            @else
+                <div class="number">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</div>
+            @endif
         </div>
-        <a href="{{ route('teacher.students') }}">Lihat Kelas Bimbingan <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
-    </div>
-
-    <div class="stat-card nilai">
-        <div>
-            <div class="stat-card-header">
-                <h6>Mata Pelajaran</h6>
-                <div class="icon-wrapper">
-                    <i class="fas fa-book"></i>
-                </div>
-            </div>
-            <div class="number">{{ $totalClasses }}</div>
-        </div>
-        <a href="{{ route('teacher.grades') }}">Input & Kelola Nilai <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
+        @if(!empty($homeroomClass))
+            <a href="{{ route('teacher.students') }}?class={{ urlencode($homeroomClass) }}">Absensi Kelas <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
+        @else
+            <a href="#">Waktu sekarang: {{ \Carbon\Carbon::now()->format('H:i') }}</a>
+        @endif
     </div>
 
     <div class="stat-card jadwal">
         <div>
             <div class="stat-card-header">
-                <h6>Jadwal Hari Ini</h6>
+                <h6>Agenda Hari Ini</h6>
                 <div class="icon-wrapper">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i class="fas fa-calendar-day"></i>
                 </div>
             </div>
-            <div class="number" style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0; color: var(--text-dark);">
-                Buka Agenda
-            </div>
+            <div class="number">{{ $todayCount }}</div>
         </div>
-        <a href="{{ route('teacher.schedule') }}">Lihat Jadwal Mengajar <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
+        <a href="{{ route('teacher.schedule') }}">Lihat Agenda Hari Ini <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
     </div>
 
-    <div class="stat-card profil">
+    <div class="stat-card nilai">
         <div>
             <div class="stat-card-header">
-                <h6>Akun Pengguna</h6>
+                <h6>Total Kelas</h6>
                 <div class="icon-wrapper">
-                    <i class="fas fa-user-badge"></i>
+                    <i class="fas fa-layer-group"></i>
                 </div>
             </div>
-            <div class="number" style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0; color: var(--text-dark);">
-                Terverifikasi
-            </div>
+            <div class="number">{{ $totalClasses }}</div>
         </div>
-        <a href="{{ route('teacher.profile') }}">Pengaturan Akun <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
+        <a href="{{ route('teacher.grades') }}">Kelola Kelas & Mata Pelajaran <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i></a>
     </div>
 </div>
 

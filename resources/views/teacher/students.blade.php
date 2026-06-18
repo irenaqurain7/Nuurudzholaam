@@ -221,6 +221,31 @@
     </div>
     <div id="searchResults"></div>
 </div>
+@php
+    $isWali = isset($homeroomClass) && $homeroomClass && empty($selectedClass);
+    $selectedClassToShow = $selectedClass ?: ($isWali ? $homeroomClass : null);
+@endphp
+
+<div style="display:flex; gap:0.75rem; align-items:center; margin-bottom:1rem;">
+    @if(isset($homeroomClass) && $homeroomClass)
+        <div style="font-weight:700;">Anda Wali Kelas: {{ $homeroomClass }}</div>
+        <a href="{{ route('teacher.students') }}?class={{ urlencode($homeroomClass) }}" class="btn-detail" style="margin-left:0.5rem;">Absensi Kelas</a>
+    @else
+        <div style="color:var(--text-secondary); font-weight:600;">Anda bukan wali kelas (tidak ada data wali otomatis)</div>
+    @endif
+
+    <form method="get" style="margin-left:auto; display:flex; gap:0.5rem; align-items:center;">
+        <label style="font-weight:600; color:var(--text-secondary);">Lihat Kelas Mapel Anda</label>
+        <select name="class" onchange="this.form.submit()" style="padding:6px 10px; border-radius:8px; border:1px solid var(--border);">
+            <option value="">-- Pilih Kelas --</option>
+            @if(isset($classesTaught) && $classesTaught->count()>0)
+                @foreach($classesTaught as $ct)
+                    <option value="{{ $ct }}" @if((string)$selectedClassToShow === (string)$ct) selected @endif>{{ $ct }}</option>
+                @endforeach
+            @endif
+        </select>
+    </form>
+</div>
 
 @if($students->count() > 0)
     <div class="section" style="padding: 0; overflow: hidden;">

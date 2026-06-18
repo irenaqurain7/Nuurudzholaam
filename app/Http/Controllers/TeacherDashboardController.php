@@ -12,6 +12,7 @@ use App\Models\SchoolInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -42,29 +43,340 @@ class TeacherDashboardController extends Controller
     {
         $user = Auth::user();
         $teacher = $user->teacher;
+        // Total students the teacher is responsible for (via grades relationship)
         $totalStudents = Grade::where('teacher_id', $teacher->id)->distinct('student_id')->count('student_id');
-        $totalClasses = Grade::where('teacher_id', $teacher->id)->distinct('subject')->count('subject');
+
+        // Determine homeroom/wali class (best-effort): prefer explicit `homeroom_class` on teacher model,
+        // otherwise pick the class with the most students taught by this teacher (based on Grade -> Student.class).
+        $homeroomClass = null;
+        if (isset($teacher->homeroom_class) && $teacher->homeroom_class) {
+            $homeroomClass = (string) $teacher->homeroom_class;
+        } else {
+            $topClass = Grade::where('teacher_id', $teacher->id)
+                ->join('students', 'grades.student_id', '=', 'students.id')
+                ->selectRaw('students.class as class_name, COUNT(*) as cnt')
+                ->groupBy('students.class')
+                ->orderByDesc('cnt')
+                ->first();
+            if ($topClass && $topClass->class_name) {
+                $homeroomClass = (string) $topClass->class_name;
+            }
+        }
+
+        // Compute today's name in Indonesian and count sessions for today
+        $dayMap = [
+            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
+        ];
+        $todayEnglish = \Carbon\Carbon::now()->format('l');
+        $todayName = $dayMap[$todayEnglish] ?? $todayEnglish;
+
+        $todayCount = \App\Models\Schedule::where('teacher_id', $teacher->id)
+            ->where('day', $todayName)
+            ->count();
+
+        // Total distinct classes across schedule & grades (assignment-based across levels)
+        $classesFromSchedules = \App\Models\Schedule::where('teacher_id', $teacher->id)
+            ->whereHas('student', function ($q) { $q->whereNotNull('class'); })
+            ->with('student')
+            ->get()
+            ->pluck('student.class')
+            ->filter()
+            ->unique();
+
+        $classesFromGrades = Grade::where('teacher_id', $teacher->id)
+            ->join('students', 'grades.student_id', '=', 'students.id')
+            ->pluck('students.class')
+            ->filter()
+            ->unique();
+
+        $totalClasses = $classesFromSchedules->merge($classesFromGrades)->unique()->count();
 
         return view('teacher.dashboard', [
             'user' => $user,
             'teacher' => $teacher,
             'totalStudents' => $totalStudents,
             'totalClasses' => $totalClasses,
+            'homeroomClass' => $homeroomClass,
+            'todayCount' => $todayCount,
+            'todayName' => $todayName,
         ]);
     }
 
     /**
      * Show teacher schedule
      */
-    public function schedule()
+    public function schedule(Request $request)
     {
         $user = Auth::user();
         $teacher = $user->teacher;
-        $schedules = $teacher->schedule()->orderBy('day')->get();
+
+        $selectedClass = trim((string)$request->query('class', ''));
+
+        // Prepare an empty collection by default
+        $schedules = collect();
+
+        if ($selectedClass !== '') {
+            // Match students whose `class` starts with the selected number (e.g. '1' matches '1A')
+            $schedules = \App\Models\Schedule::where('teacher_id', $teacher->id)
+                ->whereHas('student', function ($q) use ($selectedClass) {
+                    $q->where('class', 'like', $selectedClass . '%');
+                })->with('student')
+                ->get()
+                ->sortBy(function ($s) {
+                    $order = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                    $idx = array_search($s->day, $order, true);
+                    return $idx === false ? PHP_INT_MAX : $idx;
+                })->values();
+
+            // If DB has no schedules for this class, fallback to parsed JSON (if available)
+            if ($schedules->isEmpty()) {
+                $parsedPath = storage_path('app/jadwal_parsed.json');
+                if (file_exists($parsedPath)) {
+                    $json = json_decode(file_get_contents($parsedPath), true);
+                    $fallback = collect();
+
+                    // First: include entire groups whose header/items explicitly mention the class
+                    if (is_array($json)) {
+                        foreach ($json as $group) {
+                            $day = $group['day'] ?? '';
+                            $groupHasClass = false;
+                            foreach ($group['items'] as $item) {
+                                $subj = strtolower($item['subject'] ?? '');
+                                if (preg_match('/kelas[^0-9]*\b' . preg_quote($selectedClass, '/') . '\b/i', $subj)) {
+                                    $groupHasClass = true;
+                                    break;
+                                }
+                            }
+                            if ($groupHasClass) {
+                                foreach ($group['items'] as $item) {
+                                    $obj = new \stdClass();
+                                    $obj->day = $day;
+                                    $obj->subject = $item['subject'] ?? '';
+                                    $start = $item['start_time'] ?? '';
+                                    $end = $item['end_time'] ?? '';
+                                    $obj->start_time = strlen($start) === 5 ? $start . ':00' : ($start ?: null);
+                                    $obj->end_time = strlen($end) === 5 ? $end . ':00' : ($end ?: null);
+                                    $obj->room = $item['room'] ?? null;
+                                    $fallback->push($obj);
+                                }
+                            }
+                        }
+
+                        // If no group matched, try to include individual items that mention the class
+                        if ($fallback->isEmpty()) {
+                            foreach ($json as $group) {
+                                $day = $group['day'] ?? '';
+                                foreach ($group['items'] as $item) {
+                                    $subj = strtolower($item['subject'] ?? '');
+                                    if (preg_match('/kelas[^0-9]*\b' . preg_quote($selectedClass, '/') . '\b/i', $subj)) {
+                                        $obj = new \stdClass();
+                                        $obj->day = $day;
+                                        $obj->subject = $item['subject'] ?? '';
+                                        $start = $item['start_time'] ?? '';
+                                        $end = $item['end_time'] ?? '';
+                                        $obj->start_time = strlen($start) === 5 ? $start . ':00' : ($start ?: null);
+                                        $obj->end_time = strlen($end) === 5 ? $end . ':00' : ($end ?: null);
+                                        $obj->room = $item['room'] ?? null;
+                                        $fallback->push($obj);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Only use fallback if we found explicit class matches
+                    if ($fallback->isNotEmpty()) {
+                        $schedules = $fallback->sortBy(function ($s) {
+                            $order = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                            $idx = array_search($s->day, $order, true);
+                            return $idx === false ? PHP_INT_MAX : $idx;
+                        })->values();
+                    }
+                }
+            }
+
+            // If still empty, use a manual default schedule provided by user (school weekly planner)
+            if ($schedules->isEmpty()) {
+                $manual = [
+                    'Senin' => [
+                        'Sholat Duha', 'Upacara Bendera', 'Pendidikan Pancasila', 'Istirahat', 'Bahasa Indonesia'
+                    ],
+                    'Selasa' => [
+                        'Sholat Duha', 'Ngosrek', 'Pendidikan Agama Islam', 'Istirahat', 'B. Sunda (menggantikan Matematika)'
+                    ],
+                    'Rabu' => [
+                        'Sholat Duha', 'Kaulinan Sunda / MTK', 'Istirahat', 'Bahasa Inggris (menggantikan Bahasa Sunda)'
+                    ],
+                    'Kamis' => [
+                        'Sholat Duha', 'Pembiasaan Literasi', 'Seni Budaya', 'Istirahat', 'Huruf Sambung'
+                    ],
+                    'Jumat' => [
+                        'Sholat Duha', 'PJOK', 'Istirahat', 'TDBA / 8 Dimensi Profil Kelulusan'
+                    ],
+                ];
+
+                $gen = collect();
+                foreach ($manual as $dayName => $subjects) {
+                    foreach ($subjects as $subj) {
+                        $obj = new \stdClass();
+                        $obj->day = $dayName;
+                        $obj->subject = $subj;
+                        $obj->start_time = null;
+                        $obj->end_time = null;
+                        $obj->room = null;
+                        $gen->push($obj);
+                    }
+                }
+                if ($gen->isNotEmpty()) {
+                    $schedules = $gen->sortBy(function ($s) {
+                        $order = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+                        $idx = array_search($s->day, $order, true);
+                        return $idx === false ? PHP_INT_MAX : $idx;
+                    })->values();
+                }
+            }
+        }
+
+        // If no class selected, show unified timeline for today across all classes
+        if ($selectedClass === '') {
+            $dayMap = [
+                'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+                'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
+            ];
+            $todayEnglish = \Carbon\Carbon::now()->format('l');
+            $todayName = $dayMap[$todayEnglish] ?? $todayEnglish;
+
+            $schedules = \App\Models\Schedule::where('teacher_id', $teacher->id)
+                ->where('day', $todayName)
+                ->with('student')
+                ->orderBy('start_time')
+                ->get();
+        }
+
+        // Diagnostic information for debugging purposes
+        $parsedPath = storage_path('app/jadwal_parsed.json');
+        $parsedExists = file_exists($parsedPath);
+        $parsedGroups = 0;
+        $parsedItemsTotal = 0;
+        $detectedClasses = collect();
+        if ($parsedExists) {
+            $raw = @file_get_contents($parsedPath);
+            $j = @json_decode($raw, true);
+            if (is_array($j)) {
+                $parsedGroups = count($j);
+                foreach ($j as $g) {
+                    $parsedItemsTotal += is_array($g['items'] ?? null) ? count($g['items']) : 0;
+                    // detect classes mentioned in parsed items
+                    if (is_array($g['items'] ?? null)) {
+                        foreach ($g['items'] as $it) {
+                            $subj = strtolower($it['subject'] ?? '');
+                            if (strpos($subj, 'kelas') !== false) {
+                                if (preg_match_all('/\d+/', $subj, $m)) {
+                                    foreach ($m[0] as $num) {
+                                        $detectedClasses->push((int)$num);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                $detectedClasses = $detectedClasses->unique()->sort()->values();
+            }
+        }
+
+        // Prepare schedules array for debugging (limit size)
+        $schedulesArray = $schedules->map(function ($s) {
+            if (is_array($s)) return $s;
+            if ($s instanceof \Illuminate\Database\Eloquent\Model) return $s->toArray();
+            return (array) $s;
+        })->take(50)->values();
+
+        $diagnostic = [
+            'selectedClass' => $selectedClass,
+            'db_schedules_count' => isset($dbSchedulesCount) ? $dbSchedulesCount : ($schedules instanceof \Illuminate\Support\Collection ? $schedules->count() : null),
+            'schedules_sample' => $schedulesArray,
+            'parsed_file_exists' => $parsedExists,
+            'parsed_groups' => $parsedGroups,
+            'parsed_items_total' => $parsedItemsTotal,
+            'detected_classes_in_parsed' => $detectedClasses->values(),
+        ];
+
+        Log::debug('TeacherScheduleDebug', $diagnostic);
+
+        if ($request->boolean('debug')) {
+            return response()->json($diagnostic);
+        }
 
         return view('teacher.schedule', [
             'schedules' => $schedules,
+            'selectedClass' => $selectedClass,
+            'detectedClasses' => $detectedClasses,
         ]);
+    }
+
+    /**
+     * Import parsed jadwal_parsed.json into schedules table for the selected class.
+     * This action creates Schedule entries with teacher_id = current teacher and student_id = null.
+     */
+    public function importParsedToDb(Request $request)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $validated = $request->validate([
+            'class' => 'required|string|max:10'
+        ]);
+
+        $selectedClass = trim((string)$validated['class']);
+
+        $parsedPath = storage_path('app/jadwal_parsed.json');
+        if (!file_exists($parsedPath)) {
+            return back()->with('error', 'File parsed tidak ditemukan. Jalankan parser terlebih dahulu.');
+        }
+
+        $json = @json_decode(file_get_contents($parsedPath), true);
+        if (!is_array($json)) {
+            return back()->with('error', 'File parsed tidak valid.');
+        }
+
+        $inserted = 0;
+        foreach ($json as $group) {
+            $day = $group['day'] ?? '';
+            foreach ($group['items'] as $item) {
+                $subj = strtolower($item['subject'] ?? '');
+                if (preg_match('/kelas[^0-9]*\b' . preg_quote($selectedClass, '/') . '\b/i', $subj)) {
+                    $subject = $item['subject'] ?? '';
+                    $start = $item['start_time'] ?? null;
+                    $end = $item['end_time'] ?? null;
+                    $startTime = strlen($start) === 5 ? $start . ':00' : ($start ?: null);
+                    $endTime = strlen($end) === 5 ? $end . ':00' : ($end ?: null);
+
+                    // avoid duplicate: same teacher, day, subject, start_time
+                    $exists = \App\Models\Schedule::where('teacher_id', $teacher->id)
+                        ->where('day', $day)
+                        ->where('subject', $subject)
+                        ->where(function ($q) use ($startTime) {
+                            if ($startTime) $q->where('start_time', $startTime); else $q->whereNull('start_time');
+                        })->exists();
+
+                    if (!$exists) {
+                        \App\Models\Schedule::create([
+                            'teacher_id' => $teacher->id,
+                            'student_id' => null,
+                            'subject' => $subject,
+                            'day' => $day,
+                            'start_time' => $startTime,
+                            'end_time' => $endTime,
+                            'room' => $item['room'] ?? null,
+                        ]);
+                        $inserted++;
+                    }
+                }
+            }
+        }
+
+        return back()->with('success', "Import selesai. $inserted entri ditambahkan untuk Kelas $selectedClass.");
     }
 
     /**
@@ -75,9 +387,73 @@ class TeacherDashboardController extends Controller
         $user = Auth::user();
         $teacher = $user->teacher;
         $search = $request->input('search', '');
+        // Detect homeroom (same logic as dashboard index)
+        $homeroomClass = null;
+        if (isset($teacher->homeroom_class) && $teacher->homeroom_class) {
+            $homeroomClass = (string) $teacher->homeroom_class;
+        } else {
+            $topClass = Grade::where('teacher_id', $teacher->id)
+                ->join('students', 'grades.student_id', '=', 'students.id')
+                ->selectRaw('students.class as class_name, COUNT(*) as cnt')
+                ->groupBy('students.class')
+                ->orderByDesc('cnt')
+                ->first();
+            if ($topClass && $topClass->class_name) {
+                $homeroomClass = (string) $topClass->class_name;
+            }
+        }
 
-        // NOTE: Replaced dynamic student loading with a static, provided list
-        // to remove previous dummy data and show the requested names.
+        // Build list of classes that the teacher teaches (from schedules and grades)
+        $classesFromSchedules = \App\Models\Schedule::where('teacher_id', $teacher->id)
+            ->whereHas('student', function ($q) { $q->whereNotNull('class'); })
+            ->with('student')
+            ->get()
+            ->pluck('student.class')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $classesFromGrades = Grade::where('teacher_id', $teacher->id)
+            ->join('students', 'grades.student_id', '=', 'students.id')
+            ->pluck('students.class')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $classesTaught = $classesFromSchedules->merge($classesFromGrades)->unique()->values();
+
+        // If DB has student records and the teacher is wali/selected a class, load from DB
+        $selectedClass = trim((string)$request->query('class', ''));
+
+        $students = collect();
+        $studentsByClass = collect();
+
+        if (!empty($selectedClass) || !empty($homeroomClass)) {
+            $targetClass = !empty($selectedClass) ? $selectedClass : $homeroomClass;
+            $dbStudents = Student::with('user')
+                ->where('class', $targetClass)
+                ->orderBy('nisn')
+                ->get();
+
+            if ($dbStudents->isNotEmpty()) {
+                $students = $dbStudents->map(function ($s) {
+                    $s->id = $s->id;
+                    return $s;
+                });
+
+                $studentsByClass = collect([$targetClass => $students]);
+                return view('teacher.students', [
+                    'students' => $students,
+                    'studentsByClass' => $studentsByClass,
+                    'search' => $search,
+                    'homeroomClass' => $homeroomClass,
+                    'classesTaught' => $classesTaught,
+                    'selectedClass' => $selectedClass,
+                ]);
+            }
+        }
+
+        // Fallback static list when DB data is not present
         $provided = [
             '1' => [
                 'Rehan',
@@ -165,6 +541,9 @@ class TeacherDashboardController extends Controller
             'students' => $students,
             'studentsByClass' => $studentsByClass,
             'search' => $search,
+            'homeroomClass' => $homeroomClass,
+            'classesTaught' => $classesTaught,
+            'selectedClass' => $selectedClass,
         ]);
     }
 

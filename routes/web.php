@@ -188,6 +188,8 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
 
     // Schedule
     Route::get('/schedule', [TeacherDashboardController::class, 'schedule'])->name('schedule');
+    // Import parsed schedule from uploaded DOCX (developer helper)
+    Route::post('/schedule/import-parsed', [TeacherDashboardController::class, 'importParsedToDb'])->name('schedule.import_parsed');
 
     // Students
     Route::get('/students', [TeacherDashboardController::class, 'students'])->name('students');
