@@ -197,12 +197,41 @@
 <div class="section" style="padding: 1.25rem;">
     <form method="get" class="mb-3" id="filterForm">
         <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
-            <label for="classSelect" style="font-weight:600; color:var(--text-secondary);">Pilih Kelas</label>
+            <label for="tingkatSelect" style="font-weight:600; color:var(--text-secondary);">Tingkat</label>
+            <select id="tingkatSelect" name="tingkat" class="form-select" style="max-width:160px; border-radius:8px; padding:0.5rem;">
+                <option value="">-- Semua Tingkat --</option>
+                @php $opts = ['TK','SD','SMP','SMA','SMK']; @endphp
+                @foreach($opts as $o)
+                    <option value="{{ $o }}" @if(request()->query('tingkat')===$o) selected @endif>{{ $o }}</option>
+                @endforeach
+            </select>
+
+            <label for="classSelect" style="font-weight:600; color:var(--text-secondary);">Kelas</label>
             <select id="classSelect" name="class" class="form-select" style="max-width:200px; border-radius:8px; padding:0.5rem;">
-                <option value="">-- Pilih Kelas --</option>
-                @for($i=1;$i<=6;$i++)
-                    <option value="{{ $i }}" @if(isset($selectedClass) && (string)$selectedClass === (string)$i) selected @endif>Kelas {{ $i }}</option>
-                @endfor
+                <option value="">-- Semua Kelas --</option>
+                {{-- Populate options based on detected classes or selected tingkat --}}
+                @php
+                    $selectedTingkat = request()->query('tingkat', null);
+                    function kelasOptionsForTingkat($t){
+                        $out = [];
+                        if(!$t) return $out;
+                        if($t === 'TK') { $out = ['TK A','TK B']; }
+                        if($t === 'SD') { for($i=1;$i<=6;$i++) $out[] = $i.'A'; }
+                        if($t === 'SMP'){ for($i=7;$i<=9;$i++) $out[] = $i.'A'; }
+                        if(in_array($t,['SMA','SMK'])){ for($i=10;$i<=12;$i++) $out[] = $i.'A'; }
+                        return $out;
+                    }
+                    $dynamicClasses = kelasOptionsForTingkat($selectedTingkat);
+                @endphp
+                @if(!empty($dynamicClasses))
+                    @foreach($dynamicClasses as $c)
+                        <option value="{{ $c }}" @if(isset($selectedClass) && (string)$selectedClass === (string)$c) selected @endif>{{ $c }}</option>
+                    @endforeach
+                @else
+                    @for($i=1;$i<=6;$i++)
+                        <option value="{{ $i }}" @if(isset($selectedClass) && (string)$selectedClass === (string)$i) selected @endif>Kelas {{ $i }}</option>
+                    @endfor
+                @endif
             </select>
             @if(!empty($detectedClasses) && $detectedClasses->count()>0)
                 <div style="margin-left:0.75rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
@@ -224,6 +253,89 @@
             @endif
         </div>
     </form>
+
+    {{-- Tambahan input untuk menambah/filternya mata pelajaran: Tingkat, Kelas, Ruangan --}}
+    <div style="margin-top:0.75rem;">
+        <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+            <label for="new_subject" style="font-weight:600; color:var(--text-secondary);">Mata Pelajaran</label>
+            <input id="new_subject" name="new_subject" type="text" class="form-control" placeholder="Contoh: Matematika" style="max-width:260px; border-radius:8px; padding:0.5rem;">
+
+            <label for="new_tingkat" style="font-weight:600; color:var(--text-secondary);">Pilih Tingkat</label>
+            <select id="new_tingkat" name="new_tingkat" class="form-select" style="max-width:160px; border-radius:8px; padding:0.5rem;">
+                <option value="">-- Pilih Tingkat --</option>
+                @foreach($opts as $o)
+                    <option value="{{ $o }}">{{ $o }}</option>
+                @endforeach
+            </select>
+
+            <label for="new_class" style="font-weight:600; color:var(--text-secondary);">Pilih Kelas</label>
+            <select id="new_class" name="new_class" class="form-select" style="max-width:160px; border-radius:8px; padding:0.5rem;">
+                <option value="">-- Pilih Kelas --</option>
+            </select>
+
+            <label for="new_room" style="font-weight:600; color:var(--text-secondary);">Ruangan</label>
+            <input id="new_room" name="new_room" type="text" class="form-control" placeholder="Contoh: R.101" style="max-width:160px; border-radius:8px; padding:0.5rem;">
+        </div>
+    </div>
+
+    {{-- Weekly schedule table grouped by day --}}
+    @php
+        $allSchedules = collect($schedules ?? []);
+        $daysOrderFull = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+        $grouped = $allSchedules->groupBy(function($s){ return trim((string)($s->day ?? '')); });
+    @endphp
+    <div class="section" style="margin-top:1rem;">
+        <div style="font-weight:700; margin-bottom:0.75rem;">Tabel Jadwal Mengajar (Kelompok per Hari)</div>
+        @if($allSchedules->isEmpty())
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fas fa-calendar-alt"></i></div>
+                <h3>Tidak ada jadwal</h3>
+                <p>Belum ada data jadwal yang tersedia.</p>
+            </div>
+        @else
+            <div class="custom-table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width:120px">Hari</th>
+                            <th style="width:160px">Waktu</th>
+                            <th style="width:220px">Mata Pelajaran</th>
+                            <th style="width:120px">Tingkat</th>
+                            <th style="width:120px">Kelas</th>
+                            <th>Ruangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($daysOrderFull as $day)
+                            @if(isset($grouped[$day]) && $grouped[$day]->isNotEmpty())
+                                @foreach($grouped[$day] as $item)
+                                    @php
+                                        $start = trim((string)($item->start_time ?? ''));
+                                        $end = trim((string)($item->end_time ?? ''));
+                                        $timeText = '-';
+                                        try { if ($start) $timeText = \Carbon\Carbon::createFromFormat('H:i:s', $start)->format('H:i'); } catch(\Exception $e) { $timeText = $start ?: '-'; }
+                                        try { if ($end) $timeText .= $timeText && $end ? ' - '.\Carbon\Carbon::createFromFormat('H:i:s', $end)->format('H:i') : $end; } catch(\Exception $e) { $timeText .= $end ? ' - '.$end : ''; }
+                                        $student = $item->student ?? null;
+                                        $kelas = $student->class ?? ($item->class ?? '-');
+                                        $tingkat = $item->tingkat ?? ($student->tingkat ?? '-');
+                                        $subject = trim((string)($item->subject ?? '-')) ?: '-';
+                                    @endphp
+                                    <tr>
+                                        <td><span class="day-badge">{{ $day }}</span></td>
+                                        <td class="time-text">{{ $timeText }}</td>
+                                        <td>{{ $subject }}</td>
+                                        <td>{{ $tingkat }}</td>
+                                        <td>{{ $kelas }}</td>
+                                        <td class="room-text">{{ $item->room ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
 
     @if(empty($selectedClass))
         @php
@@ -394,11 +506,78 @@
 </div>
     <script>
     document.addEventListener('DOMContentLoaded', function(){
-        var sel = document.getElementById('classSelect');
-        if(!sel) return;
-        sel.addEventListener('change', function(){
-            document.getElementById('filterForm').submit();
-        });
+        var classSel = document.getElementById('classSelect');
+        var tingkatSel = document.getElementById('tingkatSelect');
+        var filterForm = document.getElementById('filterForm');
+
+        // new inputs
+        var newTingkat = document.getElementById('new_tingkat');
+        var newClass = document.getElementById('new_class');
+
+        // Static mapping: adjust here as needed (example mapping requested)
+        var kelasMap = {
+            'TK': ['TK A','TK B'],
+            'SD': ['1A','1B'], // example: SD shows 1A,1B
+            'SMP': ['7A','8A','9A'],
+            'SMA': ['10 IPA','10 IPS'], // example: SMA shows 10 IPA, 10 IPS
+            'SMK': ['10A','11A','12A']
+        };
+
+        function populateOptionsFor(selectEl, tingkat, includeLabel){
+            if(!selectEl) return;
+            var prev = selectEl.value || '';
+            selectEl.innerHTML = '';
+            var def = document.createElement('option');
+            def.value = '';
+            def.textContent = includeLabel ? '-- Semua Kelas --' : '-- Pilih Kelas --';
+            selectEl.appendChild(def);
+
+            if(tingkat && kelasMap[tingkat]){
+                kelasMap[tingkat].forEach(function(c){
+                    var o = document.createElement('option');
+                    o.value = c;
+                    o.textContent = c;
+                    selectEl.appendChild(o);
+                });
+            } else {
+                for(var i=1;i<=6;i++){
+                    var o = document.createElement('option');
+                    o.value = i;
+                    o.textContent = 'Kelas ' + i;
+                    selectEl.appendChild(o);
+                }
+            }
+            try { selectEl.value = prev; } catch(e){}
+        }
+
+        if(tingkatSel){
+            tingkatSel.addEventListener('change', function(){
+                var t = tingkatSel.value || null;
+                populateOptionsFor(classSel, t, true);
+                // auto-submit to apply tingkat filter
+                if(filterForm) filterForm.submit();
+            });
+        }
+
+        if(classSel){
+            classSel.addEventListener('change', function(){
+                if(filterForm) filterForm.submit();
+            });
+        }
+
+        // wire new_tingkat -> new_class dynamic population
+        if(newTingkat){
+            newTingkat.addEventListener('change', function(){
+                var t = newTingkat.value || null;
+                populateOptionsFor(newClass, t, false);
+            });
+        }
+
+        // initialize new_class if new_tingkat has preset
+        if(newTingkat && newClass){
+            var initT = newTingkat.value || null;
+            if(initT) populateOptionsFor(newClass, initT, false);
+        }
     });
     </script>
 @endsection

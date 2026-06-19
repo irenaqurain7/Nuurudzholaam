@@ -141,15 +141,16 @@
     align-items: flex-start;
     margin-bottom: 2rem;
     background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(45,68,56,0.06);
 }
 
 .page-header h1 {
-    margin: 0 0 0.5rem 0;
-    color: #2c3e50;
-    font-size: 1.8rem;
+    margin: 0 0 0.25rem 0;
+    color: #2D4438;
+    font-size: 1.6rem;
+    font-weight:700;
 }
 
 .subtitle {
@@ -159,21 +160,23 @@
 }
 
 .btn-add-new {
-    background: #3498db;
+    background: #2D4438;
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 0.6rem 1.1rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    transition: background 0.3s;
+    transition: background 0.18s, transform 0.12s;
+    box-shadow: 0 1px 2px rgba(45,68,56,0.12);
 }
 
 .btn-add-new:hover {
-    background: #2980b9;
+    background: #23362b;
+    transform: translateY(-2px);
 }
 
 .management-toolbar {
@@ -193,19 +196,8 @@
     align-items: center;
 }
 
-.search-box i {
-    position: absolute;
-    left: 1rem;
-    color: #bdc3c7;
-}
-
-.search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.95rem;
-}
+.search-box i { position: absolute; left: 1rem; color: #c8d1cc; }
+.search-input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid #e6ebe6; border-radius: 8px; font-size: 0.95rem; background: #fbfdfb; }
 
 .filter-select {
     padding: 0.75rem 1rem;
@@ -245,23 +237,14 @@
     margin-left: auto;
 }
 
-.table-responsive-container {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-}
+.table-responsive-container { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(45,68,56,0.05); margin-bottom: 2rem; }
 
 .admin-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.admin-table thead {
-    background: #34495e;
-    color: white;
-}
+.admin-table thead { background: #2D4438; color: white; }
 
 .admin-table th {
     padding: 1rem;
@@ -336,15 +319,8 @@
     text-decoration: none;
 }
 
-.btn-edit {
-    background: #3498db;
-    color: white;
-}
-
-.btn-edit:hover {
-    background: #2980b9;
-    transform: translateY(-2px);
-}
+.btn-edit { background: #2D4438; color: white; }
+.btn-edit:hover { background: #23362b; transform: translateY(-2px); }
 
 .btn-delete {
     background: #e74c3c;
