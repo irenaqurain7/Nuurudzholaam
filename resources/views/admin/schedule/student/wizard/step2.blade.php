@@ -11,7 +11,7 @@
                 <div class="card-body">
                     <h5>Metode: {{ session('wizard_upload_method', 'bulk') == 'bulk' ? 'Bulk Upload' : 'Manual Input' }}</h5>
                     @if(session('wizard_upload_method') == 'bulk')
-                        <a href="#" class="btn btn-outline-success mb-2">Download Template Excel (Template_{{ $educationLevel }}.xlsx)</a>
+                        <a href="{{ asset('templates/Template_' . $educationLevel . '.csv') }}" class="btn btn-outline-success mb-2" download>Download Template CSV (Template_{{ $educationLevel }}.csv)</a>
                         <form method="POST" action="{{ route('admin.schedule.student.wizard.step2.store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">

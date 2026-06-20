@@ -1,0 +1,3 @@
+class,subject,day,start_time,end_time,teacher,room
+X-TKJ,Komputer,Monday,07:30,09:00,Bapak Aris,Lab Komputer
+X-TKJ,Produktif,Monday,09:15,10:45,Ibu Maya,Workshop
