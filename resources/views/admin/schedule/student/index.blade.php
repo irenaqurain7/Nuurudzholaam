@@ -78,41 +78,53 @@
             </div>
         @else
             @foreach($grouped as $className => $items)
-                <div class="class-block" style="margin-bottom:1.5rem;background:white;padding:1rem;border-radius:8px;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <h3 style="margin:0">Kelas {{ $className }}</h3>
+                <div class="class-card schedule-container" data-class="{{ $className }}">
+                    <div class="class-header">
                         <div>
-                            <a href="{{ route('admin.schedule.student.wizard.step1') }}?class={{ urlencode($className) }}" class="btn-add-new">Tambah Jadwal</a>
+                            <h3 class="class-title">Kelas {{ $className }}</h3>
+                            <p class="class-subtitle">Jadwal pelajaran mingguan untuk kelas {{ $className }}</p>
                         </div>
+                        <a href="{{ route('admin.schedule.student.wizard.step1') }}?class={{ urlencode($className) }}" class="btn-add-text">
+                            <i class="fas fa-plus"></i> Tambah Jadwal
+                        </a>
                     </div>
 
-                    @php $byDay = $items->groupBy('day'); @endphp
-                    @foreach($byDay as $day => $entries)
-                        <div style="padding:0.75rem 0;border-top:1px solid #f1f1f1;">
-                            <strong>{{ $daysIndonesia[$day] ?? $day }}</strong>
-                            <ul style="margin:0.5rem 0 0 1rem;padding:0;">
-                                @foreach($entries as $entry)
-                                    <li style="margin-bottom:0.5rem;">
-                                        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
-                                            <div>
-                                                @foreach($entry->activities as $act)
-                                                    <div>{{ $act }}</div>
-                                                @endforeach
-                                            </div>
-                                            <div style="display:flex;gap:0.5rem;">
-                                                <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
-                                                <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn-action btn-delete" type="submit"><i class="fas fa-trash"></i></button>
-                                                </form>
+                    <div class="class-body">
+                        @php $byDay = $items->groupBy('day'); @endphp
+                        @foreach($byDay as $day => $entries)
+                            @foreach($entries as $entry)
+                                @foreach($entry->activities as $act)
+                                    @php
+                                        preg_match('/^(.*?)\s*\((.*?)-(.*?)\)$/', $act, $matches);
+                                        $subj = $matches[1] ?? $act;
+                                        $time = isset($matches[2]) ? trim($matches[2]) . ' - ' . trim($matches[3]) : '';
+                                    @endphp
+                                    <div class="schedule-row-item" data-day="{{ $day }}" data-subject="{{ strtolower($subj) }}">
+                                        <div class="day-col">
+                                            {{ $daysIndonesia[$day] ?? $day }}
+                                        </div>
+                                        <div class="info-col">
+                                            <div class="blue-bar"></div>
+                                            <div class="subject-details">
+                                                <div class="subject-name">{{ $subj }}</div>
+                                                @if($time)
+                                                <div class="subject-time"><i class="far fa-clock"></i> {{ $time }}</div>
+                                                @endif
                                             </div>
                                         </div>
-                                    </li>
+                                        <div class="action-col">
+                                            <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-icon text-muted" title="Edit Jadwal"><i class="fas fa-edit"></i></a>
+                                            <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-icon text-danger" style="background:none;border:none;" title="Hapus Jadwal"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 @endforeach
-                            </ul>
-                        </div>
-                    @endforeach
+                            @endforeach
+                        @endforeach
+                    </div>
                 </div>
             @endforeach
         @endif
@@ -153,18 +165,30 @@
 .admin-table tbody tr { border-bottom: 1px solid #ecf0f1; transition: background 0.3s; }
 .admin-table tbody tr:hover { background: #f8f9fa; }
 .admin-table td { padding: 1rem; }
-    .class-badge { display: inline-block; padding: 0.4rem 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; color: white; background: #2D4438; }
-.badge-subject { display: inline-block; background: #e8f4f8; color: #16a085; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; }
-.time-badge { display: inline-block; background: #fff3cd; color: #856404; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.9rem; font-weight: 500; }
-.action-buttons { display: flex; gap: 0.5rem; }
-    .btn-action { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.18s; text-decoration: none; }
-    .btn-edit { background: #2D4438; color: white; }
-    .btn-edit:hover { background: #23362b; transform: translateY(-2px); }
-.btn-delete { background: #e74c3c; color: white; }
-.btn-delete:hover { background: #c0392b; transform: translateY(-2px); }
+
+/* New Class Card UI */
+.class-card { background: #ffffff; border-radius: 12px; border: 1px solid #E2ECE8; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
+.class-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2ECE8; }
+.class-title { margin: 0 0 0.25rem 0; font-size: 1.25rem; font-weight: 700; color: #1C2D25; }
+.class-subtitle { margin: 0; font-size: 0.85rem; color: #6C8B7C; }
+.btn-add-text { color: #2D4438; font-weight: 600; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.2s; }
+.btn-add-text:hover { color: #1a2921; }
+
+.schedule-row-item { display: flex; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid #E2ECE8; transition: background 0.2s; }
+.schedule-row-item:last-child { border-bottom: none; }
+.schedule-row-item:hover { background: #fbfdfb; }
+.day-col { width: 120px; font-weight: 600; color: #1C2D25; font-size: 0.95rem; }
+.info-col { flex: 1; display: flex; align-items: stretch; gap: 1rem; }
+.blue-bar { width: 4px; background: #3b82f6; border-radius: 4px; }
+.subject-details { display: flex; flex-direction: column; justify-content: center; gap: 0.25rem; }
+.subject-name { font-weight: 500; color: #1f2937; font-size: 0.95rem; }
+.subject-time { font-size: 0.85rem; color: #6b7280; display: flex; align-items: center; gap: 0.35rem; }
+.action-col { display: flex; gap: 0.5rem; opacity: 0.4; transition: opacity 0.2s; }
+.schedule-row-item:hover .action-col { opacity: 1; }
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; transition: all 0.2s; cursor: pointer; color: inherit; text-decoration: none; }
+.btn-icon:hover { background: #f3f4f6; }
+
 .no-data { padding: 3rem 1rem; color: #7f8c8d; }
-.no-data i { font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
-.pagination-container { display: flex; justify-content: center; margin: 2rem 0; }
     .stats-container { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 2rem; }
     .stat-card { background: white; padding: 1.25rem; border-radius: 10px; box-shadow: 0 1px 3px rgba(45,68,56,0.04); display: flex; align-items: center; gap: 1rem; }
     .stat-card i { font-size: 1.9rem; color: #2D4438; }
@@ -192,23 +216,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const classFilter = document.getElementById('classFilter');
     const dayFilter = document.getElementById('dayFilter');
-    const rows = document.querySelectorAll('.schedule-row');
+    const cards = document.querySelectorAll('.schedule-container');
 
     function filterTable() {
         const searchTerm = searchInput.value.toLowerCase();
         const selectedClass = classFilter.value;
         const selectedDay = dayFilter.value;
 
-        rows.forEach(row => {
-            const rowClass = row.dataset.class || '';
-            const day = row.dataset.day || '';
-            const subject = row.dataset.subject || '';
-
-            const matchesSearch = rowClass.toLowerCase().includes(searchTerm) || subject.includes(searchTerm);
+        cards.forEach(card => {
+            const rowClass = card.dataset.class || '';
             const matchesClass = !selectedClass || rowClass === selectedClass;
-            const matchesDay = !selectedDay || day === selectedDay;
-
-            row.style.display = matchesSearch && matchesClass && matchesDay ? '' : 'none';
+            
+            let hasVisibleRows = false;
+            
+            const rows = card.querySelectorAll('.schedule-row-item');
+            rows.forEach(row => {
+                const day = row.dataset.day || '';
+                const subject = row.dataset.subject || '';
+                
+                const matchesSearch = rowClass.toLowerCase().includes(searchTerm) || subject.includes(searchTerm);
+                const matchesDay = !selectedDay || day === selectedDay;
+                
+                if (matchesSearch && matchesDay) {
+                    row.style.display = '';
+                    hasVisibleRows = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            card.style.display = matchesClass && hasVisibleRows ? '' : 'none';
         });
     }
 

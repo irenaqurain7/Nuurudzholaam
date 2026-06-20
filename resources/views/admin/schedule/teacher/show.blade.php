@@ -69,7 +69,6 @@
                                     <th>Kelas</th>
                                     <th>Mata Pelajaran</th>
                                     <th>Jenjang</th>
-                                    <th>Ruangan</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,7 +90,6 @@
                                     <td>{{ $sched->class ?? '-' }}</td>
                                     <td>{{ $sched->subject ?? '-' }}</td>
                                     <td>{{ $sched->education_level ?? '-' }}</td>
-                                    <td>{{ $sched->room ?? '-' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
