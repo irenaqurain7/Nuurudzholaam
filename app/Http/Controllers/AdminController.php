@@ -606,19 +606,51 @@ class AdminController extends Controller
     // TEACHER SCHEDULES (Monitoring Dashboard)
     public function scheduleTeacherIndex(Request $request)
     {
+        // 1. Fetch all teachers (role = guru) first, apply search filter if any
+        $teachersQuery = \App\Models\User::where('role', 'guru');
+        
+        if ($request->filled('search_guru')) {
+            $search = $request->search_guru;
+            $teachersQuery->where('name', 'like', '%' . $search . '%');
+        }
+        
+        $teachers = $teachersQuery->get();
+        $groupedSchedules = [];
+
+        foreach ($teachers as $user) {
+            // Get or create Teacher profile
+            $teacher = $user->teacher;
+            if (!$teacher) {
+                $teacher = \App\Models\Teacher::create([
+                    'user_id' => $user->id,
+                    'nip' => '-' . $user->id,
+                    'specialization' => '-'
+                ]);
+            }
+            
+            $teacherId = $teacher->id;
+            $groupedSchedules[$teacherId] = [
+                'teacher_id' => $teacherId,
+                'name' => $user->name,
+                'subjects' => [],
+                'total_classes' => [],
+                'total_minutes' => 0,
+                'schedules' => [],
+                'has_conflict' => false
+            ];
+        }
+
+        // 2. Fetch schedules
         $query = Schedule::with('teacher.user');
 
-        // Filter by jenjang (education_level)
         if ($request->filled('level')) {
             $query->where('education_level', $request->level);
         }
 
-        // Filter by hari (day)
         if ($request->filled('day')) {
             $query->where('day', $request->day);
         }
 
-        // Filter by nama guru (search)
         if ($request->filled('search_guru')) {
             $search = $request->search_guru;
             $query->whereHas('teacher.user', function ($q) use ($search) {
@@ -632,28 +664,14 @@ class AdminController extends Controller
         $totalGuru = \App\Models\User::where('role', 'guru')->count();
         $guruMemilikiJadwal = $schedules->pluck('teacher_id')->filter()->unique()->count();
         $totalJadwal = $schedules->count();
-
-        // Group by teacher
-        $groupedSchedules = [];
         $totalKonflik = 0;
 
         foreach ($schedules as $schedule) {
             $teacherId = $schedule->teacher_id;
-            if (!$teacherId) continue;
-
-            $teacherName = $schedule->teacher->user->name ?? 'Guru Tidak Diketahui';
-
-            if (!isset($groupedSchedules[$teacherId])) {
-                $groupedSchedules[$teacherId] = [
-                    'teacher_id' => $teacherId,
-                    'name' => $teacherName,
-                    'subjects' => [],
-                    'total_classes' => [],
-                    'total_minutes' => 0,
-                    'schedules' => [],
-                    'has_conflict' => false
-                ];
-            }
+            
+            // Skip if teacher_id is null or if this teacher wasn't found in our predefined list 
+            // (e.g. if their role changed but schedule remained, though rare)
+            if (!$teacherId || !isset($groupedSchedules[$teacherId])) continue;
 
             // Collect unique subjects
             if ($schedule->subject) {
@@ -745,6 +763,55 @@ class AdminController extends Controller
             'guruMemilikiJadwal', 
             'totalJadwal', 
             'totalKonflik'
+        ));
+    }
+
+    public function scheduleTeacherShow($id)
+    {
+        $teacher = \App\Models\Teacher::with(['user', 'schedules' => function($q) {
+            $q->orderBy('day')->orderBy('start_time');
+        }])->findOrFail($id);
+
+        $schedules = $teacher->schedules;
+        
+        $subjects = [];
+        $classes = [];
+        $totalMinutes = 0;
+        
+        foreach ($schedules as $schedule) {
+            if ($schedule->subject) $subjects[$schedule->subject] = true;
+            if ($schedule->class) $classes[$schedule->class] = true;
+            
+            if ($schedule->start_time && $schedule->end_time) {
+                $start = \Carbon\Carbon::parse($schedule->start_time);
+                $end = \Carbon\Carbon::parse($schedule->end_time);
+                $totalMinutes += $start->diffInMinutes($end);
+            }
+        }
+
+        $subjectsStr = implode(', ', array_keys($subjects));
+        $totalClasses = count($classes);
+        
+        $hours = floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
+        $formattedDuration = ($hours > 0 ? $hours . ' Jam ' : '') . ($minutes > 0 ? $minutes . ' Menit' : '');
+        if ($formattedDuration == '') $formattedDuration = '0 Menit';
+
+        // Detect conflicts
+        $hasConflict = false;
+        $byDay = $schedules->groupBy('day');
+        foreach ($byDay as $day => $dailySchedules) {
+            $sorted = $dailySchedules->sortBy('start_time')->values();
+            for ($i = 0; $i < $sorted->count() - 1; $i++) {
+                if ($sorted[$i]->end_time > $sorted[$i + 1]->start_time && $sorted[$i]->id !== $sorted[$i + 1]->id) {
+                    $hasConflict = true;
+                    break 2;
+                }
+            }
+        }
+
+        return view('admin.schedule.teacher.show', compact(
+            'teacher', 'schedules', 'subjectsStr', 'totalClasses', 'formattedDuration', 'hasConflict'
         ));
     }
 
@@ -969,7 +1036,7 @@ class AdminController extends Controller
                     if ($user) {
                         $teacher = \App\Models\Teacher::firstOrCreate(
                             ['user_id' => $user->id],
-                            ['nip' => null, 'specialization' => null]
+                            ['nip' => '-' . $user->id, 'specialization' => '-']
                         );
                         $teacherId = $teacher->id;
                     }
@@ -1067,10 +1134,14 @@ public function usersDownloadTemplate()
             if ($user->role === 'siswa') {
                 \App\Models\Student::create([
                     'user_id' => $user->id,
+                    'nisn' => '-' . $user->id,
+                    'class' => '-'
                 ]);
             } elseif ($user->role === 'guru') {
                 \App\Models\Teacher::create([
                     'user_id' => $user->id,
+                    'nip' => '-' . $user->id,
+                    'specialization' => '-'
                 ]);
             }
 

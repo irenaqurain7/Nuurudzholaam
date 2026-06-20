@@ -120,6 +120,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Teacher Schedule Management (Monitoring Dashboard)
     Route::prefix('schedule/teacher')->name('schedule.teacher.')->group(function () {
         Route::get('/', [AdminController::class, 'scheduleTeacherIndex'])->name('index');
+        Route::get('/{id}', [AdminController::class, 'scheduleTeacherShow'])->name('show');
     });
 
     // Student Schedule Management (wizard for creating new schedules)
