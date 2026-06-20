@@ -12,6 +12,7 @@ class Schedule extends Model
     protected $fillable = [
         'teacher_id',
         'student_id',
+        'class',
         'subject',
         'day',
         'start_time',

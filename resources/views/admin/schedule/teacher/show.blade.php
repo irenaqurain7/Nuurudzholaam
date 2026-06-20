@@ -67,6 +67,7 @@
                                     <th>Hari</th>
                                     <th>Jam</th>
                                     <th>Kelas</th>
+                                    <th>Mata Pelajaran</th>
                                     <th>Jenjang</th>
                                     <th>Ruangan</th>
                                 </tr>
@@ -83,11 +84,12 @@
                                         'Sunday' => 'Minggu'
                                     ];
                                 @endphp
-                                @foreach($sortedSchedules as $sched)
+                                @foreach($schedules as $sched)
                                 <tr>
                                     <td><strong>{{ $daysIndonesia[$sched->day] ?? $sched->day }}</strong></td>
                                     <td>{{ substr($sched->start_time, 0, 5) }} - {{ substr($sched->end_time, 0, 5) }}</td>
                                     <td>{{ $sched->class ?? '-' }}</td>
+                                    <td>{{ $sched->subject ?? '-' }}</td>
                                     <td>{{ $sched->education_level ?? '-' }}</td>
                                     <td>{{ $sched->room ?? '-' }}</td>
                                 </tr>

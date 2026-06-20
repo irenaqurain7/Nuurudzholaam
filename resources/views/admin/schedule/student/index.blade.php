@@ -8,7 +8,7 @@
     <div class="page-header">
         <div>
             <h1>Kelola Jadwal Siswa</h1>
-            <p class="subtitle">Atur jadwal pelajaran untuk setiap kelas (SD, SMP, SMA)</p>
+            <p class="subtitle">Atur jadwal pelajaran untuk setiap kelas (TK, SD, SMP, SMA)</p>
         </div>
         <a href="{{ route('admin.schedule.student.wizard.step1') }}" class="btn-add-new">
             <i class="fas fa-plus"></i> Jadwal Baru

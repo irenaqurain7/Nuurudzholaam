@@ -100,10 +100,10 @@
                         <th width="5%">NO</th>
                         <th width="20%">NAMA GURU</th>
                         <th width="25%">MATA PELAJARAN</th>
-                        <th width="10%">TOTAL KELAS</th>
+                        <th width="15%">TOTAL KELAS</th>
                         <th width="15%">TOTAL JAM</th>
                         <th width="10%">STATUS</th>
-                        <th width="15%">AKSI</th>
+                        <th width="10%">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>

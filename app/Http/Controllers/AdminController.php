@@ -724,7 +724,8 @@ class AdminController extends Controller
                 $totalKonflik++;
             }
 
-            // Convert array keys to count
+            // Convert array keys to string and count
+            $data['classes_str'] = implode(', ', array_keys($data['total_classes']));
             $data['total_classes'] = count($data['total_classes']);
             $data['subjects_str'] = implode(', ', array_keys($data['subjects']));
             
@@ -790,6 +791,7 @@ class AdminController extends Controller
         }
 
         $subjectsStr = implode(', ', array_keys($subjects));
+        $classesStr = implode(', ', array_keys($classes));
         $totalClasses = count($classes);
         
         $hours = floor($totalMinutes / 60);
@@ -811,7 +813,7 @@ class AdminController extends Controller
         }
 
         return view('admin.schedule.teacher.show', compact(
-            'teacher', 'schedules', 'subjectsStr', 'totalClasses', 'formattedDuration', 'hasConflict'
+            'teacher', 'schedules', 'subjectsStr', 'classesStr', 'totalClasses', 'formattedDuration', 'hasConflict'
         ));
     }
 
@@ -930,8 +932,10 @@ class AdminController extends Controller
         $educationLevel = session('wizard_education_level');
 
         $previewItems = session('wizard_items', []);
+        
+        $teachers = \App\Models\Teacher::with('user')->get();
 
-        return view('admin.schedule.student.wizard.step2', compact('uploadMethod','educationLevel','previewItems'));
+        return view('admin.schedule.student.wizard.step2', compact('uploadMethod','educationLevel','previewItems','teachers'));
     }
 
     public function scheduleStudentWizardStoreStep2(Request $request)
@@ -951,9 +955,42 @@ class AdminController extends Controller
                 $rows = $array[0] ?? [];
 
                 $items = [];
+                $teachersCache = []; // Cache names to IDs to optimize query loop
+
                 foreach ($rows as $index => $row) {
                     // skip header heuristically
                     if ($index === 0) continue;
+                    
+                    $teacherName = trim($row[5] ?? '');
+                    if (empty($teacherName)) {
+                        return redirect()->back()->withErrors(['file' => "Baris ke-" . ($index + 1) . ": Nama Guru wajib diisi."]);
+                    }
+
+                    // Check cache first
+                    if (isset($teachersCache[$teacherName])) {
+                        $teacherId = $teachersCache[$teacherName]['id'];
+                        $teacherRealName = $teachersCache[$teacherName]['name'];
+                    } else {
+                        // Find user with role guru matching the name closely
+                        $user = \App\Models\User::where('role', 'guru')
+                            ->where('name', 'like', '%' . $teacherName . '%')
+                            ->first();
+
+                        if (!$user) {
+                            return redirect()->back()->withErrors(['file' => "Baris ke-" . ($index + 1) . ": Guru bernama '{$teacherName}' tidak ditemukan di sistem. Pastikan guru terdaftar di menu Manajer User dengan role 'guru'."]);
+                        }
+
+                        // Ensure teacher record exists
+                        $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                        if (!$teacher) {
+                            return redirect()->back()->withErrors(['file' => "Baris ke-" . ($index + 1) . ": Guru bernama '{$teacherName}' ditemukan, namun profil detail gurunya belum lengkap."]);
+                        }
+
+                        $teacherId = $teacher->id;
+                        $teacherRealName = $user->name;
+                        $teachersCache[$teacherName] = ['id' => $teacherId, 'name' => $teacherRealName];
+                    }
+
                     // expecting columns: class,subject,day,start_time,end_time,teacher,room
                     $items[] = [
                         'class' => $row[0] ?? null,
@@ -961,7 +998,8 @@ class AdminController extends Controller
                         'day' => $row[2] ?? null,
                         'start_time' => $row[3] ?? null,
                         'end_time' => $row[4] ?? null,
-                        'teacher' => $row[5] ?? null,
+                        'teacher' => $teacherRealName,
+                        'teacher_id' => $teacherId,
                         'room' => $row[6] ?? null,
                     ];
                 }
@@ -981,11 +1019,17 @@ class AdminController extends Controller
             'day' => 'required|string',
             'start_time' => 'required|string',
             'end_time' => 'required|string',
-            'teacher' => 'nullable|string',
+            'teacher_id' => 'required|exists:teachers,id',
             'room' => 'nullable|string',
+        ], [
+            'teacher_id.required' => 'Guru wajib dipilih',
+            'teacher_id.exists' => 'Guru tidak valid',
         ]);
 
+        $teacher = \App\Models\Teacher::with('user')->find($validated['teacher_id']);
+
         $items = session('wizard_items', []);
+        $validated['teacher'] = $teacher->user->name ?? 'Unknown';
         $items[] = $validated;
         session(['wizard_items' => $items]);
 
@@ -1025,22 +1069,7 @@ class AdminController extends Controller
 
         DB::transaction(function() use($validItems, $educationLevel, $semester, $academicYear) {
             foreach ($validItems as $row) {
-                // Find or map teacher_id based on name
-                $teacherId = null;
-                if (!empty($row['teacher'])) {
-                    $teacherName = trim($row['teacher']);
-                    $user = \App\Models\User::where('role', 'guru')
-                        ->where('name', 'like', '%' . $teacherName . '%')
-                        ->first();
-                    
-                    if ($user) {
-                        $teacher = \App\Models\Teacher::firstOrCreate(
-                            ['user_id' => $user->id],
-                            ['nip' => '-' . $user->id, 'specialization' => '-']
-                        );
-                        $teacherId = $teacher->id;
-                    }
-                }
+                $teacherId = $row['teacher_id'];
 
                 // create into schedules table
                 Schedule::create([

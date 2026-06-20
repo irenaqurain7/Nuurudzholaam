@@ -79,8 +79,13 @@
                                 <input name="subject" class="form-control" placeholder="Contoh: Matematika" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Guru (Opsional)</label>
-                                <input name="teacher" class="form-control" placeholder="Nama Guru">
+                                <label class="form-label">Guru <span class="required">*</span></label>
+                                <select name="teacher_id" class="form-control" required>
+                                    <option value="">Pilih Guru</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}">{{ $teacher->user->name ?? 'Unknown' }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="form-row-3 mb-4">
