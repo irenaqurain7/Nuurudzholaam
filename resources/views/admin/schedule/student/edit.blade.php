@@ -8,7 +8,7 @@
     <div class="page-header">
         <div>
             <h1>Edit Jadwal Siswa</h1>
-            <p class="subtitle">Ubah informasi jadwal pelajaran siswa</p>
+            <p class="subtitle">Ubah informasi jadwal pelajaran secara detail</p>
         </div>
         <a href="{{ route('admin.schedule.student.index') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i> Kembali
@@ -34,33 +34,67 @@
             @method('PUT')
 
             <div class="form-section">
-                <h2 class="section-title">Informasi Jadwal Siswa</h2>
+                <h2 class="section-title">Detail Mata Pelajaran</h2>
 
-                <!-- Class Info Display -->
-                <div class="info-box">
-                    <div class="info-item">
-                        <span class="info-label">Kelas Saat Ini:</span>
-                        <span class="info-value">{{ $schedule->class }}</span>
+                <div class="form-row">
+                    <!-- Education Level Selection -->
+                    <div class="form-group">
+                        <label for="education_level" class="form-label">
+                            Jenjang Pendidikan <span class="required">*</span>
+                        </label>
+                        <select name="education_level" id="education_level" class="form-control" required>
+                            <option value="">-- Pilih Jenjang --</option>
+                            @foreach($educationLevels as $level)
+                                <option value="{{ $level }}" {{ old('education_level', $schedule->education_level) == $level ? 'selected' : '' }}>
+                                    {{ $level }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('education_level')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Class Input -->
+                    <div class="form-group">
+                        <label for="class" class="form-label">
+                            Kelas <span class="required">*</span>
+                        </label>
+                        <input type="text" name="class" id="class" class="form-control" placeholder="Contoh: 8A" value="{{ old('class', $schedule->class) }}" required>
+                        @error('class')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
-                <!-- Class Selection -->
                 <div class="form-group">
-                    <label for="class" class="form-label">
-                        Ubah Kelas <span class="optional">(Opsional)</span>
+                    <label for="subject" class="form-label">
+                        Mata Pelajaran <span class="required">*</span>
                     </label>
-                    <select name="class" id="class" class="form-control" required>
-                        <option value="">-- Pilih Kelas --</option>
-                        @foreach($classes as $classItem)
-                            <option value="{{ $classItem }}" {{ $schedule->class == $classItem ? 'selected' : '' }}>
-                                {{ $classItem }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('class')
+                    <input type="text" name="subject" id="subject" class="form-control" placeholder="Contoh: Matematika" value="{{ old('subject', $schedule->subject) }}" required>
+                    @error('subject')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
                 </div>
+
+                <div class="form-group">
+                    <label for="teacher_id" class="form-label">
+                        Guru Pengajar <span class="required">*</span>
+                    </label>
+                    <select name="teacher_id" id="teacher_id" class="form-control" required>
+                        <option value="">-- Pilih Guru --</option>
+                        @foreach($teachers as $teacher)
+                            <option value="{{ $teacher->id }}" {{ old('teacher_id', $schedule->teacher_id) == $teacher->id ? 'selected' : '' }}>
+                                {{ $teacher->user->name ?? 'Unknown' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('teacher_id')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1rem;">Waktu Pelaksanaan</h2>
 
                 <!-- Day Selection -->
                 <div class="form-group">
@@ -80,7 +114,7 @@
                                     'Saturday' => 'Sabtu'
                                 ];
                             @endphp
-                            <option value="{{ $day }}" {{ $schedule->day == $day ? 'selected' : '' }}>
+                            <option value="{{ $day }}" {{ old('day', $schedule->day) == $day ? 'selected' : '' }}>
                                 {{ $daysIndonesia[$day] ?? $day }}
                             </option>
                         @endforeach
@@ -90,33 +124,28 @@
                     @enderror
                 </div>
 
-                <!-- Activities List -->
-                <div class="form-group">
-                    <label class="form-label">Daftar Kegiatan <span class="required">*</span></label>
-                    <div id="activitiesList">
-                        @php
-                            $activities = is_array($schedule->activities) ? $schedule->activities : json_decode($schedule->activities ?? '[]', true);
-                        @endphp
-                        @forelse($activities as $act)
-                            <div class="activity-row">
-                                <input type="text" name="activities[]" class="form-control activity-input" value="{{ $act }}" required>
-                                <button type="button" class="btn-remove-activity" style="margin-top:0.5rem;">Hapus</button>
-                            </div>
-                        @empty
-                            <div class="activity-row">
-                                <input type="text" name="activities[]" class="form-control activity-input" placeholder="Contoh: Sholat Dhuha" required>
-                                <button type="button" class="btn-remove-activity" style="margin-top:0.5rem;">Hapus</button>
-                            </div>
-                        @endforelse
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start_time" class="form-label">
+                            Jam Mulai <span class="required">*</span>
+                        </label>
+                        <input type="time" name="start_time" id="start_time" class="form-control" value="{{ old('start_time', substr($schedule->start_time, 0, 5)) }}" required>
+                        @error('start_time')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
                     </div>
-                    <button type="button" id="addActivity" class="btn-add-activity" style="margin-top:0.75rem;">Tambah Kegiatan</button>
-                    @error('activities')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
-                    @error('activities.*')
-                        <span class="error-message">{{ $message }}</span>
-                    @enderror
+
+                    <div class="form-group">
+                        <label for="end_time" class="form-label">
+                            Jam Selesai <span class="required">*</span>
+                        </label>
+                        <input type="time" name="end_time" id="end_time" class="form-control" value="{{ old('end_time', substr($schedule->end_time, 0, 5)) }}" required>
+                        @error('end_time')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
+
             </div>
 
             <!-- Action Buttons -->
@@ -124,9 +153,6 @@
                 <button type="submit" class="btn-submit">
                     <i class="fas fa-save"></i> Simpan Perubahan
                 </button>
-                <a href="{{ route('admin.schedule.student.index') }}" class="btn-cancel">
-                    <i class="fas fa-times"></i> Batal
-                </a>
             </div>
         </form>
     </div>
@@ -152,8 +178,9 @@
 
 .page-header h1 {
     margin: 0 0 0.5rem 0;
-    color: #2c3e50;
+    color: #2D4438;
     font-size: 1.8rem;
+    font-weight: 700;
 }
 
 .subtitle {
@@ -163,27 +190,28 @@
 }
 
 .btn-back {
-    background: #95a5a6;
-    color: white;
+    background: #e2e8e5;
+    color: #2D4438;
     padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    transition: background 0.3s;
+    font-weight: 600;
+    transition: all 0.2s;
 }
 
 .btn-back:hover {
-    background: #7f8c8d;
+    background: #cfdcd6;
 }
 
 .alert {
     padding: 1rem;
     margin-bottom: 1.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
@@ -201,14 +229,16 @@
 
 .error-list p {
     margin: 0.25rem 0;
+    font-size: 0.95rem;
 }
 
 .form-container {
     background: white;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    max-width: 600px;
+    border-radius: 12px;
+    padding: 2.5rem;
+    width: 100%;
+    border: 1px solid #E2ECE8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .schedule-form {
@@ -225,34 +255,10 @@
 
 .section-title {
     margin: 0;
-    color: #2c3e50;
-    font-size: 1.2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #ecf0f1;
-}
-
-.info-box {
-    background: #f0f7ff;
-    padding: 1rem;
-    border-radius: 6px;
-    border-left: 4px solid #3498db;
-    display: grid;
-    gap: 0.75rem;
-}
-
-.info-item {
-    display: flex;
-    gap: 1rem;
-}
-
-.info-label {
-    font-weight: 600;
-    color: #2c3e50;
-    min-width: 120px;
-}
-
-.info-value {
-    color: #555;
+    color: #1C2D25;
+    font-size: 1.15rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f3;
 }
 
 .form-group {
@@ -271,49 +277,46 @@
     color: #e74c3c;
 }
 
-.optional {
-    color: #95a5a6;
-    font-size: 0.85rem;
-}
-
 .form-control {
     padding: 0.75rem 1rem;
-    border: 1px solid #bdc3c7;
-    border-radius: 6px;
+    border: 1px solid #d1dbd6;
+    border-radius: 8px;
     font-size: 0.95rem;
     font-family: inherit;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fbfdfb;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    border-color: #2D4438;
+    box-shadow: 0 0 0 3px rgba(45, 68, 56, 0.1);
+    background: white;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .error-message {
     color: #e74c3c;
     font-size: 0.85rem;
     font-weight: 500;
+    margin-top: 0.25rem;
 }
 
 .form-actions {
-    display: flex;
-    gap: 1rem;
     margin-top: 1rem;
 }
 
-.btn-submit,
-.btn-cancel {
-    padding: 0.75rem 1.5rem;
+.btn-submit {
+    background: #2D4438;
+    color: white;
+    padding: 0.85rem 1.5rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -321,93 +324,22 @@
     gap: 0.5rem;
     font-size: 1rem;
     font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s;
-}
-
-.btn-submit {
-    background: #27ae60;
-    color: white;
-    flex: 1;
+    width: 100%;
+    transition: all 0.2s;
 }
 
 .btn-submit:hover {
-    background: #229954;
+    background: #1a2921;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.btn-cancel {
-    background: #e74c3c;
-    color: white;
-    flex: 1;
-}
-
-.btn-cancel:hover {
-    background: #c0392b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(45, 68, 56, 0.15);
 }
 
 @media (max-width: 768px) {
-    .admin-page {
-        padding: 1rem;
-    }
-
-    .page-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .btn-back {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .form-container {
-        max-width: 100%;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .btn-submit,
-    .btn-cancel {
-        flex: 1;
-    }
+    .admin-page { padding: 1rem; }
+    .page-header { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+    .btn-back { width: 100%; justify-content: center; }
+    .form-container { padding: 1.5rem; }
+    .form-row { grid-template-columns: 1fr; gap: 1rem; }
 }
 </style>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const activitiesList = document.getElementById('activitiesList');
-    const addActivityBtn = document.getElementById('addActivity');
-
-    // Add activity row
-    addActivityBtn?.addEventListener('click', function() {
-        const row = document.createElement('div');
-        row.className = 'activity-row';
-        row.innerHTML = `\n+            <input type="text" name="activities[]" class="form-control activity-input" placeholder="Contoh: Sholat Dhuha" required>\n+            <button type="button" class="btn-remove-activity" style="margin-top:0.5rem;">Hapus</button>`;
-        activitiesList.appendChild(row);
-    });
-
-    // Remove activity (event delegation)
-    activitiesList?.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('btn-remove-activity')) {
-            const row = e.target.closest('.activity-row');
-            if (!row) return;
-            if (activitiesList.querySelectorAll('.activity-row').length === 1) {
-                const input = row.querySelector('input');
-                if (input) input.value = '';
-            } else {
-                row.remove();
-            }
-        }
-    });
-});
-</script>
 @endsection

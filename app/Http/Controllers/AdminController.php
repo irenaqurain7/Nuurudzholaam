@@ -820,7 +820,7 @@ class AdminController extends Controller
     // STUDENT SCHEDULES (SD-friendly: activities list per class & day)
     public function scheduleStudentIndex()
     {
-        $schedules = \App\Models\StudentSchedule::orderBy('class')->orderBy('day')->get();
+        $schedules = \App\Models\Schedule::with('teacher.user')->orderBy('class')->orderBy('day')->orderBy('start_time')->get();
 
         return view('admin.schedule.student.index', compact('schedules'));
     }
@@ -833,57 +833,79 @@ class AdminController extends Controller
 
     public function scheduleStudentStore(Request $request)
     {
-        $validated = $request->validate([
-            'class' => 'required|string',
-            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
-            'activities' => 'required|array|min:1',
-            'activities.*' => 'required|string',
-        ], [
-            'class.required' => 'Kelas harus dipilih',
-            'day.required' => 'Hari harus dipilih',
-            'activities.required' => 'Daftar kegiatan harus diisi',
-        ]);
-
-        \App\Models\StudentSchedule::create([
-            'class' => $validated['class'],
-            'day' => $validated['day'],
-            'activities' => $validated['activities'],
-        ]);
-
-        return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil ditambahkan.');
+        // Not used directly anymore, replaced by wizard
+        return redirect()->route('admin.schedule.student.wizard.step1');
     }
 
     public function scheduleStudentEdit($id)
     {
-        $schedule = \App\Models\StudentSchedule::findOrFail($id);
-        $classes = Student::distinct()
-            ->orderBy('class')
-            ->pluck('class')
-            ->toArray();
+        $schedule = \App\Models\Schedule::findOrFail($id);
+        $teachers = \App\Models\Teacher::with('user')->get();
+        $educationLevels = ['TK', 'SD', 'SMP', 'SMK'];
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        return view('admin.schedule.student.edit', compact('schedule', 'classes', 'days'));
+        return view('admin.schedule.student.edit', compact('schedule', 'teachers', 'educationLevels', 'days'));
     }
 
     public function scheduleStudentUpdate(Request $request, $id)
     {
-        $schedule = \App\Models\StudentSchedule::findOrFail($id);
+        $schedule = \App\Models\Schedule::findOrFail($id);
 
         $validated = $request->validate([
+            'education_level' => 'required|string',
             'class' => 'required|string',
+            'subject' => 'required|string',
+            'teacher_id' => 'required|exists:teachers,id',
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
-            'activities' => 'required|array|min:1',
-            'activities.*' => 'required|string',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ], [
-            'class.required' => 'Kelas harus dipilih',
-            'day.required' => 'Hari harus dipilih',
-            'activities.required' => 'Daftar kegiatan harus diisi',
+            'education_level.required' => 'Jenjang harus dipilih',
+            'class.required' => 'Kelas harus diisi',
+            'subject.required' => 'Mata pelajaran harus diisi',
+            'teacher_id.required' => 'Guru harus dipilih',
+            'end_time.after' => 'Jam selesai harus lebih besar dari jam mulai'
         ]);
 
+        // Cek Konflik Guru
+        $guruKonflik = \App\Models\Schedule::where('teacher_id', $validated['teacher_id'])
+            ->where('day', $validated['day'])
+            ->where('id', '!=', $id)
+            ->where(function($query) use ($validated) {
+                // start_time or end_time inside another schedule
+                $query->where(function($q) use ($validated) {
+                    $q->where('start_time', '<', $validated['end_time'])
+                      ->where('end_time', '>', $validated['start_time']);
+                });
+            })->first();
+
+        if ($guruKonflik) {
+            return back()->withErrors(['teacher_id' => 'Konflik Guru: Guru ini sudah memiliki jadwal mengajar lain pada hari dan jam tersebut.'])->withInput();
+        }
+
+        // Cek Konflik Kelas
+        $kelasKonflik = \App\Models\Schedule::where('class', $validated['class'])
+            ->where('day', $validated['day'])
+            ->where('id', '!=', $id)
+            ->where(function($query) use ($validated) {
+                $query->where(function($q) use ($validated) {
+                    $q->where('start_time', '<', $validated['end_time'])
+                      ->where('end_time', '>', $validated['start_time']);
+                });
+            })->first();
+
+        if ($kelasKonflik) {
+            return back()->withErrors(['class' => 'Konflik Kelas: Kelas ini sudah memiliki mata pelajaran lain pada hari dan jam tersebut.'])->withInput();
+        }
+
         $schedule->update([
+            'education_level' => $validated['education_level'],
             'class' => $validated['class'],
+            'subject' => $validated['subject'],
+            'teacher_id' => $validated['teacher_id'],
             'day' => $validated['day'],
-            'activities' => $validated['activities'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
         ]);
 
         return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil diperbarui.');
@@ -891,7 +913,7 @@ class AdminController extends Controller
 
     public function scheduleStudentDestroy($id)
     {
-        $schedule = \App\Models\StudentSchedule::findOrFail($id);
+        $schedule = \App\Models\Schedule::findOrFail($id);
         $schedule->delete();
         return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
     }
@@ -1087,22 +1109,6 @@ class AdminController extends Controller
                 ]);
             }
         });
-
-        // Also persist grouped StudentSchedule preview (simple grouping)
-        $grouped = [];
-        foreach ($validItems as $row) {
-            $key = ($row['class'] ?? 'Umum') . '|' . ($row['day'] ?? '');
-            $grouped[$key][] = ($row['subject'] ?? '-') . ' (' . ($row['start_time'] ?? '') . '-' . ($row['end_time'] ?? '') . ')';
-        }
-
-        foreach ($grouped as $key => $acts) {
-            [$class, $day] = explode('|', $key);
-            \App\Models\StudentSchedule::create([
-                'class' => $class,
-                'day' => $day,
-                'activities' => $acts,
-            ]);
-        }
 
         // clear wizard session
         session()->forget(['wizard_items','wizard_education_level','wizard_semester','wizard_academic_year','wizard_upload_method']);

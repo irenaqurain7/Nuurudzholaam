@@ -93,35 +93,33 @@
                         @php $byDay = $items->groupBy('day'); @endphp
                         @foreach($byDay as $day => $entries)
                             @foreach($entries as $entry)
-                                @foreach($entry->activities as $act)
-                                    @php
-                                        preg_match('/^(.*?)\s*\((.*?)-(.*?)\)$/', $act, $matches);
-                                        $subj = $matches[1] ?? $act;
-                                        $time = isset($matches[2]) ? trim($matches[2]) . ' - ' . trim($matches[3]) : '';
-                                    @endphp
-                                    <div class="schedule-row-item" data-day="{{ $day }}" data-subject="{{ strtolower($subj) }}">
-                                        <div class="day-col">
+                                @php
+                                    $subj = $entry->subject ?? '-';
+                                    $time = substr($entry->start_time, 0, 5) . ' - ' . substr($entry->end_time, 0, 5);
+                                    $teacherName = $entry->teacher->user->name ?? '-';
+                                @endphp
+                                <div class="schedule-row-item" data-day="{{ $day }}" data-subject="{{ strtolower($subj) }}">
+                                    <div class="day-col">
+                                        @if($loop->first)
                                             {{ $daysIndonesia[$day] ?? $day }}
-                                        </div>
-                                        <div class="info-col">
-                                            <div class="blue-bar"></div>
-                                            <div class="subject-details">
-                                                <div class="subject-name">{{ $subj }}</div>
-                                                @if($time)
-                                                <div class="subject-time"><i class="far fa-clock"></i> {{ $time }}</div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="action-col">
-                                            <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-icon text-muted" title="Edit Jadwal"><i class="fas fa-edit"></i></a>
-                                            <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn-icon text-danger" style="background:none;border:none;" title="Hapus Jadwal"><i class="fas fa-trash"></i></button>
-                                            </form>
+                                        @endif
+                                    </div>
+                                    <div class="info-col">
+                                        <div class="blue-bar"></div>
+                                        <div class="subject-details">
+                                            <div class="subject-name">{{ $subj }} <span style="font-size: 0.85em; font-weight: normal; color: #6C8B7C;">(Guru: {{ $teacherName }})</span></div>
+                                            <div class="subject-time"><i class="far fa-clock"></i> {{ $time }}</div>
                                         </div>
                                     </div>
-                                @endforeach
+                                    <div class="action-col">
+                                        <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-icon text-muted" title="Edit Jadwal"><i class="fas fa-edit"></i></a>
+                                        <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-icon text-danger" style="background:none;border:none;" title="Hapus Jadwal"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
                             @endforeach
                         @endforeach
                     </div>
