@@ -297,9 +297,7 @@
                 @if($school && $school->gambar_utama)
                     <img src="{{ asset('storage/' . $school->gambar_utama) }}" alt="Sekolah Nuurudzholaam" class="sejarah-image">
                 @else
-                    <div class="sejarah-image" style="height: 400px; background: linear-gradient(135deg, var(--hijau-islam), var(--emas)); display: flex; align-items: center; justify-content: center; color: white; font-size: 80px;">
-                        <i class="fas fa-school"></i>
-                    </div>
+                    <img src="{{ asset('images/foto sejarah sekolah.jpeg') }}" alt="Sejarah Sekolah Nuurudzholaam" class="sejarah-image" style="height: 400px; object-fit: cover;">
                 @endif
             </div>
         </div>
