@@ -629,7 +629,7 @@ class AdminController extends Controller
         $schedules = $query->get();
 
         // Agregasi untuk statistik ringkas
-        $totalGuru = \App\Models\Teacher::count();
+        $totalGuru = \App\Models\User::where('role', 'guru')->count();
         $guruMemilikiJadwal = $schedules->pluck('teacher_id')->filter()->unique()->count();
         $totalJadwal = $schedules->count();
 
@@ -958,9 +958,26 @@ class AdminController extends Controller
 
         DB::transaction(function() use($validItems, $educationLevel, $semester, $academicYear) {
             foreach ($validItems as $row) {
+                // Find or map teacher_id based on name
+                $teacherId = null;
+                if (!empty($row['teacher'])) {
+                    $teacherName = trim($row['teacher']);
+                    $user = \App\Models\User::where('role', 'guru')
+                        ->where('name', 'like', '%' . $teacherName . '%')
+                        ->first();
+                    
+                    if ($user) {
+                        $teacher = \App\Models\Teacher::firstOrCreate(
+                            ['user_id' => $user->id],
+                            ['nip' => null, 'specialization' => null]
+                        );
+                        $teacherId = $teacher->id;
+                    }
+                }
+
                 // create into schedules table
                 Schedule::create([
-                    'teacher_id' => null,
+                    'teacher_id' => $teacherId,
                     'student_id' => null,
                     'subject' => $row['subject'] ?? null,
                     'class' => $row['class'] ?? null,
@@ -1038,7 +1055,7 @@ public function usersDownloadTemplate()
                 continue;
             }
 
-            User::create([
+            $user = User::create([
                 'name'     => $row[0],
                 'email'    => $row[1],
                 'password' => Hash::make($row[2]),
@@ -1046,6 +1063,16 @@ public function usersDownloadTemplate()
                 'phone'    => $row[4] ?? null,
                 'address'  => $row[5] ?? null,
             ]);
+
+            if ($user->role === 'siswa') {
+                \App\Models\Student::create([
+                    'user_id' => $user->id,
+                ]);
+            } elseif ($user->role === 'guru') {
+                \App\Models\Teacher::create([
+                    'user_id' => $user->id,
+                ]);
+            }
 
             $suksesCount++;
         }
