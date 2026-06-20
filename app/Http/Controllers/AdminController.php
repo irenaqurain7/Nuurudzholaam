@@ -16,6 +16,9 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Services\ScheduleImportService;
 
 class AdminController extends Controller
 {
@@ -713,14 +716,8 @@ class AdminController extends Controller
 
     public function scheduleStudentCreate()
     {
-        // Get unique classes from students
-        $classes = Student::distinct()
-            ->orderBy('class')
-            ->pluck('class')
-            ->toArray();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-        return view('admin.schedule.student.create', compact('classes', 'days'));
+        // Redirect to new wizard step 1
+        return redirect()->route('admin.schedule.student.wizard.step1');
     }
 
     public function scheduleStudentStore(Request $request)
@@ -786,6 +783,176 @@ class AdminController extends Controller
         $schedule = \App\Models\StudentSchedule::findOrFail($id);
         $schedule->delete();
         return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
+    }
+
+    // WIZARD STEP 1: Select education level, semester, academic year, upload method
+    public function scheduleStudentWizardStep1(Request $request)
+    {
+        $educationLevels = ['TK', 'SD', 'SMP', 'SMK'];
+        $semesters = ['Ganjil', 'Genap'];
+        $years = ['2024/2025','2025/2026','2026/2027'];
+
+        return view('admin.schedule.student.wizard.step1', compact('educationLevels','semesters','years'));
+    }
+
+    public function scheduleStudentWizardStoreStep1(Request $request)
+    {
+        $validated = $request->validate([
+            'education_level' => ['required','in:TK,SD,SMP,SMK'],
+            'semester' => ['required','in:Ganjil,Genap'],
+            'academic_year' => ['required','string'],
+            'upload_method' => ['required','in:bulk,manual'],
+        ]);
+
+        // Store selections in session
+        session([ 'wizard_education_level' => $validated['education_level'],
+                  'wizard_semester' => $validated['semester'],
+                  'wizard_academic_year' => $validated['academic_year'],
+                  'wizard_upload_method' => $validated['upload_method']
+        ]);
+
+        return redirect()->route('admin.schedule.student.wizard.step2');
+    }
+
+    // WIZARD STEP 2: Upload file or manual input
+    public function scheduleStudentWizardStep2(Request $request)
+    {
+        $uploadMethod = session('wizard_upload_method', 'bulk');
+        $educationLevel = session('wizard_education_level');
+
+        $previewItems = session('wizard_items', []);
+
+        return view('admin.schedule.student.wizard.step2', compact('uploadMethod','educationLevel','previewItems'));
+    }
+
+    public function scheduleStudentWizardStoreStep2(Request $request)
+    {
+        $uploadMethod = session('wizard_upload_method', 'bulk');
+
+        if ($uploadMethod === 'bulk') {
+            $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            $file = $request->file('file');
+
+            try {
+                $array = Excel::toArray([], $file);
+                // take first sheet
+                $rows = $array[0] ?? [];
+
+                $items = [];
+                foreach ($rows as $index => $row) {
+                    // skip header heuristically
+                    if ($index === 0) continue;
+                    // expecting columns: class,subject,day,start_time,end_time,teacher,room
+                    $items[] = [
+                        'class' => $row[0] ?? null,
+                        'subject' => $row[1] ?? null,
+                        'day' => $row[2] ?? null,
+                        'start_time' => $row[3] ?? null,
+                        'end_time' => $row[4] ?? null,
+                        'teacher' => $row[5] ?? null,
+                        'room' => $row[6] ?? null,
+                    ];
+                }
+
+                session(['wizard_items' => $items]);
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['file' => 'Gagal memproses file: '.$e->getMessage()]);
+            }
+
+            return redirect()->route('admin.schedule.student.wizard.step3');
+        }
+
+        // Manual input adding a single schedule row into session
+        $validated = $request->validate([
+            'class' => 'required|string',
+            'subject' => 'required|string',
+            'day' => 'required|string',
+            'start_time' => 'required|string',
+            'end_time' => 'required|string',
+            'teacher' => 'nullable|string',
+            'room' => 'nullable|string',
+        ]);
+
+        $items = session('wizard_items', []);
+        $items[] = $validated;
+        session(['wizard_items' => $items]);
+
+        return redirect()->route('admin.schedule.student.wizard.step2');
+    }
+
+    // WIZARD STEP 3: Review & validation
+    public function scheduleStudentWizardStep3(Request $request)
+    {
+        $items = session('wizard_items', []);
+        $educationLevel = session('wizard_education_level');
+        $semester = session('wizard_semester');
+        $academicYear = session('wizard_academic_year');
+
+        $service = new ScheduleImportService();
+        $validation = $service->validateConflicts($items);
+
+        return view('admin.schedule.student.wizard.step3', compact('items','validation','educationLevel','semester','academicYear'));
+    }
+
+    // Publish wizard data into DB
+    public function scheduleStudentPublish(Request $request)
+    {
+        $items = session('wizard_items', []);
+        $educationLevel = session('wizard_education_level');
+        $semester = session('wizard_semester');
+        $academicYear = session('wizard_academic_year');
+
+        if (empty($items)) {
+            return redirect()->route('admin.schedule.student.wizard.step2')->withErrors(['no_items' => 'Tidak ada data untuk dipublikasikan.']);
+        }
+
+        $service = new ScheduleImportService();
+        $validation = $service->validateConflicts($items);
+
+        $validItems = array_filter($validation, function($v){ return $v['status'] === 'valid'; });
+
+        DB::transaction(function() use($validItems, $educationLevel, $semester, $academicYear) {
+            foreach ($validItems as $row) {
+                // create into schedules table
+                Schedule::create([
+                    'teacher_id' => null,
+                    'student_id' => null,
+                    'subject' => $row['subject'] ?? null,
+                    'class' => $row['class'] ?? null,
+                    'day' => $row['day'] ?? null,
+                    'start_time' => $row['start_time'] ?? null,
+                    'end_time' => $row['end_time'] ?? null,
+                    'room' => $row['room'] ?? null,
+                    'education_level' => $educationLevel,
+                    'semester' => $semester,
+                    'academic_year' => $academicYear,
+                ]);
+            }
+        });
+
+        // Also persist grouped StudentSchedule preview (simple grouping)
+        $grouped = [];
+        foreach ($validItems as $row) {
+            $key = ($row['class'] ?? 'Umum') . '|' . ($row['day'] ?? '');
+            $grouped[$key][] = ($row['subject'] ?? '-') . ' (' . ($row['start_time'] ?? '') . '-' . ($row['end_time'] ?? '') . ')';
+        }
+
+        foreach ($grouped as $key => $acts) {
+            [$class, $day] = explode('|', $key);
+            \App\Models\StudentSchedule::create([
+                'class' => $class,
+                'day' => $day,
+                'activities' => $acts,
+            ]);
+        }
+
+        // clear wizard session
+        session()->forget(['wizard_items','wizard_education_level','wizard_semester','wizard_academic_year','wizard_upload_method']);
+
+        return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal berhasil dipublikasikan.');
     }
 
     // 1. Fungsi Download Template CSV

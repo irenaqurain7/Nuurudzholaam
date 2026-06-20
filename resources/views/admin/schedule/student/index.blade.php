@@ -10,7 +10,7 @@
             <h1>Kelola Jadwal Siswa</h1>
             <p class="subtitle">Atur jadwal pelajaran untuk setiap kelas (SD, SMP, SMA)</p>
         </div>
-        <a href="{{ route('admin.schedule.student.create') }}" class="btn-add-new">
+        <a href="{{ route('admin.schedule.student.wizard.step1') }}" class="btn-add-new">
             <i class="fas fa-plus"></i> Jadwal Baru
         </a>
     </div>
@@ -82,7 +82,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:center;">
                         <h3 style="margin:0">Kelas {{ $className }}</h3>
                         <div>
-                            <a href="{{ route('admin.schedule.student.create') }}?class={{ urlencode($className) }}" class="btn-add-new">Tambah Jadwal</a>
+                            <a href="{{ route('admin.schedule.student.wizard.step1') }}?class={{ urlencode($className) }}" class="btn-add-new">Tambah Jadwal</a>
                         </div>
                     </div>
 

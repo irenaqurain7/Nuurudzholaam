@@ -17,6 +17,9 @@ class Schedule extends Model
         'start_time',
         'end_time',
         'room',
+        'education_level',
+        'semester',
+        'academic_year',
     ];
 
     public function teacher()

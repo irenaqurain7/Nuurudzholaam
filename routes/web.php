@@ -127,10 +127,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::delete('/{id}', [AdminController::class, 'scheduleTeacherDestroy'])->name('destroy');
     });
 
-    // Student Schedule Management
+    // Student Schedule Management (wizard for creating new schedules)
     Route::prefix('schedule/student')->name('schedule.student.')->group(function () {
         Route::get('/', [AdminController::class, 'scheduleStudentIndex'])->name('index');
-        Route::get('/create', [AdminController::class, 'scheduleStudentCreate'])->name('create');
+        // Wizard steps for creating/importing schedules
+        Route::get('/wizard/step-1', [AdminController::class, 'scheduleStudentWizardStep1'])->name('wizard.step1');
+        Route::post('/wizard/step-1', [AdminController::class, 'scheduleStudentWizardStoreStep1'])->name('wizard.step1.store');
+
+        Route::get('/wizard/step-2', [AdminController::class, 'scheduleStudentWizardStep2'])->name('wizard.step2');
+        Route::post('/wizard/step-2', [AdminController::class, 'scheduleStudentWizardStoreStep2'])->name('wizard.step2.store');
+
+        Route::get('/wizard/step-3', [AdminController::class, 'scheduleStudentWizardStep3'])->name('wizard.step3');
+
+        Route::post('/wizard/publish', [AdminController::class, 'scheduleStudentPublish'])->name('wizard.publish');
+
+        // Keep existing CRUD for listing/editing/deleting legacy student schedules
         Route::post('/', [AdminController::class, 'scheduleStudentStore'])->name('store');
         Route::get('/{id}/edit', [AdminController::class, 'scheduleStudentEdit'])->name('edit');
         Route::put('/{id}', [AdminController::class, 'scheduleStudentUpdate'])->name('update');
