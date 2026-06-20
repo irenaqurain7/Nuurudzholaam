@@ -32,6 +32,11 @@ class Teacher extends Model
         return $this->hasMany(Schedule::class);
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
     public function students()
     {
         return $this->hasManyThrough(Student::class, Grade::class, 'teacher_id', 'user_id', 'user_id', 'student_id');

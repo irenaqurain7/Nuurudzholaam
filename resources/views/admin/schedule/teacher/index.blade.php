@@ -8,111 +8,197 @@
     <div class="page-header">
         <div>
             <h1>Kelola Jadwal Guru</h1>
-            <p class="subtitle">Atur jadwal mengajar untuk semua guru</p>
+            <p class="subtitle">Jadwal guru tersinkron otomatis dari Jadwal Siswa.</p>
         </div>
-        <a href="{{ route('admin.schedule.teacher.create') }}" class="btn-add-new">
-            <i class="fas fa-plus"></i> Jadwal Baru
-        </a>
+        <div class="header-action">
+            <span class="badge bg-success py-2 px-3"><i class="fas fa-sync-alt mr-1"></i> Sinkron Otomatis</span>
+        </div>
     </div>
 
-    <!-- Status Message -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="fas fa-check-circle"></i>
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <!-- Stats Cards -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary-light text-primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ $totalGuru }}</h3>
+                <p>Total Guru</p>
+            </div>
         </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="fas fa-exclamation-circle"></i>
-            Terjadi kesalahan. Silakan periksa kembali data Anda.
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <div class="stat-card">
+            <div class="stat-icon bg-success-light text-success">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ $guruMemilikiJadwal }}</h3>
+                <p>Guru Memiliki Jadwal</p>
+            </div>
         </div>
-    @endif
+        <div class="stat-card">
+            <div class="stat-icon bg-info-light text-info">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ $totalJadwal }}</h3>
+                <p>Total Jadwal Mengajar</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon bg-danger-light text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ $totalKonflik }}</h3>
+                <p>Konflik Jadwal</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Search & Filter -->
-    <div class="management-toolbar">
+    <form method="GET" action="{{ route('admin.schedule.teacher.index') }}" class="management-toolbar">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Cari berdasarkan nama guru atau mata pelajaran..." class="search-input">
+            <input type="text" name="search_guru" value="{{ request('search_guru') }}" placeholder="Cari nama guru..." class="search-input">
         </div>
         <div class="filter-group">
-            <select id="dayFilter" class="filter-select">
+            <select name="day" class="filter-select" onchange="this.form.submit()">
                 <option value="">Semua Hari</option>
-                <option value="Monday">Senin</option>
-                <option value="Tuesday">Selasa</option>
-                <option value="Wednesday">Rabu</option>
-                <option value="Thursday">Kamis</option>
-                <option value="Friday">Jumat</option>
-                <option value="Saturday">Sabtu</option>
+                <option value="Monday" {{ request('day') == 'Monday' ? 'selected' : '' }}>Senin</option>
+                <option value="Tuesday" {{ request('day') == 'Tuesday' ? 'selected' : '' }}>Selasa</option>
+                <option value="Wednesday" {{ request('day') == 'Wednesday' ? 'selected' : '' }}>Rabu</option>
+                <option value="Thursday" {{ request('day') == 'Thursday' ? 'selected' : '' }}>Kamis</option>
+                <option value="Friday" {{ request('day') == 'Friday' ? 'selected' : '' }}>Jumat</option>
+                <option value="Saturday" {{ request('day') == 'Saturday' ? 'selected' : '' }}>Sabtu</option>
             </select>
+            <select name="level" class="filter-select" onchange="this.form.submit()">
+                <option value="">Semua Jenjang</option>
+                <option value="TK" {{ request('level') == 'TK' ? 'selected' : '' }}>TK</option>
+                <option value="SD" {{ request('level') == 'SD' ? 'selected' : '' }}>SD</option>
+                <option value="SMP" {{ request('level') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                <option value="SMK" {{ request('level') == 'SMK' ? 'selected' : '' }}>SMK</option>
+            </select>
+            @if(request()->hasAny(['search_guru', 'day', 'level']))
+                <a href="{{ route('admin.schedule.teacher.index') }}" class="btn btn-outline-secondary">Reset</a>
+            @endif
+            <button type="submit" class="btn btn-primary d-none">Cari</button>
         </div>
-    </div>
+    </form>
 
     <!-- Schedules Table -->
     <div class="table-responsive-container">
-        <table class="admin-table" id="scheduleTable">
+        <table class="admin-table">
             <thead>
                 <tr>
                     <th style="width: 5%;">No</th>
-                    <th style="width: 20%;">Nama Guru</th>
-                    <th style="width: 15%;">Mata Pelajaran</th>
-                    <th style="width: 12%;">Hari</th>
-                    <th style="width: 15%;">Waktu</th>
-                    <th style="width: 10%;">Ruang</th>
-                    <th style="width: 23%;">Aksi</th>
+                    <th style="width: 25%;">Nama Guru</th>
+                    <th style="width: 20%;">Mata Pelajaran</th>
+                    <th style="width: 10%;">Total Kelas</th>
+                    <th style="width: 15%;">Total Jam</th>
+                    <th style="width: 10%;">Status</th>
+                    <th style="width: 15%;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($schedules as $index => $schedule)
-                    @php
-                        $daysIndonesia = [
-                            'Monday' => 'Senin',
-                            'Tuesday' => 'Selasa',
-                            'Wednesday' => 'Rabu',
-                            'Thursday' => 'Kamis',
-                            'Friday' => 'Jumat',
-                            'Saturday' => 'Sabtu'
-                        ];
-                        $dayName = $daysIndonesia[$schedule->day] ?? $schedule->day;
-                    @endphp
-                    <tr class="schedule-row" data-teacher="{{ $teacherNames[$schedule->teacher_id] ?? '' }}" data-day="{{ $schedule->day }}" data-subject="{{ strtolower($schedule->subject) }}">
-                        <td>{{ ($schedules->currentPage() - 1) * $schedules->perPage() + $index + 1 }}</td>
+                @forelse($groupedSchedulesPaginated as $index => $data)
+                    <tr>
+                        <td>{{ ($groupedSchedulesPaginated->currentPage() - 1) * $groupedSchedulesPaginated->perPage() + $index + 1 }}</td>
                         <td>
                             <div class="teacher-info">
-                                <span class="teacher-name">{{ $teacherNames[$schedule->teacher_id] ?? 'Guru Tidak Diketahui' }}</span>
+                                <span class="teacher-name">{{ $data['name'] }}</span>
                             </div>
                         </td>
-                        <td><span class="badge-subject">{{ $schedule->subject }}</span></td>
-                        <td>{{ $dayName }}</td>
+                        <td><span class="text-muted">{{ $data['subjects_str'] ?: '-' }}</span></td>
+                        <td>{{ $data['total_classes'] }} Kelas</td>
+                        <td>{{ $data['formatted_duration'] }}</td>
                         <td>
-                            <span class="time-badge">
-                                {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
-                            </span>
+                            @if($data['has_conflict'])
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Konflik Jadwal</span>
+                            @else
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Normal</span>
+                            @endif
                         </td>
-                        <td>{{ $schedule->room ?? '-' }}</td>
                         <td>
-                            <div class="action-buttons">
-                                <a href="{{ route('admin.schedule.teacher.edit', $schedule->id) }}" class="btn-action btn-edit" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('admin.schedule.teacher.destroy', $schedule->id) }}" method="POST" class="delete-form" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete" title="Hapus" onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $data['teacher_id'] }}">
+                                <i class="fas fa-eye mr-1"></i> Lihat Jadwal
+                            </button>
                         </td>
                     </tr>
+                    
+                    <!-- Modal Detail -->
+                    <div class="modal fade" id="modalDetail{{ $data['teacher_id'] }}" tabindex="-1" aria-labelledby="modalLabel{{ $data['teacher_id'] }}" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title" id="modalLabel{{ $data['teacher_id'] }}">Detail Jadwal Mengajar</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-4">
+                                        <table class="table table-borderless table-sm mb-0">
+                                            <tr>
+                                                <td width="150" class="text-muted">Nama Guru</td>
+                                                <th>{{ $data['name'] }}</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Mata Pelajaran</td>
+                                                <th>{{ $data['subjects_str'] ?: '-' }}</th>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-muted">Total Jam Mengajar</td>
+                                                <th>{{ $data['formatted_duration'] }}</th>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    @if($data['has_conflict'])
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-exclamation-triangle"></i> Ditemukan jadwal yang saling bertabrakan (overlap waktu pada hari yang sama).
+                                        </div>
+                                    @endif
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Hari</th>
+                                                    <th>Jam</th>
+                                                    <th>Kelas</th>
+                                                    <th>Jenjang</th>
+                                                    <th>Ruangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @php
+                                                    $daysIndonesia = ['Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
+                                                    $sortedSchedules = collect($data['schedules'])->sortBy('day')->sortBy('start_time');
+                                                @endphp
+                                                @forelse($sortedSchedules as $sched)
+                                                    <tr>
+                                                        <td>{{ $daysIndonesia[$sched->day] ?? $sched->day }}</td>
+                                                        <td>{{ substr($sched->start_time, 0, 5) }} - {{ substr($sched->end_time, 0, 5) }}</td>
+                                                        <td>{{ $sched->class ?? '-' }}</td>
+                                                        <td>{{ $sched->education_level ?? '-' }}</td>
+                                                        <td>{{ $sched->room ?? '-' }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr><td colspan="5" class="text-center">Tidak ada jadwal</td></tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 @empty
                     <tr>
                         <td colspan="7" class="text-center no-data">
                             <i class="fas fa-inbox"></i>
-                            <p>Belum ada jadwal guru</p>
+                            <p>Belum ada data guru yang memiliki jadwal</p>
                         </td>
                     </tr>
                 @endforelse
@@ -121,9 +207,9 @@
     </div>
 
     <!-- Pagination -->
-    @if($schedules->hasPages())
+    @if($groupedSchedulesPaginated->hasPages())
         <div class="pagination-container">
-            {{ $schedules->links() }}
+            {{ $groupedSchedulesPaginated->links() }}
         </div>
     @endif
 </div>
@@ -159,28 +245,50 @@
     font-size: 0.95rem;
 }
 
-.btn-add-new {
-    background: #2D4438;
-    color: white;
-    padding: 0.6rem 1.1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    transition: background 0.18s, transform 0.12s;
-    box-shadow: 0 1px 2px rgba(45,68,56,0.12);
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
 }
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 3px rgba(45,68,56,0.06);
+}
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+.bg-primary-light { background: rgba(13, 110, 253, 0.1); }
+.bg-success-light { background: rgba(25, 135, 84, 0.1); }
+.bg-info-light { background: rgba(13, 202, 240, 0.1); }
+.bg-danger-light { background: rgba(220, 53, 69, 0.1); }
 
-.btn-add-new:hover {
-    background: #23362b;
-    transform: translateY(-2px);
+.stat-info h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2D4438;
+}
+.stat-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6C8B7C;
 }
 
 .management-toolbar {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1.5rem;
     background: white;
@@ -191,6 +299,7 @@
 
 .search-box {
     flex: 1;
+    min-width: 250px;
     position: relative;
     display: flex;
     align-items: center;
@@ -198,43 +307,19 @@
 
 .search-box i { position: absolute; left: 1rem; color: #c8d1cc; }
 .search-input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid #e6ebe6; border-radius: 8px; font-size: 0.95rem; background: #fbfdfb; }
+.search-input:focus { outline: none; border-color: #2D4438; }
+
+.filter-group {
+    display: flex;
+    gap: 0.5rem;
+}
 
 .filter-select {
-    padding: 0.75rem 1rem;
+    padding: 0.6rem 1rem;
     border: 1px solid #ddd;
     border-radius: 6px;
     background: white;
     cursor: pointer;
-}
-
-.alert {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-danger {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    opacity: 0.7;
-    margin-left: auto;
 }
 
 .table-responsive-container { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(45,68,56,0.05); margin-bottom: 2rem; }
@@ -263,6 +348,7 @@
 
 .admin-table td {
     padding: 1rem;
+    vertical-align: middle;
 }
 
 .teacher-info {
@@ -274,62 +360,6 @@
 .teacher-name {
     font-weight: 600;
     color: #2c3e50;
-}
-
-.teacher-spec {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-}
-
-.badge-subject {
-    display: inline-block;
-    background: #e8f4f8;
-    color: #16a085;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.time-badge {
-    display: inline-block;
-    background: #fff3cd;
-    color: #856404;
-    padding: 0.5rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-}
-
-.btn-edit { background: #2D4438; color: white; }
-.btn-edit:hover { background: #23362b; transform: translateY(-2px); }
-
-.btn-delete {
-    background: #e74c3c;
-    color: white;
-}
-
-.btn-delete:hover {
-    background: #c0392b;
-    transform: translateY(-2px);
 }
 
 .no-data {
@@ -350,56 +380,31 @@
     margin-top: 2rem;
 }
 
+.modal-header.bg-success {
+    background-color: #2D4438 !important;
+}
+
 @media (max-width: 768px) {
     .page-header {
         flex-direction: column;
         gap: 1rem;
     }
-
-    .btn-add-new {
-        width: 100%;
-        justify-content: center;
+    
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
     }
 
     .management-toolbar {
         flex-direction: column;
     }
-
-    .admin-table {
-        font-size: 0.9rem;
+    
+    .filter-group {
+        width: 100%;
+        flex-wrap: wrap;
     }
-
-    .admin-table th,
-    .admin-table td {
-        padding: 0.75rem;
+    .filter-group select {
+        flex: 1;
     }
 }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const dayFilter = document.getElementById('dayFilter');
-    const rows = document.querySelectorAll('.schedule-row');
-
-    function filterTable() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const selectedDay = dayFilter.value;
-
-        rows.forEach(row => {
-            const teacher = row.dataset.teacher.toLowerCase();
-            const day = row.dataset.day;
-            const subject = row.dataset.subject;
-
-            const matchesSearch = teacher.includes(searchTerm) || subject.includes(searchTerm);
-            const matchesDay = !selectedDay || day === selectedDay;
-
-            row.style.display = matchesSearch && matchesDay ? '' : 'none';
-        });
-    }
-
-    searchInput?.addEventListener('keyup', filterTable);
-    dayFilter?.addEventListener('change', filterTable);
-});
-</script>
 @endsection

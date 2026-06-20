@@ -603,107 +603,149 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Password telah direset ke: ' . $tempPassword . ' (harap segera ubah password saat login pertama)');
     }
 
-    // TEACHER SCHEDULES
-    private function getTemporaryTeacherNames(): array
+    // TEACHER SCHEDULES (Monitoring Dashboard)
+    public function scheduleTeacherIndex(Request $request)
     {
-        return [
-            1 => 'A. Dede Ali, S.Pd',
-            2 => 'Ade Royani, S.Pd',
-            3 => 'Ananda Jihan Kamilah',
-            4 => 'Dinda Aulia Putri',
-            5 => 'Kurnia Amelia',
-            6 => 'Mochamad Fazhri Syamsi',
-            7 => 'Rinda Maryani, S.Pd',
-            8 => 'Siti Aminah',
-            9 => 'Siti Rokayah',
-            10 => 'Warnengsih',
-            11 => 'Wiwi Suherti, S.Pd',
-        ];
-    }
+        $query = Schedule::with('teacher.user');
 
-    public function scheduleTeacherIndex()
-    {
-        $schedules = Schedule::whereNotNull('teacher_id')
-            ->orderBy('day')
-            ->paginate(15);
+        // Filter by jenjang (education_level)
+        if ($request->filled('level')) {
+            $query->where('education_level', $request->level);
+        }
 
-        $teacherNames = $this->getTemporaryTeacherNames();
+        // Filter by hari (day)
+        if ($request->filled('day')) {
+            $query->where('day', $request->day);
+        }
 
-        return view('admin.schedule.teacher.index', compact('schedules', 'teacherNames'));
-    }
+        // Filter by nama guru (search)
+        if ($request->filled('search_guru')) {
+            $search = $request->search_guru;
+            $query->whereHas('teacher.user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        }
 
-    public function scheduleTeacherCreate()
-    {
-        $teachers = $this->getTemporaryTeacherNames();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        $schedules = $query->get();
 
-        return view('admin.schedule.teacher.create', compact('teachers', 'days'));
-    }
+        // Agregasi untuk statistik ringkas
+        $totalGuru = \App\Models\Teacher::count();
+        $guruMemilikiJadwal = $schedules->pluck('teacher_id')->filter()->unique()->count();
+        $totalJadwal = $schedules->count();
 
-    public function scheduleTeacherStore(Request $request)
-    {
-        $teachers = $this->getTemporaryTeacherNames();
-        $validated = $request->validate([
-            'teacher_id' => ['required', Rule::in(array_keys($teachers))],
-            'subject' => 'required|string',
-            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'room' => 'nullable|string',
-        ], [
-            'teacher_id.required' => 'Guru harus dipilih',
-            'teacher_id.in' => 'Guru tidak ditemukan',
-            'subject.required' => 'Mata pelajaran harus diisi',
-            'day.required' => 'Hari harus dipilih',
-            'start_time.required' => 'Waktu mulai harus diisi',
-            'end_time.required' => 'Waktu selesai harus diisi',
-            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
-        ]);
+        // Group by teacher
+        $groupedSchedules = [];
+        $totalKonflik = 0;
 
-        Schedule::create($validated);
-        return redirect()->route('admin.schedule.teacher.index')->with('success', 'Jadwal guru berhasil ditambahkan.');
-    }
+        foreach ($schedules as $schedule) {
+            $teacherId = $schedule->teacher_id;
+            if (!$teacherId) continue;
 
-    public function scheduleTeacherEdit($id)
-    {
-        $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
-        $teachers = $this->getTemporaryTeacherNames();
-        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            $teacherName = $schedule->teacher->user->name ?? 'Guru Tidak Diketahui';
 
-        return view('admin.schedule.teacher.edit', compact('schedule', 'teachers', 'days'));
-    }
+            if (!isset($groupedSchedules[$teacherId])) {
+                $groupedSchedules[$teacherId] = [
+                    'teacher_id' => $teacherId,
+                    'name' => $teacherName,
+                    'subjects' => [],
+                    'total_classes' => [],
+                    'total_minutes' => 0,
+                    'schedules' => [],
+                    'has_conflict' => false
+                ];
+            }
 
-    public function scheduleTeacherUpdate(Request $request, $id)
-    {
-        $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
-        $teachers = $this->getTemporaryTeacherNames();
+            // Collect unique subjects
+            if ($schedule->subject) {
+                $groupedSchedules[$teacherId]['subjects'][$schedule->subject] = true;
+            }
 
-        $validated = $request->validate([
-            'teacher_id' => ['required', Rule::in(array_keys($teachers))],
-            'subject' => 'required|string',
-            'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'room' => 'nullable|string',
-        ], [
-            'teacher_id.required' => 'Guru harus dipilih',
-            'teacher_id.in' => 'Guru tidak ditemukan',
-            'subject.required' => 'Mata pelajaran harus diisi',
-            'day.required' => 'Hari harus dipilih',
-            'start_time.required' => 'Waktu mulai harus diisi',
-            'end_time.required' => 'Waktu selesai harus diisi',
-            'end_time.after' => 'Waktu selesai harus lebih besar dari waktu mulai',
-        ]);
+            // Collect unique classes
+            if ($schedule->class) {
+                $groupedSchedules[$teacherId]['total_classes'][$schedule->class] = true;
+            }
 
-        $schedule->update($validated);
-        return redirect()->route('admin.schedule.teacher.index')->with('success', 'Jadwal guru berhasil diperbarui.');
-    }
+            // Calculate duration
+            if ($schedule->start_time && $schedule->end_time) {
+                $start = \Carbon\Carbon::parse($schedule->start_time);
+                $end = \Carbon\Carbon::parse($schedule->end_time);
+                $diff = $start->diffInMinutes($end);
+                $groupedSchedules[$teacherId]['total_minutes'] += $diff;
+            }
 
-    public function scheduleTeacherDestroy($id)
-    {
-        $schedule = Schedule::whereNotNull('teacher_id')->findOrFail($id);
-        $schedule->delete();
-        return redirect()->back()->with('success', 'Jadwal guru berhasil dihapus.');
+            $groupedSchedules[$teacherId]['schedules'][] = $schedule;
+        }
+
+        // Detect conflicts for each teacher
+        foreach ($groupedSchedules as $teacherId => &$data) {
+            $teacherSchedules = collect($data['schedules']);
+            
+            // Group by day to check overlaps
+            $byDay = $teacherSchedules->groupBy('day');
+            $hasConflict = false;
+
+            foreach ($byDay as $day => $dailySchedules) {
+                // Sort by start_time
+                $sorted = $dailySchedules->sortBy('start_time')->values();
+                
+                for ($i = 0; $i < $sorted->count() - 1; $i++) {
+                    $current = $sorted[$i];
+                    $next = $sorted[$i + 1];
+
+                    // Logic overlap: next start_time < current end_time
+                    // but we also ensure they are distinct schedules if they have different classes
+                    if ($current->end_time > $next->start_time && $current->id !== $next->id) {
+                        $hasConflict = true;
+                        break 2; // break both loops
+                    }
+                }
+            }
+
+            $data['has_conflict'] = $hasConflict;
+            if ($hasConflict) {
+                $totalKonflik++;
+            }
+
+            // Convert array keys to count
+            $data['total_classes'] = count($data['total_classes']);
+            $data['subjects_str'] = implode(', ', array_keys($data['subjects']));
+            
+            // Format total duration (hours and minutes)
+            $hours = floor($data['total_minutes'] / 60);
+            $minutes = $data['total_minutes'] % 60;
+            $data['formatted_duration'] = ($hours > 0 ? $hours . ' Jam ' : '') . ($minutes > 0 ? $minutes . ' Menit' : '');
+            if ($data['formatted_duration'] == '') $data['formatted_duration'] = '0 Menit';
+        }
+
+        // Sort by teacher name
+        usort($groupedSchedules, function($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
+
+        // Convert array to pagination-like structure or just pass as array since it's grouped.
+        // If we need pagination, we can manually slice it. For now, we'll pass the full grouped array.
+        // A custom paginator can be created if needed, but for dashboard grouping, array is fine.
+        
+        // Paginate the grouped results
+        $page = $request->get('page', 1);
+        $perPage = 15;
+        $offset = ($page - 1) * $perPage;
+        $paginatedItems = array_slice($groupedSchedules, $offset, $perPage);
+        $groupedSchedulesPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $paginatedItems, 
+            count($groupedSchedules), 
+            $perPage, 
+            $page, 
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('admin.schedule.teacher.index', compact(
+            'groupedSchedulesPaginated', 
+            'totalGuru', 
+            'guruMemilikiJadwal', 
+            'totalJadwal', 
+            'totalKonflik'
+        ));
     }
 
     // STUDENT SCHEDULES (SD-friendly: activities list per class & day)

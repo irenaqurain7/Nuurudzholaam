@@ -117,14 +117,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');
 
-    // Teacher Schedule Management
+    // Teacher Schedule Management (Monitoring Dashboard)
     Route::prefix('schedule/teacher')->name('schedule.teacher.')->group(function () {
         Route::get('/', [AdminController::class, 'scheduleTeacherIndex'])->name('index');
-        Route::get('/create', [AdminController::class, 'scheduleTeacherCreate'])->name('create');
-        Route::post('/', [AdminController::class, 'scheduleTeacherStore'])->name('store');
-        Route::get('/{id}/edit', [AdminController::class, 'scheduleTeacherEdit'])->name('edit');
-        Route::put('/{id}', [AdminController::class, 'scheduleTeacherUpdate'])->name('update');
-        Route::delete('/{id}', [AdminController::class, 'scheduleTeacherDestroy'])->name('destroy');
     });
 
     // Student Schedule Management (wizard for creating new schedules)
