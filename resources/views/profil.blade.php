@@ -58,12 +58,6 @@
         align-items: center;
     }
 
-    .grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 30px;
-    }
-
     .grid-auto {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -187,24 +181,6 @@
         margin-bottom: 12px;
     }
 
-    .keunggulan-card {
-        padding: 44px 32px;
-        text-align: center;
-        border-top: 4px solid var(--hijau-islam);
-    }
-
-    .keunggulan-icon {
-        font-size: 48px;
-        margin-bottom: 20px;
-    }
-
-    .keunggulan-title {
-        color: var(--hijau-islam);
-        font-size: 18px;
-        margin-bottom: 15px;
-        font-weight: 700;
-    }
-
     .cta-section {
         background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%);
         color: white;
@@ -246,11 +222,6 @@
         .grid-2 {
             grid-template-columns: 1fr;
             gap: 32px;
-        }
-
-        .grid-3 {
-            grid-template-columns: 1fr;
-            gap: 24px;
         }
 
         h2 {
@@ -320,7 +291,7 @@
                     @if($school && $school->visi)
                         "{{ $school->visi }}"
                     @else
-                        Terwujudnya pribadi anak yang beriman bertaqwa. berakhlak mulia, kreatif, sehat, cerdas dan memiliki kesiapan fisik maupun mental dalam memasuki pendidikan lebih lanjut.
+                        Terwujudnya pribadi siswa siswi yang beriman bertaqwa. berakhlak mulia, kreatif, sehat, cerdas dan memiliki kesiapan fisik maupun mental dalam memasuki pendidikan lebih lanjut.
                     @endif
                 </p>
             </div>
@@ -334,43 +305,14 @@
                     @if($school && $school->misi)
                         <p style="margin: 0;">{{ $school->misi }}</p>
                     @else
+                        <p style="margin-bottom: 12px;">Mewujudkan cita-cita luhur sekolah nuurudzholaam berupa :</p>
                         <ul>
-                            <li>• Mengembangkan pesantren berkualitas dalam ilmu agama, umum dan teknologi informasi dan komunikasi berlandaskan ahlakul karimah.</li>
-                            <li>• Mengembangkan SDM secara mandiri untuk memajukan pesantren melalui kewirausahaan (Entrepreneurship).</li>
-                            <li>• Mengembangkan pesantren yang memiliki jiwa kepemimpinan (Leadership).</li>
-                            <li>• Mengembangkan pesantren yang berwawasan keagamaan dan kebangsaan</li>
-                            <li>• Mengembangkan pesantren yang berkehidupan Tertib dan Disiplin.</li>
+                            <li>1. Menanamkan keimanan & taqwa kepada Allah SWT. serta sikap dan perilaku yang mulia kepada anak</li>
+                            <li>2. Meningkatkan kecerdasan/kemampuan siswa siswi melalui kegiatan interaktif sambil belajar yang menyenangkan</li>
+                            <li>3. Meningkatkan kesadaran, kemampuan dan berpartisipasi aktif kepada masyarakat dalam memberikan layanan pendidikan sekolah</li>
                         </ul>
                     @endif
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Keunggulan Kami -->
-<div class="section">
-    <div class="profil-container">
-        <h2>Keunggulan Kami</h2>
-        <p class="section-subtitle">Dedikasi kami untuk memberikan pendidikan berkualitas yang mengintegrasikan nilai-nilai Islamic</p>
-
-        <div class="grid-3">
-            <div class="card keunggulan-card" style="border-top-color: var(--hijau-islam);">
-                <div class="keunggulan-icon" style="color: var(--hijau-islam);"><i class="fas fa-book"></i></div>
-                <h3 class="keunggulan-title">Lingkungan Islami</h3>
-                <p style="color: var(--text-light); line-height: 1.6; margin: 0;">Ekosistem sekolah yang mendukung pembentukan akhlak dan ketakwaan melalui pendekatan terintegrasi</p>
-            </div>
-
-            <div class="card keunggulan-card" style="border-top-color: var(--emas);">
-                <div class="keunggulan-icon" style="color: var(--emas);"><i class="fas fa-graduation-cap"></i></div>
-                <h3 class="keunggulan-title">Kurikulum Integratif</h3>
-                <p style="color: var(--text-light); line-height: 1.6; margin: 0;">Perpaduan sempurna antara kurikulum nasional dan nilai-nilai agama Islam yang komprehensif</p>
-            </div>
-
-            <div class="card keunggulan-card" style="border-top-color: var(--hijau-islam-light);">
-                <div class="keunggulan-icon" style="color: var(--hijau-islam-light);"><i class="fas fa-users"></i></div>
-                <h3 class="keunggulan-title">Guru Berdedikasi</h3>
-                <p style="color: var(--text-light); line-height: 1.6; margin: 0;">Tenaga pendidik profesional yang berkomitmen untuk membantu setiap siswa mencapai potensi maksimal</p>
             </div>
         </div>
     </div>
