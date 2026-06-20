@@ -163,13 +163,129 @@
 <div style="background-color: var(--bg-light); padding: 60px 20px;">
     <div class="container">
         <h2 style="font-size: 1.75rem; text-align: center; color: var(--hijau-islam); margin-bottom: 40px; font-weight: 700;">Lokasi Kami</h2>
-        <div style="width: 100%; height: 450px; background: linear-gradient(135deg, var(--hijau-islam-lighter) 0%, var(--emas-light) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 10px 30px rgba(26, 92, 66, 0.15);">
-            <div style="text-align: center;">
-                <i class="fas fa-map" style="font-size: 56px; margin-bottom: 15px; display: block; opacity: 0.9;"></i>
-                <p style="margin: 0; font-weight: 500; font-size: 1.1rem;">Google Maps Embedded</p>
-                <p style="font-size: 0.9rem; opacity: 0.85; margin: 8px 0 0 0;">Peta lokasi Al-Hikmah Academy dapat diintegrasikan di sini</p>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div id="mapContainer" style="position: relative; width: 100%; height: 450px; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(26, 92, 66, 0.15); cursor: grab;">
+                <style>
+                    #mapContainer:active {
+                        cursor: grabbing;
+                    }
+                    #mapContainer iframe {
+                        pointer-events: auto;
+                    }
+                    .map-hint {
+                        position: absolute;
+                        top: 15px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: rgba(0, 0, 0, 0.7);
+                        color: white;
+                        padding: 8px 16px;
+                        border-radius: 6px;
+                        font-size: 0.85rem;
+                        font-weight: 500;
+                        z-index: 10;
+                        pointer-events: none;
+                        animation: fadeInOut 3s ease-in-out;
+                    }
+                    @keyframes fadeInOut {
+                        0% { opacity: 0; }
+                        10% { opacity: 1; }
+                        90% { opacity: 1; }
+                        100% { opacity: 0; }
+                    }
+                    .map-button-container {
+                        display: flex;
+                        gap: 12px;
+                        justify-content: flex-start;
+                        flex-wrap: wrap;
+                    }
+                    .map-button {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 12px 20px;
+                        background-color: white;
+                        color: var(--hijau-islam);
+                        border: 2px solid var(--hijau-islam);
+                        border-radius: 8px;
+                        text-decoration: none;
+                        font-weight: 600;
+                        font-size: 0.95rem;
+                        box-shadow: 0 4px 12px rgba(26, 92, 66, 0.1);
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                    }
+                    .map-button:hover {
+                        background-color: var(--hijau-islam);
+                        color: white;
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 16px rgba(26, 92, 66, 0.2);
+                    }
+                    .map-button i {
+                        font-size: 1.1rem;
+                    }
+                </style>
+                <div class="map-hint">
+                    <i class="fas fa-hand-paper" style="margin-right: 6px;"></i>Geser peta untuk melihat lokasi lainnya
+                </div>
+                <iframe 
+                    id="googleMaps"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.3654521989736!2d107.6369!3d-6.484599!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e691d16b5b5b5b5%3A0x5b5b5b5b5b5b5b5b!2sJl.%20Sindangreret%2C%20Dangdeur%2C%20Kec.%20Bungursari%2C%20Kab.%20Purwakarta%2C%20Jawa%20Barat%2041181!5e0!3m2!1sid!2sid!4v1687000000000" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0; margin: 0; padding: 0; display: block;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+            <div class="map-button-container">
+                <a href="https://maps.app.goo.gl/GPtgJaHTQzNngfKQ7?g_st=aw" target="_blank" rel="noopener noreferrer" class="map-button">
+                    <i class="fas fa-map-marker-alt"></i>Buka di Google Maps
+                </a>
+                <a href="https://maps.google.com/maps?q=Jl.%20Sindangreret%2C%20Dangdeur%2C%20Kec.%20Bungursari%2C%20Kab.%20Purwakarta" target="_blank" rel="noopener noreferrer" class="map-button">
+                    <i class="fas fa-directions"></i>Dapatkan Arah
+                </a>
             </div>
         </div>
+        
+        <script>
+            // Enhanced map interaction
+            document.addEventListener('DOMContentLoaded', function() {
+                const mapContainer = document.getElementById('mapContainer');
+                const googleMaps = document.getElementById('googleMaps');
+                
+                // Show grab cursor on hover
+                mapContainer.addEventListener('mouseenter', function() {
+                    mapContainer.style.cursor = 'grab';
+                });
+                
+                // Enable smooth scrolling interaction
+                googleMaps.style.pointerEvents = 'auto';
+                
+                // Touch support for mobile
+                let isDragging = false;
+                mapContainer.addEventListener('touchstart', function() {
+                    isDragging = true;
+                    googleMaps.style.pointerEvents = 'auto';
+                });
+                
+                mapContainer.addEventListener('touchend', function() {
+                    isDragging = false;
+                });
+                
+                // Show hint when user moves mouse over map
+                let hintShown = false;
+                mapContainer.addEventListener('mousemove', function() {
+                    if (!hintShown && mapContainer.querySelector('.map-hint')) {
+                        hintShown = true;
+                        setTimeout(() => {
+                            hintShown = false;
+                        }, 5000);
+                    }
+                });
+            });
+        </script>
     </div>
 </div>
 
