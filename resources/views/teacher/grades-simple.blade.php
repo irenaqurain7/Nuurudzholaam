@@ -10,22 +10,26 @@
 
 <style>
     :root {
-        --school-primary: #1B4332;
-        --school-secondary: #52B788;
+        --school-primary: #163827;
+        --school-primary-contrast: #eaf6ef;
+        --school-secondary: #4fb07a;
         --school-surface: #ffffff;
         --school-muted: #6b7280;
-        --school-border: #dbe7e1;
+        --school-border: #e6f0ea;
     }
 
     .grades-page {
         display: flex;
         flex-direction: column;
-        gap: 0.85rem;
+        gap: 1rem;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 1.25rem 1rem 2rem;
     }
 
     .page-header {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
         gap: 1rem;
         flex-wrap: wrap;
@@ -33,13 +37,13 @@
 
     .page-title {
         margin: 0;
-        font-size: 1.9rem;
+        font-size: 1.7rem;
         font-weight: 800;
         color: var(--school-primary);
     }
 
     .page-subtitle {
-        margin: 0.35rem 0 0;
+        margin: 0.25rem 0 0;
         color: var(--school-muted);
     }
 
@@ -63,6 +67,13 @@
         white-space: nowrap;
         width: fit-content;
         transition: all 0.2s ease;
+    }
+
+    .btn-school { padding: 11px 18px; }
+
+    .badge-soft {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.86rem;
     }
 
     .btn-school {
@@ -112,6 +123,10 @@
         transform: translateY(-8px);
         transition: all 0.2s ease;
         overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+        .export-dropdown-menu { right: 0; left: 0; min-width: auto; width: 220px; }
     }
 
     .export-dropdown-menu.show {
@@ -365,7 +380,7 @@
     .card-school {
         border: 1px solid var(--school-border);
         border-radius: 12px;
-        box-shadow: 0 6px 18px rgba(27, 67, 50, 0.06);
+        box-shadow: 0 8px 22px rgba(22, 56, 39, 0.06);
         overflow: hidden;
         background: var(--school-surface);
     }
@@ -384,7 +399,20 @@
     }
 
     .card-school .card-body {
-        padding: 0.95rem 1rem;
+        padding: 1.1rem 1.25rem;
+    }
+
+    .card-school .card-header h6 {
+        font-size: 0.98rem;
+        color: #23493b;
+        font-weight: 700;
+    }
+
+    #saveAllBtn {
+        min-width: 150px;
+        padding: 10px 18px;
+        font-weight: 800;
+        box-shadow: 0 10px 24px rgba(22,56,39,0.08);
     }
 
     .workspace-section + .workspace-section {
@@ -403,10 +431,27 @@
 
     .form-control,
     .form-select {
-        border-radius: 10px;
-        border-color: #cfdcd5;
-        min-height: 40px;
-        font-size: 0.9rem;
+        border-radius: 12px;
+        border-color: #d1e6db;
+        min-height: 48px;
+        font-size: 0.96rem;
+        padding: 10px 12px;
+        background: linear-gradient(180deg, #fff, #fbfffb);
+        transition: box-shadow 0.15s ease, border-color 0.12s ease;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .form-select:hover,
+    .form-control:hover {
+        border-color: #b9ddc6;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+        outline: none;
+        border-color: var(--school-secondary);
+        box-shadow: 0 6px 18px rgba(79, 176, 122, 0.12);
     }
 
     .form-control:focus,
@@ -419,8 +464,14 @@
     .filters-row {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.85rem;
+        gap: 1rem;
         align-items: end;
+        margin-bottom: 0.6rem;
+    }
+
+    .filters-row .filter-item .label-soft {
+        font-size: 0.92rem;
+        margin-bottom: 0.5rem;
     }
 
     .filter-item { min-width: 0; display:flex; flex-direction:column; }
@@ -432,6 +483,12 @@
         }
     }
 
+    @media (max-width: 1024px) and (min-width: 768px) {
+        .filters-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
     .hint-box {
         background: #f7fbf8;
         border: 1px dashed #cfe0d8;
@@ -439,6 +496,13 @@
         border-radius: 12px;
         padding: 0.75rem 0.9rem;
         font-size: 0.92rem;
+    }
+
+    .empty-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.4rem 1.2rem;
     }
 
     .summary-grid {
@@ -468,15 +532,17 @@
         font-weight: 800;
         white-space: nowrap;
         vertical-align: middle;
-        padding-top: 0.55rem;
-        padding-bottom: 0.55rem;
+        padding: 0.9rem 1rem;
     }
 
     .grade-table tbody td {
         vertical-align: middle;
-        padding-top: 0.6rem;
-        padding-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
         border-top: 1px solid #f2f6f3;
+    }
+
+    .grade-table tr:hover td {
+        background: #fbfffb;
     }
 
     .grade-input {
@@ -493,10 +559,23 @@
         border: 1px solid transparent;
         border-left-width: 4px;
         border-radius: 12px;
-        padding: 0.8rem 1rem;
+        padding: 1rem 1.1rem;
         margin-bottom: 0;
         font-weight: 600;
         box-shadow: 0 6px 14px rgba(27, 67, 50, 0.06);
+    }
+
+    .message-box.is-info {
+        max-width: 680px;
+    }
+
+    .card-header.d-flex {
+        padding: 1.05rem 1.25rem;
+    }
+
+    /* Import card visual polish */
+    .card-school + .card-school {
+        margin-top: 1.25rem;
     }
 
     .message-box .message-title {
@@ -604,6 +683,20 @@
             right: 0;
             left: auto;
         }
+        .message-box {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
+    /* Ensure table area keeps visual height when empty */
+    .table-responsive {
+        min-height: 220px;
+        display: block;
+        background: linear-gradient(180deg, #fff, #fbfffb);
+        border-radius: 10px;
+        padding: 0.6rem;
+        border: 1px solid rgba(28, 71, 52, 0.04);
     }
 </style>
 
@@ -658,13 +751,13 @@
                     </div>
 
                     <div class="filter-item filter-subject">
-                        <label for="subjectInput" class="label-soft">Mapel</label>
-                        <input list="subjectList" id="subjectInput" class="form-control" placeholder="Contoh: Matematika" value="{{ $selectedSubjectValue }}">
-                        <datalist id="subjectList">
+                        <label for="subjectSelect" class="label-soft">Mapel</label>
+                        <select id="subjectSelect" name="subject" class="form-select">
+                            <option value="">-- Pilih Mapel --</option>
                             @foreach($subjects as $subject)
-                                <option value="{{ $subject }}"></option>
+                                <option value="{{ $subject }}" {{ $selectedSubjectValue === $subject ? 'selected' : '' }}>{{ $subject }}</option>
                             @endforeach
-                        </datalist>
+                        </select>
                     </div>
 
                     <div class="filter-item filter-search">
@@ -699,51 +792,63 @@
 
                 <div id="tableMessage" class="alert d-none message-box" role="alert" aria-hidden="true"></div>
 
-                <div class="table-responsive">
-                    <table class="table grade-table align-middle mb-0 table-borderless">
-                        <thead>
-                            <tr>
-                                <th>Nama</th>
-                                <th>NIS</th>
-                                <th>Kelas</th>
-                                <th style="width: 180px;">Nilai</th>
-                                <th style="width: 160px;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTableBody">
-                            <tr>
-                                <td colspan="5" class="text-center py-4 small-muted">Pilih kelas dan mapel.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="workspace-section" id="importSection">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                    <div>
-                        <h6 class="mb-1">Import Nilai</h6>
-                        <div class="small-muted">Kolom: NISN, Mapel, Nilai, Keterangan.</div>
+                @if(!empty($selectedClassValue) && !empty($selectedSubjectValue))
+                    <div class="table-responsive">
+                        <table class="table grade-table align-middle mb-0 table-borderless">
+                            <thead>
+                                <tr>
+                                    <th class="p-3">Nama</th>
+                                    <th class="p-3">NIS</th>
+                                    <th class="p-3">Kelas</th>
+                                    <th class="p-3" style="width: 180px;">Nilai</th>
+                                    <th class="p-3" style="width: 160px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                {{-- Rows will be rendered by JS after fetching via AJAX --}}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 small-muted">Memuat data siswa...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-
-                <form id="importForm">
-                    @csrf
-                    <div class="row g-3 align-items-end">
-                        <div class="col-lg-9">
-                            <label for="importFile" class="label-soft">File</label>
-                            <input type="file" id="importFile" name="file" class="form-control" accept=".xlsx,.csv,.txt" required>
-                        </div>
-                        <div class="col-lg-3 d-grid">
-                            <button type="submit" class="btn btn-school" id="importSubmitBtn">
-                                <i class="fas fa-file-import me-2"></i>Import
-                            </button>
+                @else
+                    <div class="empty-placeholder">
+                        <div class="message-box is-info" style="display:inline-block;">
+                            <div class="message-title"><i class="fas fa-info-circle"></i><span>Perhatian</span></div>
+                            <div class="message-body">Silakan pilih kelas dan mapel terlebih dahulu.</div>
                         </div>
                     </div>
-                </form>
-
-                <div id="importMessage" class="alert d-none mt-3 message-box" role="alert"></div>
+                @endif
             </div>
+        </div>
+    </div>
+
+    {{-- Import section moved to its own card for clarity --}}
+    <div class="card card-school mt-4">
+        <div class="card-header">
+            <h6 class="mb-0">Import Nilai</h6>
+        </div>
+        <div class="card-body">
+            <div class="small-muted">Kolom: NISN, Mapel, Nilai, Keterangan.</div>
+            <form id="importForm" class="mt-3">
+                @csrf
+                <div style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:240px;">
+                        <label for="importFile" class="label-soft">File</label>
+                        <input type="file" id="importFile" name="file" class="form-control" accept=".xlsx,.csv,.txt" required>
+                    </div>
+                    <div style="min-width:160px;">
+                        <button type="submit" class="btn btn-school" id="importSubmitBtn">
+                            <i class="fas fa-file-import me-2"></i>Import
+                        </button>
+                    </div>
+                    <div style="flex-basis:100%;"></div>
+                    <div id="importMessage" class="mt-3" style="width:100%;"></div>
+                </div>
+            </form>
+        </div>
+    </div>
         </div>
     </div>
 </div>
@@ -788,7 +893,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const classSelect = document.getElementById('classSelect');
-    const subjectInput = document.getElementById('subjectInput');
+    const subjectSelect = document.getElementById('subjectSelect');
     const studentSearch = document.getElementById('studentSearch');
     const studentsTableBody = document.getElementById('studentsTableBody');
     const tableMessage = document.getElementById('tableMessage');
@@ -932,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadStudents() {
         const selectedClass = classSelect.value.trim();
-        const selectedSubject = subjectInput.value.trim();
+        const selectedSubject = (subjectSelect ? subjectSelect.value : '').trim();
         const search = studentSearch.value.trim();
 
         if (!selectedClass || !selectedSubject) {
@@ -974,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const gradeInput = row.querySelector('.grade-input');
         const badge = row.querySelector('[data-grade-badge]');
         const button = row.querySelector('.save-grade-btn');
-        const selectedSubject = subjectInput.value.trim();
+        const selectedSubject = (subjectSelect ? subjectSelect.value : '').trim();
         const gradeValue = gradeInput.value.trim();
         let result = false;
 
@@ -1051,10 +1156,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     classSelect.addEventListener('change', loadStudents);
-    subjectInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(loadStudents, 300);
-    });
+    if (subjectSelect) {
+        subjectSelect.addEventListener('change', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(loadStudents, 300);
+        });
+    }
     studentSearch.addEventListener('input', function() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(loadStudents, 300);
@@ -1099,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const gradeVal = val === '' ? null : Number(val);
                 return {
                     student_id: studentId,
-                    subject: subjectInput.value.trim(),
+                    subject: (subjectSelect ? subjectSelect.value.trim() : ''),
                     grade: gradeVal,
                     notes: ''
                 };
@@ -1223,7 +1330,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    if (classSelect.value && subjectInput.value.trim()) {
+    if (classSelect.value && (subjectSelect ? subjectSelect.value.trim() : '')) {
         loadStudents();
     } else {
         renderEmptyRow('Pilih kelas dan mapel untuk menampilkan tabel siswa.');
@@ -1236,7 +1343,8 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Pilih kelas terlebih dahulu');
             return;
         }
-        window.location.href = '{{ route("teacher.export-report-pdf") }}?class=' + selectedClass;
+        const selectedSubject = (subjectSelect ? subjectSelect.value : '');
+        window.location.href = '{{ route("teacher.export-report-pdf") }}?class=' + encodeURIComponent(selectedClass) + '&subject=' + encodeURIComponent(selectedSubject);
     };
 
     window.exportToExcel = function() {
@@ -1245,7 +1353,8 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Pilih kelas terlebih dahulu');
             return;
         }
-        window.location.href = '{{ route("teacher.export-grades-excel") }}?class=' + selectedClass;
+        const selectedSubject = (subjectSelect ? subjectSelect.value : '');
+        window.location.href = '{{ route("teacher.export-grades-excel") }}?class=' + encodeURIComponent(selectedClass) + '&subject=' + encodeURIComponent(selectedSubject);
     };
 
     // Custom Export Dropdown Handler
