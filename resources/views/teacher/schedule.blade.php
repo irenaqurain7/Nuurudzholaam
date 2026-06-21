@@ -259,23 +259,10 @@
     @if(empty($selectedClass))
         @php
             // Unified timeline view for today
-            $dayMap = [
-                'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
-                'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
-            ];
             $todayEnglish = \Carbon\Carbon::now()->format('l');
-            $todayName = $dayMap[$todayEnglish] ?? $todayEnglish;
+            $todayName = getDayNameIndonesia($todayEnglish);
             // ensure $schedules is a collection
             $timeline = collect($schedules ?? []);
-
-            function jenjangFromClass($c) {
-                if (!$c) return '-';
-                $num = intval($c);
-                if ($num >=1 && $num <=6) return 'SD';
-                if ($num >=7 && $num <=9) return 'SMP';
-                if ($num >=10) return 'SMK';
-                return '-';
-            }
         @endphp
 
         <div class="section">
@@ -423,7 +410,5 @@
         </div>
     @endif
 </div>
-    
-@endsection
-    
+
 @endsection
