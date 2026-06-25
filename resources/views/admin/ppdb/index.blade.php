@@ -79,10 +79,11 @@
             <thead>
                 <tr>
                     <th>Nama Lengkap</th>
+                    <th>Jenjang</th>
                     <th>Email</th>
                     <th>No Telepon</th>
                     <th>Asal Sekolah</th>
-                    <th>Program</th>
+                    <th>Program/Jurusan</th>
                     <th>Tanggal Daftar</th>
                     <th>Status</th>
                     <th>Aksi</th>
@@ -92,10 +93,19 @@
                 @forelse($registrations as $reg)
                 <tr>
                     <td class="font-bold">{{ $reg->nama_lengkap }}</td>
+                    <td><span class="badge" style="background: #e3f2fd; color: #1976d2;">{{ strtoupper($reg->jenjang) }}</span></td>
                     <td>{{ $reg->email }}</td>
                     <td>{{ $reg->no_telepon }}</td>
                     <td>{{ $reg->asal_sekolah }}</td>
-                    <td><span class="badge-program">{{ ucfirst($reg->program) }}</span></td>
+                    <td>
+                        @if($reg->jenjang == 'smk' && $reg->jurusan)
+                            <span class="badge-program">{{ $reg->jurusan }}</span>
+                        @elseif($reg->program)
+                            <span class="badge-program">{{ ucfirst($reg->program) }}</span>
+                        @else
+                            -
+                        @endif
+                    </td>
                     <td>{{ $reg->created_at->format('d M Y') }}</td>
                     <td>
                         @if($reg->status == 'pending')
@@ -122,7 +132,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-4">
+                    <td colspan="9" class="text-center text-muted py-4">
                         <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; display: block; opacity: 0.5;"></i>
                         <p>Belum ada data pendaftar</p>
                     </td>
