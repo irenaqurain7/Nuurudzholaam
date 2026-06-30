@@ -57,6 +57,7 @@
             overflow-y: auto;
             border-right: 1px solid #E2ECE8;
             z-index: 1000;
+            transition: width 0.3s ease;
         }
 
         .admin-sidebar-header {
@@ -145,6 +146,35 @@
             border-radius: 2px;
         }
 
+        /* ===== SIDEBAR COLLAPSED ===== */
+        .admin-sidebar.collapsed {
+            width: 75px;
+        }
+        .admin-sidebar.collapsed .admin-sidebar-title span {
+            display: none;
+        }
+        .admin-sidebar.collapsed .nav-label {
+            display: none;
+        }
+        .admin-sidebar.collapsed .admin-sidebar-nav a {
+            font-size: 0;
+            justify-content: center;
+            padding: 12px 0;
+            gap: 0;
+        }
+        .admin-sidebar.collapsed .admin-sidebar-nav a i {
+            font-size: 18px;
+            width: 100%;
+        }
+        .admin-sidebar.collapsed .admin-sidebar-header {
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 12px;
+        }
+        .admin-main.expanded {
+            margin-left: 75px;
+        }
+
         /* ===== MAIN CONTENT ===== */
         .admin-main {
             margin-left: 250px;
@@ -153,6 +183,7 @@
             flex-direction: column;
             min-height: 100vh;
             background-color: #F4F7F5;
+            transition: margin-left 0.3s ease;
         }
 
         .admin-topbar {
@@ -599,11 +630,14 @@
 <body>
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
-        <div class="admin-sidebar-header">
+        <div class="admin-sidebar-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 15px;">
             <div class="admin-sidebar-title">
                 <i class="fas fa-building" style="color: var(--emas);"></i>
                 <span style="color: #1C2D25;">Admin</span>
             </div>
+            <button id="sidebarToggleBtn" style="background: none; border: none; cursor: pointer; color: #5A7E6B; font-size: 18px; padding: 4px;">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
         <nav>
             <ul class="admin-sidebar-nav">
@@ -802,6 +836,13 @@
         function confirmLogout() {
             document.getElementById('logout-form').submit();
         }
+
+        document.getElementById('sidebarToggleBtn').addEventListener('click', function() {
+            const sidebar = document.getElementById('adminSidebar');
+            const main = document.querySelector('.admin-main');
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+        });
     </script>
 
     @stack('scripts')
