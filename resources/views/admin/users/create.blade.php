@@ -136,7 +136,9 @@
             <div class="form-grid two-col">
                 <div class="field-group">
                     <label for="class">Kelas</label>
-                    <input type="text" id="class" name="class" value="{{ old('class') }}" placeholder="Contoh: 7A">
+                    <select id="class" name="class" data-old-value="{{ old('class') }}">
+                        <!-- Diisi secara dinamis oleh JavaScript -->
+                    </select>
                     @error('class')<small>{{ $message }}</small>@enderror
                 </div>
             </div>
@@ -553,6 +555,13 @@
 </style>
 
 <script>
+    const classOptions = {
+        'TK': ['TK-A', 'TK-B'],
+        'SD': ['1', '2', '3', '4', '5', '6'],
+        'SMP': ['7', '8', '9'],
+        'SMK': ['10-RPL', '10-TKJ', '11-RPL', '11-TKJ', '12-RPL', '12-TKJ']
+    };
+
     function toggleRoleFields() {
         const role = document.getElementById('role').value;
         const studentFields = document.getElementById('student-fields');
@@ -575,6 +584,30 @@
         } else {
             nisnGroup.style.display = 'flex';
         }
+
+        populateClassOptions(jenjang);
+    }
+
+    function populateClassOptions(jenjang) {
+        const classSelect = document.getElementById('class');
+        const selectedValue = classSelect.getAttribute('data-old-value') || classSelect.value;
+        
+        classSelect.innerHTML = '';
+        
+        if (classOptions[jenjang]) {
+            classOptions[jenjang].forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                if (option === selectedValue) {
+                    optElement.selected = true;
+                }
+                classSelect.appendChild(optElement);
+            });
+        }
+
+        // Remove the data-old-value after first load so subsequent changes don't force select it
+        classSelect.removeAttribute('data-old-value');
     }
 
     document.addEventListener('DOMContentLoaded', () => {

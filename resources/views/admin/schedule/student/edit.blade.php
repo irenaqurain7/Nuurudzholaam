@@ -60,7 +60,9 @@
                         <label for="class" class="form-label">
                             Kelas <span class="required">*</span>
                         </label>
-                        <input type="text" name="class" id="class" class="form-control" placeholder="Contoh: 8A" value="{{ old('class', $schedule->class) }}" required>
+                        <select name="class" id="class" class="form-control" data-old-value="{{ old('class', $schedule->class) }}" required>
+                            <!-- Diisi secara dinamis oleh JavaScript -->
+                        </select>
                         @error('class')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -335,11 +337,45 @@
 }
 
 @media (max-width: 768px) {
-    .admin-page { padding: 1rem; }
-    .page-header { flex-direction: column; gap: 1rem; padding: 1.5rem; }
-    .btn-back { width: 100%; justify-content: center; }
-    .form-container { padding: 1.5rem; }
-    .form-row { grid-template-columns: 1fr; gap: 1rem; }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const classOptions = {
+        'TK': ['TK-A', 'TK-B'],
+        'SD': ['1', '2', '3', '4', '5', '6'],
+        'SMP': ['7', '8', '9'],
+        'SMK': ['10-RPL', '10-TKJ', '11-RPL', '11-TKJ', '12-RPL', '12-TKJ']
+    };
+
+    const educationLevelSelect = document.getElementById('education_level');
+    const classSelect = document.getElementById('class');
+
+    function populateClassOptions() {
+        const selectedLevel = educationLevelSelect.value;
+        const selectedValue = classSelect.getAttribute('data-old-value') || classSelect.value;
+        
+        classSelect.innerHTML = '';
+        
+        if (classOptions[selectedLevel]) {
+            classOptions[selectedLevel].forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                if (option === selectedValue) {
+                    optElement.selected = true;
+                }
+                classSelect.appendChild(optElement);
+            });
+        }
+        classSelect.removeAttribute('data-old-value');
+    }
+
+    educationLevelSelect.addEventListener('change', populateClassOptions);
+    
+    // Initial load
+    populateClassOptions();
+});
+</script>
 @endsection
