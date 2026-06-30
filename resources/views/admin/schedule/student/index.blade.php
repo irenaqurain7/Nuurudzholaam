@@ -25,6 +25,31 @@
             'Saturday' => 'Sabtu'
         ];
         
+        $statsGroupedByJenjang = [
+            'TK' => collect(),
+            'SD' => collect(),
+            'SMP' => collect(),
+            'SMK' => collect(),
+        ];
+        
+        foreach ($allSchedules as $schedule) {
+            $c = $schedule->class;
+            $num = intval($c);
+            if (stripos($c, 'tk') !== false) {
+                $j = 'TK';
+            } elseif ($num >= 1 && $num <= 6) {
+                $j = 'SD';
+            } elseif ($num >= 7 && $num <= 9) {
+                $j = 'SMP';
+            } elseif ($num >= 10) {
+                $j = 'SMK';
+            } else {
+                $j = 'Lainnya';
+                if (!isset($statsGroupedByJenjang[$j])) $statsGroupedByJenjang[$j] = collect();
+            }
+            $statsGroupedByJenjang[$j]->push($schedule);
+        }
+
         $groupedByJenjang = [
             'TK' => collect(),
             'SD' => collect(),
@@ -57,7 +82,7 @@
                 <i class="fas fa-calendar-check"></i>
             </div>
             <div class="stat-content">
-                <h3>{{ $schedules->count() }}</h3>
+                <h3>{{ $allSchedules->count() }}</h3>
                 <p>Semua Jadwal</p>
             </div>
         </div>
@@ -66,7 +91,7 @@
                 <i class="fas fa-child"></i>
             </div>
             <div class="stat-content">
-                <h3>{{ $groupedByJenjang['TK']->count() }}</h3>
+                <h3>{{ $statsGroupedByJenjang['TK']->count() }}</h3>
                 <p>Jadwal TK</p>
             </div>
         </div>
@@ -75,7 +100,7 @@
                 <i class="fas fa-school"></i>
             </div>
             <div class="stat-content">
-                <h3>{{ $groupedByJenjang['SD']->count() }}</h3>
+                <h3>{{ $statsGroupedByJenjang['SD']->count() }}</h3>
                 <p>Jadwal SD</p>
             </div>
         </div>
@@ -84,7 +109,7 @@
                 <i class="fas fa-building"></i>
             </div>
             <div class="stat-content">
-                <h3>{{ $groupedByJenjang['SMP']->count() }}</h3>
+                <h3>{{ $statsGroupedByJenjang['SMP']->count() }}</h3>
                 <p>Jadwal SMP</p>
             </div>
         </div>
@@ -93,7 +118,7 @@
                 <i class="fas fa-graduation-cap"></i>
             </div>
             <div class="stat-content">
-                <h3>{{ $groupedByJenjang['SMK']->count() }}</h3>
+                <h3>{{ $statsGroupedByJenjang['SMK']->count() }}</h3>
                 <p>Jadwal SMK</p>
             </div>
         </div>
@@ -108,7 +133,7 @@
             <select id="classFilter" class="filter-select">
                 <option value="">Semua Kelas</option>
                 @php
-                    $uniqueClasses = $schedules->pluck('class')->unique()->sort();
+                    $uniqueClasses = $allSchedules->pluck('class')->unique()->sort();
                 @endphp
                 @foreach($uniqueClasses as $class)
                     <option value="{{ $class }}">{{ $class }}</option>
@@ -196,6 +221,13 @@
                         @endforeach
                     </div>
                 @endforeach
+            </div>
+        @endif
+
+        <!-- Pagination -->
+        @if($schedules->hasPages())
+            <div class="pagination-wrapper" style="display: flex; justify-content: center; margin-top: 20px;">
+                {{ $schedules->links('partials.pagination') }}
             </div>
         @endif
     </div>

@@ -144,7 +144,7 @@
 
     <!-- Pagination -->
     <div class="pagination-wrapper">
-        {{ $registrations->links() }}
+        {{ $registrations->links('partials.pagination') }}
     </div>
 </div>
 

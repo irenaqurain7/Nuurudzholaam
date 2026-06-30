@@ -183,7 +183,7 @@
             </div>
 
             <div class="pagination-wrap">
-                {{ $users->links() }}
+                {{ $users->links('partials.pagination') }}
             </div>
         @else
             <div class="empty-state">

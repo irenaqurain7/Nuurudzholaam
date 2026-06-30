@@ -865,9 +865,10 @@ class AdminController extends Controller
     // STUDENT SCHEDULES (SD-friendly: activities list per class & day)
     public function scheduleStudentIndex()
     {
-        $schedules = \App\Models\Schedule::with('teacher.user')->orderBy('class')->orderBy('day')->orderBy('start_time')->get();
+        $allSchedules = \App\Models\Schedule::with('teacher.user')->orderBy('class')->orderBy('day')->orderBy('start_time')->get();
+        $schedules = \App\Models\Schedule::with('teacher.user')->orderBy('class')->orderBy('day')->orderBy('start_time')->paginate(15);
 
-        return view('admin.schedule.student.index', compact('schedules'));
+        return view('admin.schedule.student.index', compact('schedules', 'allSchedules'));
     }
 
     public function scheduleStudentCreate()

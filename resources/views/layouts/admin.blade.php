@@ -529,6 +529,71 @@
                 font-size: 12px;
             }
         }
+
+        /* ===== CUSTOM PAGINATION ===== */
+        .custom-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .custom-pagination .page-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--hijau-islam);
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .custom-pagination .page-link:hover:not(.disabled):not(.active) {
+            background-color: var(--border-color);
+            color: var(--text-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .custom-pagination .page-link.active {
+            background-color: var(--hijau-islam);
+            border-color: var(--hijau-islam);
+            color: #ffffff;
+            cursor: default;
+            box-shadow: 0 4px 10px rgba(45, 68, 56, 0.15);
+        }
+
+        .custom-pagination .page-link.disabled {
+            color: var(--text-muted);
+            background-color: #f8faf9;
+            border-color: var(--border-color);
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .custom-pagination .page-numbers {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (max-width: 640px) {
+            .custom-pagination .page-numbers {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
