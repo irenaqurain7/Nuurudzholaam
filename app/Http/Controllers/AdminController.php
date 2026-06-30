@@ -25,13 +25,100 @@ class AdminController extends Controller
     // DASHBOARD
     public function dashboard()
     {
-        $totalPPDB = PPDBRegistration::count();
-        $ppdbBaru = PPDBRegistration::where('status', 'pending')->count();
-        $totalKegiatan = Activity::count();
-        $totalProgram = Program::count();
-        $latestPPDB = PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(10)->get();
+        $totalUsers = \App\Models\User::count();
+        $totalSiswa = \App\Models\User::where('role', 'siswa')->count();
+        $totalGuru = \App\Models\User::where('role', 'guru')->count();
+        $totalPPDB = \App\Models\PPDBRegistration::count();
 
-        return view('admin.dashboard', compact('totalPPDB', 'ppdbBaru', 'totalKegiatan', 'totalProgram', 'latestPPDB'));
+        // PPDB registrations by level (case-insensitive check)
+        $ppdbTK = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['tk'])->count();
+        $ppdbSD = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['sd'])->count();
+        $ppdbSMP = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['smp'])->count();
+        $ppdbSMK = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['smk'])->count();
+
+        // PPDB progress statistics
+        $ppdbPending = \App\Models\PPDBRegistration::where('status', 'pending')->count();
+        $ppdbApproved = \App\Models\PPDBRegistration::where('status', 'approved')->count();
+        $ppdbRejected = \App\Models\PPDBRegistration::where('status', 'rejected')->count();
+
+        // Latest registrations (max 5)
+        $latestRegistrations = \App\Models\PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(5)->get();
+
+        // Latest announcements (max 3)
+        $latestAnnouncements = \App\Models\Announcement::orderBy('created_at', 'desc')->limit(3)->get();
+
+        // Today's schedule summary
+        $todayEnglish = \Carbon\Carbon::now()->format('l');
+        $dayMap = [
+            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
+        ];
+        $todayIndonesian = $dayMap[$todayEnglish] ?? $todayEnglish;
+
+        $todayTeacherSchedule = \App\Models\Schedule::whereIn('day', [$todayEnglish, $todayIndonesian])->count();
+        
+        $todayStudentSchedule = 0;
+        $studentSchedulesToday = \App\Models\StudentSchedule::whereIn('day', [$todayEnglish, $todayIndonesian])->get();
+        if ($studentSchedulesToday->isNotEmpty()) {
+            foreach ($studentSchedulesToday as $ss) {
+                if (is_array($ss->activities)) {
+                    $todayStudentSchedule += count($ss->activities);
+                } else {
+                    $todayStudentSchedule++;
+                }
+            }
+        } else {
+            $todayStudentSchedule = \App\Models\Schedule::whereNotNull('class')->whereIn('day', [$todayEnglish, $todayIndonesian])->count();
+        }
+
+        // Recent Activities feed
+        $recentActivities = collect();
+
+        // 1. Fetch recent users
+        $recentUsers = \App\Models\User::orderBy('created_at', 'desc')->limit(5)->get();
+        foreach ($recentUsers as $u) {
+            $roleName = $u->role === 'guru' ? 'Guru' : ($u->role === 'siswa' ? 'Siswa' : 'User');
+            $recentActivities->push([
+                'time' => $u->created_at ?: now(),
+                'icon' => 'fas fa-user-plus',
+                'color' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'message' => "{$roleName} baru ditambahkan: <strong>{$u->name}</strong>"
+            ]);
+        }
+
+        // 2. Fetch recent announcements
+        $recentAnnouncements = \App\Models\Announcement::orderBy('created_at', 'desc')->limit(5)->get();
+        foreach ($recentAnnouncements as $a) {
+            $recentActivities->push([
+                'time' => $a->created_at ?: now(),
+                'icon' => 'fas fa-bullhorn',
+                'color' => 'bg-blue-100 text-blue-800 border-blue-200',
+                'message' => "Pengumuman baru diterbitkan: <strong>{$a->judul}</strong>"
+            ]);
+        }
+
+        // 3. Fetch recent PPDB registrations
+        $recentPPDB = \App\Models\PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(5)->get();
+        foreach ($recentPPDB as $p) {
+            $recentActivities->push([
+                'time' => $p->tgl_daftar ?: $p->created_at ?: now(),
+                'icon' => 'fas fa-file-signature',
+                'color' => 'bg-amber-100 text-amber-800 border-amber-200',
+                'message' => "Pendaftar PPDB baru masuk: <strong>{$p->nama_lengkap}</strong> (" . strtoupper($p->jenjang) . ")"
+            ]);
+        }
+
+        // Sort all activities by time descending and take 5
+        $recentActivities = $recentActivities->sortByDesc('time')->take(5);
+
+        return view('admin.dashboard', compact(
+            'totalUsers', 'totalSiswa', 'totalGuru', 'totalPPDB',
+            'ppdbTK', 'ppdbSD', 'ppdbSMP', 'ppdbSMK',
+            'ppdbPending', 'ppdbApproved', 'ppdbRejected',
+            'latestRegistrations', 'latestAnnouncements',
+            'todayTeacherSchedule', 'todayStudentSchedule',
+            'recentActivities'
+        ));
     }
 
     // PPDB REGISTRATIONS
