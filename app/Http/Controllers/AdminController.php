@@ -434,9 +434,41 @@ class AdminController extends Controller
     }
 
     // USER MANAGEMENT
-    public function usersIndex()
+    public function usersIndex(Request $request)
     {
-        $users = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(15);
+        $query = User::with(['student', 'teacher'])->where('role', '!=', 'admin');
+
+        // Search logic
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('student', function ($sq) use ($search) {
+                      $sq->where('nisn', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('teacher', function ($tq) use ($search) {
+                      $tq->where('nip', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Role filter
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // Jenjang filter (only applies to siswa)
+        if ($request->filled('jenjang')) {
+            $jenjang = $request->jenjang;
+            $query->whereHas('student', function ($q) use ($jenjang) {
+                $q->where('jenjang', $jenjang);
+            });
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+
+        // Global stats (unfiltered)
         $totalSiswa = User::where('role', 'siswa')->count();
         $totalGuru = User::where('role', 'guru')->count();
         $totalOrangtua = User::where('role', 'orangtua')->count();
@@ -456,7 +488,12 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
             'role' => 'required|in:siswa,guru',
-            'nisn' => 'required_if:role,siswa|nullable|unique:users',
+            'jenjang' => 'required_if:role,siswa|in:TK,SD,SMP,SMK|nullable',
+            'nisn' => [
+                Rule::requiredIf(fn () => $request->role == 'siswa' && $request->jenjang != 'TK'),
+                'nullable',
+                'unique:users'
+            ],
             'class' => 'required_if:role,siswa|nullable|string',
             'nip' => 'required_if:role,guru|nullable|unique:users',
             'specialization' => 'required_if:role,guru|nullable|string',
@@ -480,6 +517,7 @@ class AdminController extends Controller
         if ($user->role === 'siswa') {
             Student::create([
                 'user_id' => $user->id,
+                'jenjang' => $validated['jenjang'] ?? 'SD',
                 'nisn' => $validated['nisn'],
                 'class' => $validated['class'],
             ]);
@@ -515,7 +553,12 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'role' => 'required|in:siswa,guru',
-            'nisn' => 'required_if:role,siswa|nullable|unique:users,nisn,' . $user->id,
+            'jenjang' => 'required_if:role,siswa|in:TK,SD,SMP,SMK|nullable',
+            'nisn' => [
+                Rule::requiredIf(fn () => $request->role == 'siswa' && $request->jenjang != 'TK'),
+                'nullable',
+                'unique:users,nisn,' . $user->id
+            ],
             'class' => 'required_if:role,siswa|nullable|string',
             'nip' => 'required_if:role,guru|nullable|unique:users,nip,' . $user->id,
             'specialization' => 'required_if:role,guru|nullable|string',
@@ -543,12 +586,14 @@ class AdminController extends Controller
 
             if ($user->student) {
                 $user->student->update([
+                    'jenjang' => $validated['jenjang'] ?? 'SD',
                     'nisn' => $validated['nisn'],
                     'class' => $validated['class'],
                 ]);
             } else {
                 Student::create([
                     'user_id' => $user->id,
+                    'jenjang' => $validated['jenjang'] ?? 'SD',
                     'nisn' => $validated['nisn'],
                     'class' => $validated['class'],
                 ]);

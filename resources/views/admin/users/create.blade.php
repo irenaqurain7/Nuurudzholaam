@@ -115,12 +115,25 @@
             </div>
 
             <div class="form-grid two-col">
-                <div class="field-group">
+                <div class="field-group" id="jenjang-field-group">
+                    <label for="jenjang">Jenjang</label>
+                    <select id="jenjang" name="jenjang" onchange="toggleJenjangFields()">
+                        <option value="TK" {{ old('jenjang') == 'TK' ? 'selected' : '' }}>TK</option>
+                        <option value="SD" {{ old('jenjang') == 'SD' || !old('jenjang') ? 'selected' : '' }}>SD</option>
+                        <option value="SMP" {{ old('jenjang') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                        <option value="SMK" {{ old('jenjang') == 'SMK' ? 'selected' : '' }}>SMK</option>
+                    </select>
+                    @error('jenjang')<small>{{ $message }}</small>@enderror
+                </div>
+
+                <div class="field-group" id="nisn-field-group">
                     <label for="nisn">NISN</label>
                     <input type="text" id="nisn" name="nisn" value="{{ old('nisn') }}" placeholder="Nomor induk siswa">
                     @error('nisn')<small>{{ $message }}</small>@enderror
                 </div>
+            </div>
 
+            <div class="form-grid two-col">
                 <div class="field-group">
                     <label for="class">Kelas</label>
                     <input type="text" id="class" name="class" value="{{ old('class') }}" placeholder="Contoh: 7A">
@@ -547,8 +560,25 @@
 
         studentFields.style.display = role === 'siswa' ? 'block' : 'none';
         teacherFields.style.display = role === 'guru' ? 'block' : 'none';
+
+        if (role === 'siswa') {
+            toggleJenjangFields();
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', toggleRoleFields);
+    function toggleJenjangFields() {
+        const jenjang = document.getElementById('jenjang').value;
+        const nisnGroup = document.getElementById('nisn-field-group');
+        
+        if (jenjang === 'TK') {
+            nisnGroup.style.display = 'none';
+        } else {
+            nisnGroup.style.display = 'flex';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        toggleRoleFields();
+    });
 </script>
 @endsection
