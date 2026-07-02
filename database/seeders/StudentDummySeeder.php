@@ -176,7 +176,7 @@ class StudentDummySeeder extends Seeder
         $existingStudentUsers = User::where('role', 'siswa')->get();
 
         foreach ($existingStudentUsers as $studentUser) {
-            $class = (string) ($studentUser->class ?: '10A');
+            $class = (string) ($studentUser->class ?: '10');
             $baseNisn = preg_replace('/\D+/', '', (string) $studentUser->nisn);
             if (!$baseNisn) {
                 $baseNisn = str_pad((string) (9000000000000 + (int) $studentUser->id), 13, '0', STR_PAD_LEFT);

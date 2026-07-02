@@ -12,9 +12,6 @@ class StudentScheduleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Kelas 2
-        $class = '2';
-
         $data = [
             'Monday' => [
                 'Sholat Dhuha',
@@ -51,13 +48,17 @@ class StudentScheduleSeeder extends Seeder
             ],
         ];
 
-        foreach ($data as $day => $activities) {
-            StudentSchedule::updateOrCreate([
-                'class' => $class,
-                'day' => $day,
-            ], [
-                'activities' => $activities,
-            ]);
+        $targetClasses = ['2', '10'];
+
+        foreach ($targetClasses as $class) {
+            foreach ($data as $day => $activities) {
+                StudentSchedule::updateOrCreate([
+                    'class' => $class,
+                    'day' => $day,
+                ], [
+                    'activities' => $activities,
+                ]);
+            }
         }
     }
 }
