@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Student;
+use App\Models\Grade;
+use App\Models\Teacher;
 use App\Models\Announcement;
 use App\Models\Activity;
 use App\Models\SchoolInfo;
@@ -72,6 +74,30 @@ class StudentDashboardController extends Controller
         $user = Auth::user();
         $student = Student::where('user_id', $user->id)->firstOrFail();
         $grades = $student->grades()->with('teacher.user')->get();
+
+        // Demo fallback: auto-create a few grades in local env so UI is never empty.
+        if ($grades->isEmpty() && app()->environment('local')) {
+            $teacher = Teacher::query()->first();
+            if ($teacher) {
+                $subjects = ['Matematika', 'Bahasa Indonesia', 'IPA'];
+
+                foreach ($subjects as $index => $subject) {
+                    Grade::updateOrCreate(
+                        [
+                            'student_id' => $student->id,
+                            'teacher_id' => $teacher->id,
+                            'subject' => $subject,
+                        ],
+                        [
+                            'grade' => 75 + ($index * 5),
+                            'notes' => 'Nilai dummy otomatis untuk tampilan demo',
+                        ]
+                    );
+                }
+
+                $grades = $student->grades()->with('teacher.user')->get();
+            }
+        }
 
         return view('student.grades', [
             'grades' => $grades,

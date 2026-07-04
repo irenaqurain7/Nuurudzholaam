@@ -72,7 +72,30 @@
                         <div class="form-row-3 mb-3">
                             <div class="form-group">
                                 <label class="form-label">Kelas <span class="required">*</span></label>
-                                <input name="class" class="form-control" placeholder="Contoh: 10A" required>
+                                <select name="class" class="form-control" required>
+                                    @if($educationLevel === 'TK')
+                                        <option value="TK-A">TK-A</option>
+                                        <option value="TK-B">TK-B</option>
+                                    @elseif($educationLevel === 'SD')
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                    @elseif($educationLevel === 'SMP')
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    @elseif($educationLevel === 'SMK')
+                                        <option value="10-RPL">10-RPL</option>
+                                        <option value="10-TKJ">10-TKJ</option>
+                                        <option value="11-RPL">11-RPL</option>
+                                        <option value="11-TKJ">11-TKJ</option>
+                                        <option value="12-RPL">12-RPL</option>
+                                        <option value="12-TKJ">12-TKJ</option>
+                                    @endif
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Mata Pelajaran <span class="required">*</span></label>

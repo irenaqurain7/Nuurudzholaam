@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sekolah Islam Nuurudzholaam</title>
+    <title>Login - Sekolah Nuurudzholaam</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -339,7 +339,7 @@
                 <a href="{{ route('home') }}">
                     <img src="{{ asset('images/logo-nuzo.png') }}" alt="Logo">
                 </a>
-                <span class="logo-text">SEKOLAH ISLAM<br>NUURUDZHOLAAM</span>
+                <span class="logo-text">SEKOLAH<br>NUURUDZHOLAAM</span>
             </div>
 
             <div class="illustration">

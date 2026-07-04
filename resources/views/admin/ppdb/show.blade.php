@@ -19,8 +19,35 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Jenjang</h4>
+                <p style="color: var(--text-light); margin: 0; font-size: 16px;">
+                    <span class="badge" style="background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;">
+                        {{ strtoupper($registration->jenjang) }}
+                    </span>
+                </p>
+            </div>
+            <div>
                 <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Email</h4>
                 <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->email }}</p>
+            </div>
+            <div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">NISN</h4>
+                <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->nisn ?: '-' }}</p>
+            </div>
+            <div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">NIK</h4>
+                <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->nik ?: '-' }}</p>
+            </div>
+            <div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Tempat, Tanggal Lahir</h4>
+                <p style="color: var(--text-light); margin: 0; font-size: 16px;">
+                    {{ $registration->tempat_lahir ? $registration->tempat_lahir . ', ' : '' }}
+                    {{ $registration->tanggal_lahir->format('d M Y') }}
+                </p>
+            </div>
+            <div>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Jenis Kelamin</h4>
+                <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ ucfirst($registration->jenis_kelamin) }}</p>
             </div>
             <div>
                 <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Nomor Telepon</h4>
@@ -31,12 +58,16 @@
                 <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->asal_sekolah }}</p>
             </div>
             <div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Tanggal Lahir</h4>
-                <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->tanggal_lahir->format('d M Y') }}</p>
-            </div>
-            <div>
-                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Program Pilihan</h4>
-                <p style="color: var(--text-light); margin: 0; font-size: 16px; text-transform: uppercase;">{{ $registration->program }}</p>
+                <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Program / Jurusan</h4>
+                <p style="color: var(--text-light); margin: 0; font-size: 16px;">
+                    @if($registration->jenjang == 'smk' && $registration->jurusan)
+                        <span style="background: rgba(31, 127, 95, 0.1); color: var(--hijau-islam); padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;">{{ $registration->jurusan }}</span>
+                    @elseif($registration->program)
+                        <span style="background: rgba(31, 127, 95, 0.1); color: var(--hijau-islam); padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;">{{ ucfirst($registration->program) }}</span>
+                    @else
+                        -
+                    @endif
+                </p>
             </div>
             <div>
                 <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Tanggal Daftar</h4>
@@ -48,8 +79,16 @@
             <h3 style="color: var(--hijau-islam); margin-bottom: 15px; font-size: 16px;">Data Orang Tua/Wali</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div>
-                    <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Nama Orang Tua</h4>
-                    <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->nama_ortu }}</p>
+                    <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Nama Ayah</h4>
+                    <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->nama_ayah ?: '-' }}</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Nama Ibu</h4>
+                    <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->nama_ibu ?: '-' }}</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">Nama Orang Tua (Gabungan)</h4>
+                    <p style="color: var(--text-light); margin: 0; font-size: 16px;">{{ $registration->nama_ortu ?: '-' }}</p>
                 </div>
                 <div>
                     <h4 style="color: var(--hijau-islam); margin-bottom: 8px; font-size: 14px; font-weight: 600; text-transform: uppercase;">No Telepon Orang Tua</h4>

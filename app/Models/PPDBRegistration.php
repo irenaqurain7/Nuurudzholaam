@@ -12,14 +12,22 @@ class PPDBRegistration extends Model
     protected $table = 'ppdb_registrations';
     
     protected $fillable = [
+        'jenjang',
         'nama_lengkap',
+        'nisn',
+        'nik',
+        'tempat_lahir',
+        'jenis_kelamin',
         'email',
         'no_telepon',
         'asal_sekolah',
+        'nama_ayah',
+        'nama_ibu',
         'nama_ortu',
         'no_ortu',
         'tanggal_lahir',
         'program',
+        'jurusan',
         'alamat',
         'file_ijazah',
         'file_ktp',

@@ -1,429 +1,577 @@
-@extends('teacher.layout')
+﻿@extends('teacher.layout')
 
 @section('teacher-content')
 <style>
     :root {
-        --primary: #2d5016;
-        --text-primary: #1a1a1a;
-        --text-secondary: #666;
-        --text-muted: #999;
-        --border: #e5e5e5;
-        --bg-light: #f9f9f9;
+        --primary: #2F4F3E;
+        --secondary: #456652;
+        --bg: #F5F7F6;
+        --card: #FFFFFF;
+        --border: #E5ECE7;
+        --text: #1C2D25;
+        --muted: #667A70;
+        --shadow: 0 12px 30px rgba(31,45,37,0.06);
+    }
+
+    .schedule-page {
+        background: var(--bg);
+        min-height: 100%;
+        padding-bottom: 2rem;
     }
 
     .page-header {
-        margin-bottom: 2rem;
+        margin-bottom: 1.75rem;
     }
 
     .page-header h1 {
-        font-size: 1.75rem;
-        font-weight: 600;
-        color: var(--text-primary);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
         margin: 0;
     }
 
     .page-header p {
-        color: var(--text-secondary);
+        color: var(--muted);
         margin: 0.5rem 0 0 0;
+        font-size: 0.95rem;
+        max-width: 760px;
+    }
+
+    .filter-row .form-select,
+    .filter-row .btn,
+    .filter-row .form-control {
+        min-height: 46px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
         font-size: 0.95rem;
     }
 
-    .section {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+    .filter-row .btn-primary {
+        background: var(--primary);
+        border-color: var(--primary);
     }
 
-    /* Custom Clean Table */
-    .custom-table-container {
-        width: 100%;
+    .filter-row .btn-outline-secondary {
+        border-color: var(--border);
+        color: var(--text);
+        background: #fff;
+    }
+
+    .schedule-panel,
+    .right-panel-card,
+    .summary-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+    }
+
+    .schedule-panel {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--text);
+    }
+
+    .section-note {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text);
+        background: rgba(47,79,62,0.08);
+        border-radius: 999px;
+        padding: 0.55rem 0.85rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .calendar-board {
         overflow-x: auto;
     }
 
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
+    .calendar-grid {
+        min-width: 1000px;
+        display: grid;
+        grid-template-columns: 90px repeat(6, minmax(180px, 1fr));
+        gap: 1px;
+        background: var(--border);
+        border-radius: 18px;
+        overflow: hidden;
     }
 
-    .custom-table th {
-        background-color: var(--bg-light);
-        color: var(--text-secondary);
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 1rem 1.25rem;
-        border-bottom: 2px solid var(--border);
+    .calendar-header,
+    .calendar-cell,
+    .time-label {
+        background: var(--card);
+        color: var(--text);
     }
 
-    .custom-table td {
-        padding: 1.25rem;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-primary);
-        font-size: 0.95rem;
-        vertical-align: middle;
-    }
-
-    .custom-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .custom-table tbody tr:hover {
-        background-color: rgba(45, 80, 22, 0.01);
-    }
-
-    /* Clean Day Badge */
-    .day-badge {
-        background-color: rgba(45, 80, 22, 0.08);
-        color: var(--primary);
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .badge-senin { background: #e6f4ea; color: #2d7a3f; }
-    .badge-selasa { background: #e8f0ff; color: #2b63d6; }
-    .badge-rabu { background: #fff9e6; color: #c68f00; }
-    .badge-kamis { background: #f3e9ff; color: #7b4db3; }
-    .badge-jumat { background: #ffecec; color: #c0392b; }
-
-    /* Elegant Empty State */
-    .empty-state {
+    .calendar-header {
+        padding: 1rem 0.75rem;
+        font-weight: 700;
         text-align: center;
-        padding: 4rem 2rem;
+        color: var(--primary);
+        background: #F2F7F1;
     }
 
-    .empty-state-icon {
-        background-color: var(--bg-light);
-        color: var(--text-muted);
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
+    .time-label {
+        padding: 1rem 0.75rem;
+        font-size: 0.85rem;
+        color: var(--muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2rem;
+        min-height: 100px;
+    }
+
+    .calendar-cell {
+        min-height: 100px;
+        padding: 0.85rem;
+        background: #fff;
+    }
+
+    .calendar-cell.empty {
+        background: #F8FAF8;
+    }
+
+    .lesson-card {
+        background: var(--card);
         border: 1px solid var(--border);
-    }
-
-    .empty-state h3 {
-        font-size: 1.15rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0 0 0.5rem 0;
-    }
-
-    .empty-state p {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        margin: 0;
-    }
-
-    .time-text {
-        font-weight: 500;
-        color: var(--text-primary);
-    }
-
-    .room-text {
-        color: var(--text-secondary);
-    }
-
-    /* Planner Cards */
-    .planner-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    @media (max-width: 768px) {
-        .planner-grid { grid-template-columns: 1fr; }
-    }
-
-    .planner-card {
-        background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,250,0.95));
+        border-left-width: 4px;
         border-radius: 16px;
-        padding: 0.8rem;
-        box-shadow: 0 6px 18px rgba(45,80,22,0.06);
-        border: 1px solid rgba(45,80,22,0.06);
-        transition: transform 150ms ease, box-shadow 150ms ease;
-        min-height: 120px;
+        padding: 1rem;
+        box-shadow: 0 12px 24px rgba(31,45,37,0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+    }
+
+    .lesson-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 32px rgba(31,45,37,0.1);
+    }
+
+    .lesson-card .lesson-subj {
+        font-size: 0.98rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+
+    .lesson-card .lesson-meta {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .lesson-card .lesson-tags {
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 0.75rem;
     }
 
-    .planner-card:hover { transform: translateY(-4px); box-shadow: 0 12px 26px rgba(45,80,22,0.08); }
-
-    .planner-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
-    .planner-day { font-weight:700; color:var(--primary); font-size:1.05rem; }
-    .planner-count { background: rgba(45,80,22,0.08); color:var(--primary); padding:4px 8px; border-radius:12px; font-size:0.9rem; font-weight:600; }
-
-    .planner-card-body { flex:1; overflow:auto; }
-    .no-lessons { color:var(--text-secondary); padding:0.8rem; text-align:center; }
-
-    .lesson-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.5rem; }
-    .lesson-item { display:flex; gap:0.75rem; align-items:center; padding:0.45rem; border-radius:10px; transition:background 120ms ease; }
-    .lesson-item:hover { background: rgba(45,80,22,0.03); }
-    .lesson-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:rgba(45,80,22,0.06); color:var(--primary); padding:8px; border-radius:8px; font-size:14px; }
-    .lesson-meta { display:flex; flex-direction:column; }
-    .lesson-title { font-weight:700; color:var(--text-primary); font-size:0.95rem; }
-    .lesson-time { font-size:0.82rem; color:var(--text-secondary); }
-
-    /* Quick-select buttons */
-    .qs-btn {
-        display:inline-block;
-        padding:6px 10px;
-        font-size:0.85rem;
-        background: #eef6ee;
+    .lesson-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.35rem 0.75rem;
+        background: rgba(47,79,62,0.08);
         color: var(--primary);
-        border-radius: 10px;
-        border: 1px solid rgba(45,80,22,0.06);
-        text-decoration: none;
-        font-weight:600;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
     }
-    .qs-btn:hover { background:#e2efe2; }
+
+    .lesson-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .lesson-actions .btn {
+        flex: 1 1 100px;
+        min-width: 100px;
+        font-size: 0.78rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: 10px;
+    }
+
+    .lesson-actions .btn-outline-primary {
+        background: #fff;
+        color: var(--primary);
+        border-color: rgba(47,79,62,0.16);
+    }
+
+    .lesson-actions .btn-primary {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .summary-card {
+        padding: 1.3rem;
+    }
+
+    .summary-card .label {
+        color: var(--muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+        display: inline-block;
+    }
+
+    .summary-card .value {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.1;
+    }
+
+    .right-panel-card {
+        padding: 1.4rem;
+    }
+
+    .right-panel-card h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.85rem;
+        color: var(--text);
+    }
+
+    .right-panel-card p,
+    .right-panel-card li {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .right-panel-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .right-panel-list li {
+        background: #F8FAF8;
+        border: 1px solid #E5ECE7;
+        border-radius: 14px;
+        padding: 0.95rem 1rem;
+    }
+
+    .right-panel-item-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.55rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .right-panel-item-sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 1199px) {
+        .calendar-grid { min-width: 820px; }
+    }
+
+    @media (max-width: 991px) {
+        .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 767px) {
+        .filter-row .col-12 { margin-bottom: 0.5rem; }
+        .calendar-grid { min-width: 100%; grid-template-columns: 70px repeat(6, minmax(140px, 1fr)); }
+        .calendar-header { font-size: 0.9rem; }
+        .time-label { font-size: 0.8rem; min-height: 80px; }
+        .lesson-card { margin-bottom: 0.65rem; }
+        .right-panel-list li { padding: 0.85rem; }
+    }
 </style>
 
-<div class="page-header">
-    <h1>Jadwal Mengajar</h1>
-    <p>Daftar agenda dan waktu mengajar Anda di sekolah</p>
-</div>
-<div class="section" style="padding: 1.25rem;">
-    {{-- Toolbar removed as per request: simplified view without tingkat/kelas filters and import controls --}}
+@php
+    use Carbon\Carbon;
 
-    {{-- Weekly schedule table grouped by day --}}
-    @php
-        $allSchedules = collect($schedules ?? []);
-        $daysOrderFull = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
-        $grouped = $allSchedules->groupBy(function($s){ return trim((string)($s->day ?? '')); });
-    @endphp
-    <div class="section" style="margin-top:1rem;">
-        <div style="font-weight:700; margin-bottom:0.75rem;">Tabel Jadwal Mengajar (Kelompok per Hari)</div>
-        @if($allSchedules->isEmpty())
-            <div class="empty-state">
-                <div class="empty-state-icon"><i class="fas fa-calendar-alt"></i></div>
-                <h3>Tidak ada jadwal</h3>
-                <p>Belum ada data jadwal yang tersedia.</p>
-            </div>
-        @else
-            <div class="custom-table-container">
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th style="width:120px">Hari</th>
-                            <th style="width:160px">Waktu</th>
-                            <th style="width:220px">Mata Pelajaran</th>
-                            <th style="width:120px">Tingkat</th>
-                            <th style="width:120px">Kelas</th>
-                            <th>Ruangan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($daysOrderFull as $day)
-                            @if(isset($grouped[$day]) && $grouped[$day]->isNotEmpty())
-                                @foreach($grouped[$day] as $item)
-                                    @php
-                                        $start = trim((string)($item->start_time ?? ''));
-                                        $end = trim((string)($item->end_time ?? ''));
-                                        $timeText = '-';
-                                        try { if ($start) $timeText = \Carbon\Carbon::createFromFormat('H:i:s', $start)->format('H:i'); } catch(\Exception $e) { $timeText = $start ?: '-'; }
-                                        try { if ($end) $timeText .= $timeText && $end ? ' - '.\Carbon\Carbon::createFromFormat('H:i:s', $end)->format('H:i') : $end; } catch(\Exception $e) { $timeText .= $end ? ' - '.$end : ''; }
-                                        $student = $item->student ?? null;
-                                        $kelas = $student->class ?? ($item->class ?? '-');
-                                        $tingkat = $item->tingkat ?? ($student->tingkat ?? '-');
-                                        $subject = trim((string)($item->subject ?? '-')) ?: '-';
-                                    @endphp
-                                    <tr>
-                                        <td><span class="day-badge">{{ $day }}</span></td>
-                                        <td class="time-text">{{ $timeText }}</td>
-                                        <td>{{ $subject }}</td>
-                                        <td>{{ $tingkat }}</td>
-                                        <td>{{ $kelas }}</td>
-                                        <td class="room-text">{{ $item->room ?? '-' }}</td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
+    $schedulesCollection = collect($schedules ?? []);
+    $dayOrder = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    $hours = collect(range(7,16))->map(fn($h) => str_pad($h, 2, '0', STR_PAD_LEFT).':00')->all();
+
+    function normalizeDay($value) {
+        $value = strtolower(trim((string)$value));
+        if ($value === 'jumat' || strpos($value, "jum'at") !== false) return 'Jumat';
+        if (strpos($value, 'senin') !== false) return 'Senin';
+        if (strpos($value, 'selasa') !== false) return 'Selasa';
+        if (strpos($value, 'rabu') !== false) return 'Rabu';
+        if (strpos($value, 'kamis') !== false) return 'Kamis';
+        if (strpos($value, 'sabtu') !== false) return 'Sabtu';
+        return '';
+    }
+
+    function formatHour($time) {
+        $time = trim((string)$time);
+        if (!$time) return '';
+        try {
+            return Carbon::createFromFormat('H:i:s', $time)->format('H:i');
+        } catch (Exception $e) {
+            try { return Carbon::createFromFormat('H:i', $time)->format('H:i'); } catch (Exception $e) { return substr($time,0,5); }
+        }
+    }
+
+    function subjectBorderColor($subject) {
+        $subject = strtolower($subject);
+        if (strpos($subject, 'matematika') !== false) return '#2F4F3E';
+        if (strpos($subject, 'bahasa') !== false) return '#456652';
+        if (strpos($subject, 'ipa') !== false) return '#3598b6';
+        if (strpos($subject, 'ips') !== false) return '#d37c1f';
+        if (strpos($subject, 'pjok') !== false || strpos($subject, 'penjaskes') !== false) return '#6b8d2d';
+        return '#7d5aa3';
+    }
+
+    function subjectBackground($subject) {
+        $subject = strtolower($subject);
+        if (strpos($subject, 'matematika') !== false) return '#e9f4eb';
+        if (strpos($subject, 'bahasa') !== false) return '#edf7f0';
+        if (strpos($subject, 'ipa') !== false) return '#eaf4fb';
+        if (strpos($subject, 'ips') !== false) return '#fff2e3';
+        if (strpos($subject, 'pjok') !== false || strpos($subject, 'penjaskes') !== false) return '#eff4e3';
+        return '#f1edfb';
+    }
+
+    function calculateDuration($start, $end) {
+        $start = formatHour($start);
+        $end = formatHour($end);
+        if (!$start || !$end) return 0;
+        try {
+            $a = Carbon::createFromFormat('H:i', $start);
+            $b = Carbon::createFromFormat('H:i', $end);
+            return max(0, $b->floatDiffInHours($a));
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    $grid = [];
+    foreach ($dayOrder as $day) {
+        foreach ($hours as $hour) {
+            $grid[$day][$hour] = collect();
+        }
+    }
+
+    foreach ($schedulesCollection as $item) {
+        $day = normalizeDay($item->day ?? '');
+        if (!$day || !in_array($day, $dayOrder)) continue;
+        $time = formatHour($item->start_time ?? $item->time ?? '');
+        if (in_array($time, $hours)) {
+            $grid[$day][$time]->push($item);
+        }
+    }
+
+    $totalHoursWeek = $schedulesCollection->sum(function ($item) {
+        return calculateDuration($item->start_time ?? '', $item->end_time ?? '');
+    });
+
+    $totalClasses = $schedulesCollection->pluck('class')->filter()->unique()->count();
+    $totalStudents = $schedulesCollection->pluck('student.id')->filter()->unique()->count();
+    $todayName = normalizeDay(Carbon::now()->translatedFormat('l')) ?: normalizeDay(Carbon::now()->format('l'));
+    $todayItems = $schedulesCollection->filter(fn($item) => normalizeDay($item->day ?? '') === $todayName);
+    $hoursToday = $todayItems->sum(fn($item) => calculateDuration($item->start_time ?? '', $item->end_time ?? ''));
+    $agendaItems = $schedulesCollection->sortBy(function ($item) use ($dayOrder) {
+        $day = normalizeDay($item->day ?? '');
+        return array_search($day, $dayOrder) ?: 99;
+    })->take(4);
+@endphp
+
+<div class="schedule-page">
+    <div class="page-header">
+        <h1>Jadwal Mengajar</h1>
+        <p>Kelola agenda mengajar mingguan dengan filter cepat, kalender jadwal, dan ringkasan statistik.</p>
     </div>
 
-    @if(empty($selectedClass))
-        @php
-            // Unified timeline view for today
-            $dayMap = [
-                'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
-                'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
-            ];
-            $todayEnglish = \Carbon\Carbon::now()->format('l');
-            $todayName = $dayMap[$todayEnglish] ?? $todayEnglish;
-            // ensure $schedules is a collection
-            $timeline = collect($schedules ?? []);
-
-            if (!function_exists('jenjangFromClass')) {
-                function jenjangFromClass($c) {
-                    if (!$c) return '-';
-                    $num = intval($c);
-                    if ($num >=1 && $num <=6) return 'SD';
-                    if ($num >=7 && $num <=9) return 'SMP';
-                    if ($num >=10) return 'SMK';
-                    return '-';
-                }
-            }
-        @endphp
-
-        <div class="section">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-                <div style="font-weight:700;">Timeline Hari Ini — {{ $todayName }}</div>
-                <div style="color:var(--text-secondary); font-weight:600;">{{ $timeline->count() }} sesi</div>
-            </div>
-
-            @if($timeline->isEmpty())
-                <div class="empty-state" style="padding:2rem;">
-                    <div class="empty-state-icon"><i class="fas fa-calendar-times"></i></div>
-                    <h3>Tidak ada jadwal untuk hari ini</h3>
-                    <p>Anda tidak memiliki sesi mengajar untuk hari {{ $todayName }}.</p>
-                </div>
-            @else
-                <div class="custom-table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th style="width:140px">Jam</th>
-                                <th style="width:100px">Jenjang</th>
-                                <th style="width:140px">Kelas</th>
-                                <th>Mata Pelajaran / Agenda</th>
-                                <th style="width:140px; text-align:right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($timeline as $item)
-                                @php
-                                    $start = trim((string)($item->start_time ?? ''));
-                                    $end = trim((string)($item->end_time ?? ''));
-                                    $timeText = '-';
-                                    try { if ($start) $timeText = \Carbon\Carbon::createFromFormat('H:i:s', $start)->format('H:i'); } catch(\Exception $e) { $timeText = $start ?: '-'; }
-                                    try { if ($end) $timeText .= $timeText && $end ? ' - '.\Carbon\Carbon::createFromFormat('H:i:s', $end)->format('H:i') : $end; } catch(\Exception $e) { $timeText .= $end ? ' - '.$end : ''; }
-                                    $student = $item->student ?? null;
-                                    $kelas = $student->class ?? ($item->class ?? '-');
-                                    $jenjang = jenjangFromClass($kelas);
-                                    $subject = trim((string)($item->subject ?? '-')) ?: '-';
-                                @endphp
-                                <tr>
-                                    <td class="time-text">{{ $timeText }}</td>
-                                    <td>{{ $jenjang }}</td>
-                                    <td>{{ $kelas }}</td>
-                                    <td>{{ $subject }} @if(!empty($item->room)) <span class="room-text">• {{ $item->room }}</span> @endif</td>
-                                    <td style="text-align:right">
-                                        <a href="#" class="btn-detail" style="margin-left:auto;">Jurnal</a>
-                                        <a href="#" class="btn-detail" style="margin-left:0.6rem;">Absensi</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </div>
-    @else
-        @php
-            // Normalize schedules into a map by day (Senin..Jumat)
-            $daysOrder = ['Senin','Selasa','Rabu','Kamis','Jumat'];
-            $byDay = [];
-            foreach ($daysOrder as $d) { $byDay[$d] = collect(); }
-            foreach ($schedules as $s) {
-                $day = trim((string) ($s->day ?? ''));
-                if ($day === '') continue;
-                // normalize common variants
-                $dayNorm = ucfirst(strtolower(str_replace(["\r","\n"],'',$day)));
-                if ($dayNorm === "Jum'at") $dayNorm = 'Jumat';
-                if (!in_array($dayNorm, $daysOrder)) continue;
-                $byDay[$dayNorm]->push($s);
-            }
-
-            // helper icon mapping
-            $iconMap = [
-                'matematika' => 'fas fa-calculator',
-                'mat' => 'fas fa-calculator',
-                'b. indonesia' => 'fas fa-book-open',
-                'bahasa indonesia' => 'fas fa-book-open',
-                'bahasa inggris' => 'fas fa-language',
-                'pjok' => 'fas fa-running',
-                'penjaskes' => 'fas fa-running',
-                'pai' => 'fas fa-mosque',
-                'pkn' => 'fas fa-balance-scale',
-                'ips' => 'fas fa-globe',
-                'ipa' => 'fas fa-flask',
-                'seni' => 'fas fa-palette',
-                'musik' => 'fas fa-music',
-                'prakarya' => 'fas fa-wrench',
-                'istirahat' => 'fas fa-coffee',
-                'duha' => 'fas fa-mosque',
-            ];
-
-            function pickIcon($subject, $map, $default = 'fas fa-book') {
-                $s = strtolower($subject);
-                foreach ($map as $k => $v) {
-                    if (strpos($s, $k) !== false) return $v;
-                }
-                return $default;
-            }
-        @endphp
-
-        <div style="display:block;">
-            <div style="margin-bottom:0.75rem; color:var(--text-secondary); font-weight:600;">Tampilan planner mingguan untuk Kelas {{ $selectedClass }}</div>
-
-            <div class="planner-grid">
-                @foreach($daysOrder as $day)
-                    @php $list = $byDay[$day] ?? collect(); @endphp
-                    <div class="planner-card">
-                        <div class="planner-card-header">
-                            <div class="planner-day">{{ $day }}</div>
-                            <div class="planner-count">{{ $list->count() }} pelajaran</div>
-                        </div>
-                        <div class="planner-card-body">
-                            @if($list->isEmpty())
-                                <div class="no-lessons">Tidak ada jadwal</div>
-                            @else
-                                <ul class="lesson-list">
-                                    @foreach($list as $lesson)
-                                        @php
-                                            $subject = trim((string)($lesson->subject ?? '-')) ?: '-';
-                                            $icon = pickIcon($subject, $iconMap);
-                                            $start = trim((string)($lesson->start_time ?? ''));
-                                            $end = trim((string)($lesson->end_time ?? ''));
-                                            $timeText = '';
-                                            if ($start) {
-                                                try { $timeText = \Carbon\Carbon::createFromFormat('H:i:s', $start)->format('H:i'); } catch (\Exception $e) { $timeText = $start; }
-                                            }
-                                            if ($end) {
-                                                try { $timeText .= $timeText ? ' - '.\Carbon\Carbon::createFromFormat('H:i:s', $end)->format('H:i') : $end; } catch (\Exception $e) { $timeText .= $timeText ? ' - '.$end : $end; }
-                                            }
-                                        @endphp
-                                        <li class="lesson-item">
-                                            <i class="{{ $icon }} lesson-icon" aria-hidden="true"></i>
-                                            <div class="lesson-meta">
-                                                <div class="lesson-title">{{ $subject }}</div>
-                                                <div class="lesson-time">{{ $timeText ?: '-' }}</div>
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </div>
-                    </div>
+    <div class="row g-3 filter-row mb-4">
+        <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label">Hari</label>
+            <select class="form-select">
+                <option selected>Semua Hari</option>
+                @foreach($dayOrder as $day)
+                    <option>{{ $day }}</option>
                 @endforeach
+            </select>
+        </div>
+        <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label">Semester</label>
+            <select class="form-select">
+                <option selected>Ganjil</option>
+                <option>Genap</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label">Tahun Ajaran</label>
+            <select class="form-select">
+                <option selected>2025 / 2026</option>
+                <option>2024 / 2025</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label">Mata Pelajaran</label>
+            <select class="form-select">
+                <option selected>Semua Mapel</option>
+                @foreach($schedulesCollection->pluck('subject')->filter()->unique()->take(10) as $subject)
+                    <option>{{ $subject }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-12 col-md-6 col-lg-2">
+            <label class="form-label">Kelas</label>
+            <select class="form-select">
+                <option selected>Semua Kelas</option>
+                @foreach($schedulesCollection->pluck('class')->filter()->unique()->take(10) as $class)
+                    <option>{{ $class }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-12 col-md-6 col-lg-2 d-flex align-items-end gap-2">
+            <button class="btn btn-outline-secondary w-100">Cetak Jadwal</button>
+            <button class="btn btn-primary w-100">Export PDF</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="schedule-panel">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <div class="section-title">Kalender Mingguan</div>
+                        <div class="section-note">Tampilan jam 07.00–16.00 untuk Senin sampai Sabtu.</div>
+                    </div>
+                    <div class="badge-pill">{{ $schedulesCollection->count() }} sesi minggu ini</div>
+                </div>
+                <div class="calendar-board">
+                    <div class="calendar-grid">
+                        <div class="calendar-header"></div>
+                        @foreach($dayOrder as $day)
+                            <div class="calendar-header">{{ $day }}</div>
+                        @endforeach
+
+                        @foreach($hours as $hour)
+                            <div class="time-label">{{ $hour }}</div>
+                            @foreach($dayOrder as $day)
+                                @php $items = $grid[$day][$hour] ?? collect(); @endphp
+                                <div class="calendar-cell {{ $items->isEmpty() ? 'empty' : '' }}">
+                                    @foreach($items as $item)
+                                        @php
+                                            $subject = trim((string)($item->subject ?? '-')) ?: '-';
+                                            $kelas = trim((string)($item->class ?? ($item->student->class ?? '-')));
+                                            $room = trim((string)($item->room ?? '-'));
+                                            $timeText = trim(formatHour($item->start_time ?? '') . ' - ' . formatHour($item->end_time ?? ''));
+                                        @endphp
+                                        <div class="lesson-card" style="border-color: {{ subjectBorderColor($subject) }}; background: {{ subjectBackground($subject) }};">
+                                            <div class="lesson-subj">{{ $subject }}</div>
+                                            <div class="lesson-meta">{{ $kelas }} • {{ $timeText }} • {{ $room }}</div>
+                                            <div class="lesson-tags">
+                                                <span class="lesson-tag">{{ $item->student_count ?? ($item->students_count ?? '---') }} siswa</span>
+                                                <span class="lesson-tag">{{ $room ?: 'Ruang belum ditetapkan' }}</span>
+                                            </div>
+                                            <div class="lesson-actions">
+                                                <a href="#" class="btn btn-outline-primary">Input Absensi</a>
+                                                <a href="#" class="btn btn-outline-primary">Input Nilai</a>
+                                                <a href="#" class="btn btn-primary">Lihat Detail</a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endforeach
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="label">Total Jam Mengajar Minggu Ini</div>
+                    <div class="value">{{ number_format($totalHoursWeek, 1, '.', ',') }} jam</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Total Kelas</div>
+                    <div class="value">{{ $totalClasses }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Total Siswa</div>
+                    <div class="value">{{ $totalStudents }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Jam Mengajar Hari Ini</div>
+                    <div class="value">{{ number_format($hoursToday, 1, '.', ',') }} jam</div>
+                </div>
             </div>
         </div>
-    @endif
+
+        <div class="col-lg-4">
+            <div class="right-panel-card">
+                <h5>Pemberitahuan Perubahan Jadwal</h5>
+                <p>Belum ada pembaruan jadwal terbaru. Pastikan selalu memeriksa notifikasi jika ada perubahan dari admin sekolah.</p>
+            </div>
+            <div class="right-panel-card">
+                <h5>Kelas Hari Ini</h5>
+                <ul class="right-panel-list">
+                    @forelse($todayItems->take(4) as $item)
+                        @php
+                            $subject = trim((string)($item->subject ?? '-')) ?: '-';
+                            $timeText = trim(formatHour($item->start_time ?? '') . ' - ' . formatHour($item->end_time ?? ''));
+                            $kelas = trim((string)($item->class ?? ($item->student->class ?? '-')));
+                        @endphp
+                        <li>
+                            <div class="right-panel-item-title">{{ $subject }} <span>{{ $timeText }}</span></div>
+                            <div class="right-panel-item-sub">{{ $kelas }} • {{ $item->room ?? 'Ruang belum ditetapkan' }}</div>
+                        </li>
+                    @empty
+                        <li class="right-panel-item-sub">Tidak ada kelas hari ini.</li>
+                    @endforelse
+                </ul>
+            </div>
+            <div class="right-panel-card">
+                <h5>Agenda Guru</h5>
+                <ul class="right-panel-list">
+                    @forelse($agendaItems as $item)
+                        @php
+                            $day = normalizeDay($item->day ?? '-');
+                            $subject = trim((string)($item->subject ?? '-')) ?: '-';
+                            $timeText = trim(formatHour($item->start_time ?? '') . ' - ' . formatHour($item->end_time ?? ''));
+                        @endphp
+                        <li>
+                            <div class="right-panel-item-title">{{ $day }} <span>{{ $timeText }}</span></div>
+                            <div class="right-panel-item-sub">{{ $subject }}</div>
+                        </li>
+                    @empty
+                        <li class="right-panel-item-sub">Agenda belum tersedia.</li>
+                    @endforelse
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
-    
 @endsection

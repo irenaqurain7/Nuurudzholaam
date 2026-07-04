@@ -40,16 +40,28 @@ class PPDBController extends Controller
         }
 
         $validated = $request->validate([
+            'jenjang' => 'required|in:tk,sd,smp,smk',
             'nama_lengkap' => 'required|string|max:255',
+            'nisn' => 'nullable|string|max:20|required_if:jenjang,smp,smk',
+            'nik' => 'required|string|max:20',
+            'tempat_lahir' => 'required|string|max:255',
+            'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'email' => 'required|email|unique:ppdb_registrations',
             'no_telepon' => 'required|string|max:20',
             'asal_sekolah' => 'required|string|max:255',
-            'nama_ortu' => 'required|string|max:255',
+            'nama_ayah' => 'required|string|max:255',
+            'nama_ibu' => 'required|string|max:255',
+            'nama_ortu' => 'nullable|string|max:255',
             'no_ortu' => 'required|string|max:20',
             'tanggal_lahir' => 'required|date',
-            'program' => 'required|in:ipa,ips,keagamaan',
+            'program' => 'nullable|in:ipa,ips,keagamaan',
+            'jurusan' => 'nullable|string|required_if:jenjang,smk',
             'alamat' => 'required|string',
         ]);
+
+        if (empty($validated['nama_ortu'])) {
+            $validated['nama_ortu'] = $validated['nama_ayah'] . ' / ' . $validated['nama_ibu'];
+        }
 
         PPDBRegistration::create($validated);
 

@@ -32,7 +32,7 @@ class CreateDemoStudentSeeder extends Seeder
             ['user_id' => $user->id],
             [
                 'nisn' => '1234567890123',
-                'class' => '10A',
+                'class' => '10',
             ]
         );
 

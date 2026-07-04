@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\Hash;
 
 class StudentDummySeeder extends Seeder
 {
+    private function generateUniqueNisn(string $baseNisn, int $userId): string
+    {
+        $candidate = $baseNisn;
+
+        while (Student::where('nisn', $candidate)->where('user_id', '!=', $userId)->exists()) {
+            $numeric = (int) $candidate;
+            $candidate = str_pad((string) ($numeric + 1), 13, '0', STR_PAD_LEFT);
+        }
+
+        return $candidate;
+    }
+
     /**
      * Run the database seeds.
      */
@@ -157,6 +169,42 @@ class StudentDummySeeder extends Seeder
                         ]
                     );
                 }
+            }
+        }
+
+        // Ensure existing siswa users (e.g. manual/test accounts) also have student + grades.
+        $existingStudentUsers = User::where('role', 'siswa')->get();
+
+        foreach ($existingStudentUsers as $studentUser) {
+            $class = (string) ($studentUser->class ?: '10');
+            $baseNisn = preg_replace('/\D+/', '', (string) $studentUser->nisn);
+            if (!$baseNisn) {
+                $baseNisn = str_pad((string) (9000000000000 + (int) $studentUser->id), 13, '0', STR_PAD_LEFT);
+            }
+            $nisn = $this->generateUniqueNisn(str_pad(substr($baseNisn, 0, 13), 13, '0', STR_PAD_LEFT), $studentUser->id);
+
+            $student = Student::updateOrCreate(
+                ['user_id' => $studentUser->id],
+                [
+                    'nisn' => $nisn,
+                    'class' => $class,
+                ]
+            );
+
+            foreach ($subjects as $subjectIndex => $subject) {
+                $gradeValue = 72 + ((($student->id * 3) + ($subjectIndex * 7)) % 24);
+
+                Grade::updateOrCreate(
+                    [
+                        'student_id' => $student->id,
+                        'teacher_id' => $teacher->id,
+                        'subject' => $subject,
+                    ],
+                    [
+                        'grade' => $gradeValue,
+                        'notes' => 'Nilai dummy untuk akun siswa existing',
+                    ]
+                );
             }
         }
     }

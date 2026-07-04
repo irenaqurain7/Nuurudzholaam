@@ -15,21 +15,114 @@
         </a>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            <i class="fas fa-check-circle"></i>
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-        </div>
-    @endif
+    @php
+        $daysIndonesia = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu'
+        ];
+        
+        $statsGroupedByJenjang = [
+            'TK' => collect(),
+            'SD' => collect(),
+            'SMP' => collect(),
+            'SMK' => collect(),
+        ];
+        
+        foreach ($allSchedules as $schedule) {
+            $c = $schedule->class;
+            $num = intval($c);
+            if (stripos($c, 'tk') !== false) {
+                $j = 'TK';
+            } elseif ($num >= 1 && $num <= 6) {
+                $j = 'SD';
+            } elseif ($num >= 7 && $num <= 9) {
+                $j = 'SMP';
+            } elseif ($num >= 10) {
+                $j = 'SMK';
+            } else {
+                $j = 'Lainnya';
+                if (!isset($statsGroupedByJenjang[$j])) $statsGroupedByJenjang[$j] = collect();
+            }
+            $statsGroupedByJenjang[$j]->push($schedule);
+        }
 
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="fas fa-exclamation-circle"></i>
-            Terjadi kesalahan. Silakan periksa kembali data Anda.
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        $groupedByJenjang = [
+            'TK' => collect(),
+            'SD' => collect(),
+            'SMP' => collect(),
+            'SMK' => collect(),
+        ];
+        
+        foreach ($schedules as $schedule) {
+            $c = $schedule->class;
+            $num = intval($c);
+            if (stripos($c, 'tk') !== false) {
+                $j = 'TK';
+            } elseif ($num >= 1 && $num <= 6) {
+                $j = 'SD';
+            } elseif ($num >= 7 && $num <= 9) {
+                $j = 'SMP';
+            } elseif ($num >= 10) {
+                $j = 'SMK';
+            } else {
+                $j = 'Lainnya';
+                if (!isset($groupedByJenjang[$j])) $groupedByJenjang[$j] = collect();
+            }
+            $groupedByJenjang[$j]->push($schedule);
+        }
+    @endphp
+
+    <div class="stats-grid">
+        <div class="stat-card jenjang-card active" data-target="all" style="cursor:pointer">
+            <div class="stat-icon bg-blue">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ $allSchedules->count() }}</h3>
+                <p>Semua Jadwal</p>
+            </div>
         </div>
-    @endif
+        <div class="stat-card jenjang-card" data-target="tk" style="cursor:pointer">
+            <div class="stat-icon bg-green">
+                <i class="fas fa-child"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ $statsGroupedByJenjang['TK']->count() }}</h3>
+                <p>Jadwal TK</p>
+            </div>
+        </div>
+        <div class="stat-card jenjang-card" data-target="sd" style="cursor:pointer">
+            <div class="stat-icon bg-purple">
+                <i class="fas fa-school"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ $statsGroupedByJenjang['SD']->count() }}</h3>
+                <p>Jadwal SD</p>
+            </div>
+        </div>
+        <div class="stat-card jenjang-card" data-target="smp" style="cursor:pointer">
+            <div class="stat-icon bg-orange">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ $statsGroupedByJenjang['SMP']->count() }}</h3>
+                <p>Jadwal SMP</p>
+            </div>
+        </div>
+        <div class="stat-card jenjang-card" data-target="smk" style="cursor:pointer">
+            <div class="stat-icon bg-red">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ $statsGroupedByJenjang['SMK']->count() }}</h3>
+                <p>Jadwal SMK</p>
+            </div>
+        </div>
+    </div>
 
     <div class="management-toolbar">
         <div class="search-box">
@@ -40,7 +133,7 @@
             <select id="classFilter" class="filter-select">
                 <option value="">Semua Kelas</option>
                 @php
-                    $uniqueClasses = $schedules->pluck('class')->unique()->sort();
+                    $uniqueClasses = $allSchedules->pluck('class')->unique()->sort();
                 @endphp
                 @foreach($uniqueClasses as $class)
                     <option value="{{ $class }}">{{ $class }}</option>
@@ -58,84 +151,85 @@
         </div>
     </div>
 
-    <div class="table-responsive-container">
+    <div class="schedule-wrapper">
         @php
-            $grouped = $schedules->groupBy('class');
-            $daysIndonesia = [
-                'Monday' => 'Senin',
-                'Tuesday' => 'Selasa',
-                'Wednesday' => 'Rabu',
-                'Thursday' => 'Kamis',
-                'Friday' => 'Jumat',
-                'Saturday' => 'Sabtu'
-            ];
+            $groupedByJenjang = array_filter($groupedByJenjang, function($c) { return $c->count() > 0; });
         @endphp
 
-        @if($grouped->isEmpty())
+        @if(empty($groupedByJenjang))
             <div class="no-data" style="padding:2rem;text-align:center;">
                 <i class="fas fa-inbox" style="font-size:2rem;color:#7f8c8d"></i>
                 <p>Belum ada jadwal siswa</p>
             </div>
         @else
-            @foreach($grouped as $className => $items)
-                <div class="class-card schedule-container" data-class="{{ $className }}">
-                    <div class="class-header">
-                        <div>
-                            <h3 class="class-title">Kelas {{ $className }}</h3>
-                            <p class="class-subtitle">Jadwal pelajaran mingguan untuk kelas {{ $className }}</p>
-                        </div>
-                        <a href="{{ route('admin.schedule.student.wizard.step1') }}?class={{ urlencode($className) }}" class="btn-add-text">
-                            <i class="fas fa-plus"></i> Tambah Jadwal
-                        </a>
-                    </div>
 
-                    <div class="class-body">
-                        @php $byDay = $items->groupBy('day'); @endphp
-                        @foreach($byDay as $day => $entries)
-                            @foreach($entries as $entry)
-                                @php
-                                    $subj = $entry->subject ?? '-';
-                                    $time = substr($entry->start_time, 0, 5) . ' - ' . substr($entry->end_time, 0, 5);
-                                    $teacherName = $entry->teacher->user->name ?? '-';
-                                @endphp
-                                <div class="schedule-row-item" data-day="{{ $day }}" data-subject="{{ strtolower($subj) }}">
-                                    <div class="day-col">
-                                        @if($loop->first)
-                                            {{ $daysIndonesia[$day] ?? $day }}
-                                        @endif
+            <div class="jenjang-contents">
+                @foreach($groupedByJenjang as $jenjang => $items)
+                    <div class="jenjang-section" id="jenjang-{{ Str::slug($jenjang) }}">
+                        <div class="jenjang-header">
+                            <h2><i class="fas fa-layer-group"></i> Jenjang {{ $jenjang }}</h2>
+                        </div>
+                        
+                        @php $groupedByClass = $items->groupBy('class'); @endphp
+                        @foreach($groupedByClass as $className => $classItems)
+                            <div class="class-card schedule-container" data-class="{{ $className }}">
+                                <div class="class-header">
+                                    <div>
+                                        <h3 class="class-title">Kelas {{ $className }}</h3>
+                                        <p class="class-subtitle">Jadwal pelajaran mingguan untuk kelas {{ $className }}</p>
                                     </div>
-                                    <div class="info-col">
-                                        <div class="blue-bar"></div>
-                                        <div class="subject-details">
-                                            <div class="subject-name">{{ $subj }} <span style="font-size: 0.85em; font-weight: normal; color: #6C8B7C;">(Guru: {{ $teacherName }})</span></div>
-                                            <div class="subject-time"><i class="far fa-clock"></i> {{ $time }}</div>
-                                        </div>
-                                    </div>
-                                    <div class="action-col">
-                                        <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-icon text-muted" title="Edit Jadwal"><i class="fas fa-edit"></i></a>
-                                        <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-icon text-danger" style="background:none;border:none;" title="Hapus Jadwal"><i class="fas fa-trash"></i></button>
-                                        </form>
-                                    </div>
+                                    <a href="{{ route('admin.schedule.student.wizard.step1') }}?class={{ urlencode($className) }}" class="btn-add-text">
+                                        <i class="fas fa-plus"></i> Tambah Jadwal
+                                    </a>
                                 </div>
-                            @endforeach
+
+                                <div class="class-body">
+                                    @php $byDay = $classItems->groupBy('day'); @endphp
+                                    @foreach($byDay as $day => $entries)
+                                        @foreach($entries as $entry)
+                                            @php
+                                                $subj = $entry->subject ?? '-';
+                                                $time = substr($entry->start_time, 0, 5) . ' - ' . substr($entry->end_time, 0, 5);
+                                                $teacherName = $entry->teacher->user->name ?? '-';
+                                            @endphp
+                                            <div class="schedule-row-item" data-day="{{ $day }}" data-subject="{{ strtolower($subj) }}">
+                                                <div class="day-col">
+                                                    @if($loop->first)
+                                                        {{ $daysIndonesia[$day] ?? $day }}
+                                                    @endif
+                                                </div>
+                                                <div class="info-col">
+                                                    <div class="blue-bar"></div>
+                                                    <div class="subject-details">
+                                                        <div class="subject-name">{{ $subj }} <span style="font-size: 0.85em; font-weight: normal; color: #6C8B7C;">(Guru: {{ $teacherName }})</span></div>
+                                                        <div class="subject-time"><i class="far fa-clock"></i> {{ $time }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="action-col">
+                                                    <a href="{{ route('admin.schedule.student.edit', $entry->id) }}" class="btn-icon text-muted" title="Edit Jadwal"><i class="fas fa-edit"></i></a>
+                                                    <form action="{{ route('admin.schedule.student.destroy', $entry->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn-icon text-danger" style="background:none;border:none;" title="Hapus Jadwal"><i class="fas fa-trash"></i></button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
                     </div>
-                </div>
-            @endforeach
-        @endif
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-card">
-            <i class="fas fa-calendar-check"></i>
-            <div class="stat-content">
-                <span class="stat-label">Total Jadwal</span>
-                <span class="stat-value">{{ $schedules->count() }}</span>
+                @endforeach
             </div>
-        </div>
+        @endif
+
+        <!-- Pagination -->
+        @if($schedules->hasPages())
+            <div class="pagination-wrapper" style="display: flex; justify-content: center; margin-top: 20px;">
+                {{ $schedules->links('partials.pagination') }}
+            </div>
+        @endif
     </div>
 </div>
 
@@ -187,12 +281,23 @@
 .btn-icon:hover { background: #f3f4f6; }
 
 .no-data { padding: 3rem 1rem; color: #7f8c8d; }
-    .stats-container { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 2rem; }
-    .stat-card { background: white; padding: 1.25rem; border-radius: 10px; box-shadow: 0 1px 3px rgba(45,68,56,0.04); display: flex; align-items: center; gap: 1rem; }
-    .stat-card i { font-size: 1.9rem; color: #2D4438; }
-.stat-content { display: flex; flex-direction: column; gap: 0.25rem; }
-.stat-label { color: #7f8c8d; font-size: 0.9rem; }
-.stat-value { color: #2c3e50; font-size: 1.5rem; font-weight: 700; }
+
+/* Stats Grid & Jenjang Cards */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.stat-card { background: white; padding: 1.25rem; border-radius: 12px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); display: flex; align-items: center; gap: 1.25rem; transition: all 0.2s; border: 2px solid transparent; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(45,68,56,0.1); }
+.stat-card.active { border-color: #2D4438; box-shadow: 0 4px 12px rgba(45,68,56,0.15); background: #fbfdfb; }
+.stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+.stat-icon.bg-blue { background: #eff6ff; color: #3b82f6; }
+.stat-icon.bg-green { background: #ecfdf5; color: #10b981; }
+.stat-icon.bg-purple { background: #f5f3ff; color: #8b5cf6; }
+.stat-icon.bg-orange { background: #fff7ed; color: #f97316; }
+.stat-icon.bg-red { background: #fef2f2; color: #ef4444; }
+.stat-content h3 { margin: 0 0 0.2rem 0; font-size: 1.5rem; font-weight: 700; color: #1C2D25; }
+.stat-content p { margin: 0; color: #6C8B7C; font-size: 0.9rem; font-weight: 600; }
+.jenjang-header { margin-bottom: 1.5rem; padding-left: 0.5rem; }
+.jenjang-header h2 { margin: 0; font-size: 1.4rem; color: #1C2D25; display: flex; align-items: center; gap: 0.75rem; font-weight: 700; }
+.jenjang-header h2 i { color: #709D88; }
 
 @media (max-width: 1024px) {
     .management-toolbar { flex-direction: column; }
@@ -214,42 +319,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const classFilter = document.getElementById('classFilter');
     const dayFilter = document.getElementById('dayFilter');
-    const cards = document.querySelectorAll('.schedule-container');
+    const jenjangCards = document.querySelectorAll('.jenjang-card');
+    const jenjangSections = document.querySelectorAll('.jenjang-section');
 
     function filterTable() {
         const searchTerm = searchInput.value.toLowerCase();
         const selectedClass = classFilter.value;
         const selectedDay = dayFilter.value;
+        const activeTab = document.querySelector('.jenjang-card.active')?.dataset.target || 'all';
 
-        cards.forEach(card => {
-            const rowClass = card.dataset.class || '';
-            const matchesClass = !selectedClass || rowClass === selectedClass;
+        jenjangSections.forEach(sec => {
+            let hasVisibleCard = false;
+            const isTabMatch = activeTab === 'all' || sec.id === 'jenjang-' + activeTab;
             
-            let hasVisibleRows = false;
-            
-            const rows = card.querySelectorAll('.schedule-row-item');
-            rows.forEach(row => {
-                const day = row.dataset.day || '';
-                const subject = row.dataset.subject || '';
+            const cardsInSec = sec.querySelectorAll('.schedule-container');
+            cardsInSec.forEach(card => {
+                const rowClass = card.dataset.class || '';
+                const matchesClass = !selectedClass || rowClass === selectedClass;
                 
-                const matchesSearch = rowClass.toLowerCase().includes(searchTerm) || subject.includes(searchTerm);
-                const matchesDay = !selectedDay || day === selectedDay;
+                let hasVisibleRows = false;
+                const rows = card.querySelectorAll('.schedule-row-item');
                 
-                if (matchesSearch && matchesDay) {
-                    row.style.display = '';
-                    hasVisibleRows = true;
+                rows.forEach(row => {
+                    const day = row.dataset.day || '';
+                    const subject = row.dataset.subject || '';
+                    
+                    const matchesSearch = rowClass.toLowerCase().includes(searchTerm) || subject.includes(searchTerm);
+                    const matchesDay = !selectedDay || day === selectedDay;
+                    
+                    if (matchesSearch && matchesDay) {
+                        row.style.display = '';
+                        hasVisibleRows = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                if (matchesClass && hasVisibleRows) {
+                    card.style.display = '';
+                    hasVisibleCard = true;
                 } else {
-                    row.style.display = 'none';
+                    card.style.display = 'none';
                 }
             });
             
-            card.style.display = matchesClass && hasVisibleRows ? '' : 'none';
+            if (isTabMatch && hasVisibleCard) {
+                sec.style.display = 'block';
+            } else {
+                sec.style.display = 'none';
+            }
         });
     }
+
+    jenjangCards.forEach(card => {
+        card.addEventListener('click', () => {
+            jenjangCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            filterTable();
+        });
+    });
 
     searchInput?.addEventListener('keyup', filterTable);
     classFilter?.addEventListener('change', filterTable);
     dayFilter?.addEventListener('change', filterTable);
+    
+    // Initial filter execution to ensure correct display on load
+    filterTable();
 });
 </script>
 @endsection

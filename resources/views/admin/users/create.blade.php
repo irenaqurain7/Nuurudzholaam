@@ -115,15 +115,30 @@
             </div>
 
             <div class="form-grid two-col">
-                <div class="field-group">
+                <div class="field-group" id="jenjang-field-group">
+                    <label for="jenjang">Jenjang</label>
+                    <select id="jenjang" name="jenjang" onchange="toggleJenjangFields()">
+                        <option value="TK" {{ old('jenjang') == 'TK' ? 'selected' : '' }}>TK</option>
+                        <option value="SD" {{ old('jenjang') == 'SD' || !old('jenjang') ? 'selected' : '' }}>SD</option>
+                        <option value="SMP" {{ old('jenjang') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                        <option value="SMK" {{ old('jenjang') == 'SMK' ? 'selected' : '' }}>SMK</option>
+                    </select>
+                    @error('jenjang')<small>{{ $message }}</small>@enderror
+                </div>
+
+                <div class="field-group" id="nisn-field-group">
                     <label for="nisn">NISN</label>
                     <input type="text" id="nisn" name="nisn" value="{{ old('nisn') }}" placeholder="Nomor induk siswa">
                     @error('nisn')<small>{{ $message }}</small>@enderror
                 </div>
+            </div>
 
+            <div class="form-grid two-col">
                 <div class="field-group">
                     <label for="class">Kelas</label>
-                    <input type="text" id="class" name="class" value="{{ old('class') }}" placeholder="Contoh: 7A">
+                    <select id="class" name="class" data-old-value="{{ old('class') }}">
+                        <!-- Diisi secara dinamis oleh JavaScript -->
+                    </select>
                     @error('class')<small>{{ $message }}</small>@enderror
                 </div>
             </div>
@@ -540,6 +555,13 @@
 </style>
 
 <script>
+    const classOptions = {
+        'TK': ['TK-A', 'TK-B'],
+        'SD': ['1', '2', '3', '4', '5', '6'],
+        'SMP': ['7', '8', '9'],
+        'SMK': ['10-RPL', '10-TKJ', '11-RPL', '11-TKJ', '12-RPL', '12-TKJ']
+    };
+
     function toggleRoleFields() {
         const role = document.getElementById('role').value;
         const studentFields = document.getElementById('student-fields');
@@ -547,8 +569,49 @@
 
         studentFields.style.display = role === 'siswa' ? 'block' : 'none';
         teacherFields.style.display = role === 'guru' ? 'block' : 'none';
+
+        if (role === 'siswa') {
+            toggleJenjangFields();
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', toggleRoleFields);
+    function toggleJenjangFields() {
+        const jenjang = document.getElementById('jenjang').value;
+        const nisnGroup = document.getElementById('nisn-field-group');
+        
+        if (jenjang === 'TK') {
+            nisnGroup.style.display = 'none';
+        } else {
+            nisnGroup.style.display = 'flex';
+        }
+
+        populateClassOptions(jenjang);
+    }
+
+    function populateClassOptions(jenjang) {
+        const classSelect = document.getElementById('class');
+        const selectedValue = classSelect.getAttribute('data-old-value') || classSelect.value;
+        
+        classSelect.innerHTML = '';
+        
+        if (classOptions[jenjang]) {
+            classOptions[jenjang].forEach(option => {
+                const optElement = document.createElement('option');
+                optElement.value = option;
+                optElement.textContent = option;
+                if (option === selectedValue) {
+                    optElement.selected = true;
+                }
+                classSelect.appendChild(optElement);
+            });
+        }
+
+        // Remove the data-old-value after first load so subsequent changes don't force select it
+        classSelect.removeAttribute('data-old-value');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        toggleRoleFields();
+    });
 </script>
 @endsection

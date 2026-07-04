@@ -111,31 +111,86 @@
             @endif
             
             <!-- Form Steps -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px;">
-                <div class="form-step-indicator" data-step="1" style="text-align: center;">
-                    <div style="width: 50px; height: 50px; background-color: var(--hijau-islam); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 10px;">
+            <div style="display: flex; justify-content: center; gap: 60px; margin-bottom: 50px; flex-wrap: wrap;">
+                <div class="form-step-indicator" data-step="1" style="text-align: center; width: 120px;">
+                    <div style="width: 40px; height: 40px; background-color: var(--hijau-islam); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; margin: 0 auto 10px;">
                         <span class="step-number">1</span>
                     </div>
-                    <h3 style="color: var(--hijau-islam); font-size: 16px; margin: 0;">Data Siswa</h3>
+                    <h3 style="color: var(--hijau-islam); font-size: 14px; margin: 0;">Pilih Jenjang</h3>
                 </div>
 
-                <div class="form-step-indicator" data-step="2" style="text-align: center; opacity: 0.5;">
-                    <div style="width: 50px; height: 50px; background-color: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 10px;">
+                <div class="form-step-indicator" data-step="2" style="text-align: center; opacity: 0.5; width: 120px;">
+                    <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; margin: 0 auto 10px;">
                         <span class="step-number">2</span>
                     </div>
-                    <h3 style="color: #999; font-size: 16px; margin: 0;">Data Orang Tua</h3>
+                    <h3 style="color: #999; font-size: 14px; margin: 0;">Data Siswa</h3>
                 </div>
 
-                <div class="form-step-indicator" data-step="3" style="text-align: center; opacity: 0.5;">
-                    <div style="width: 50px; height: 50px; background-color: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 10px;">
+                <div class="form-step-indicator" data-step="3" style="text-align: center; opacity: 0.5; width: 120px;">
+                    <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; margin: 0 auto 10px;">
                         <span class="step-number">3</span>
                     </div>
-                    <h3 style="color: #999; font-size: 16px; margin: 0;">Pilih Program</h3>
+                    <h3 style="color: #999; font-size: 14px; margin: 0;">Data Orang Tua</h3>
+                </div>
+
+                <div class="form-step-indicator" data-step="4" style="text-align: center; opacity: 0.5; width: 120px;" id="indicator-step-4">
+                    <div style="width: 40px; height: 40px; background-color: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; margin: 0 auto 10px;">
+                        <span class="step-number">4</span>
+                    </div>
+                    <h3 style="color: #999; font-size: 14px; margin: 0;">Pilih Jurusan</h3>
                 </div>
             </div>
 
-            <!-- Step 1: Data Siswa -->
+            <!-- Step 1: Pilih Jenjang -->
             <div class="form-step" id="step-1">
+                <div class="card">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--hijau-islam); padding-bottom: 15px;">
+                        <i class="fas fa-graduation-cap" style="color: var(--hijau-islam); font-size: 24px;"></i>
+                        <h2 style="color: var(--hijau-islam); font-size: 24px; margin: 0; font-weight: bold;">Pilih Jenjang Pendidikan</h2>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                        <div>
+                            <label style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 15px; font-size: 16px;">Pilih Jenjang yang Akan Didaftar <span style="color: red;">*</span></label>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
+                                    <input type="radio" name="jenjang" value="tk" required style="width: 20px; height: 20px; cursor: pointer;" onchange="handleJenjangChange()">
+                                    <div style="margin-left: 15px;">
+                                        <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">TK</h4>
+                                    </div>
+                                </label>
+                                <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
+                                    <input type="radio" name="jenjang" value="sd" required style="width: 20px; height: 20px; cursor: pointer;" onchange="handleJenjangChange()">
+                                    <div style="margin-left: 15px;">
+                                        <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">SD</h4>
+                                    </div>
+                                </label>
+                                <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
+                                    <input type="radio" name="jenjang" value="smp" required style="width: 20px; height: 20px; cursor: pointer;" onchange="handleJenjangChange()">
+                                    <div style="margin-left: 15px;">
+                                        <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">SMP</h4>
+                                    </div>
+                                </label>
+                                <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
+                                    <input type="radio" name="jenjang" value="smk" required style="width: 20px; height: 20px; cursor: pointer;" onchange="handleJenjangChange()">
+                                    <div style="margin-left: 15px;">
+                                        <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">SMK</h4>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 30px; gap: 15px;">
+                        <button type="button" class="next-btn" onclick="nextStep()" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            Lanjutnya <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Data Siswa -->
+            <div class="form-step" id="step-2" style="display: none;">
                 <div class="card">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--hijau-islam); padding-bottom: 15px;">
                         <i class="fas fa-user" style="color: var(--hijau-islam); font-size: 24px;"></i>
@@ -149,8 +204,8 @@
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div>
-                                <label for="nisn" style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 8px;">NISN (Nomor Induk Siswa Nasional) <span style="color: red;">*</span></label>
+                            <div id="nisn_container">
+                                <label for="nisn" style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 8px;">NISN (Nomor Induk Siswa Nasional) <span style="color: red;" id="nisn_required_star">*</span></label>
                                 <input type="text" id="nisn" name="nisn" placeholder="Contoh: 0123456789" value="{{ old('nisn') }}" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                             </div>
                             <div>
@@ -199,7 +254,10 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; justify-content: flex-end; margin-top: 30px; gap: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 30px; gap: 15px;">
+                        <button type="button" class="prev-btn" onclick="prevStep()" style="background-color: #e0e0e0; color: var(--text-dark); padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-arrow-left"></i> Sebelumnya
+                        </button>
                         <button type="button" class="next-btn" onclick="nextStep()" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                             Lanjutnya <i class="fas fa-arrow-right"></i>
                         </button>
@@ -207,8 +265,8 @@
                 </div>
             </div>
 
-            <!-- Step 2: Data Orang Tua -->
-            <div class="form-step" id="step-2" style="display: none;">
+            <!-- Step 3: Data Orang Tua -->
+            <div class="form-step" id="step-3" style="display: none;">
                 <div class="card">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--hijau-islam); padding-bottom: 15px;">
                         <i class="fas fa-users" style="color: var(--hijau-islam); font-size: 24px;"></i>
@@ -240,39 +298,39 @@
                         <button type="button" class="prev-btn" onclick="prevStep()" style="background-color: #e0e0e0; color: var(--text-dark); padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                             <i class="fas fa-arrow-left"></i> Sebelumnya
                         </button>
-                        <button type="button" class="next-btn" onclick="nextStep()" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <button type="button" class="next-btn" id="btn-next-step-3" onclick="handleStep3Next()" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                             Lanjutnya <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 3: Pilih Program -->
-            <div class="form-step" id="step-3" style="display: none;">
+            <!-- Step 4: Pilih Jurusan (Khusus SMK) -->
+            <div class="form-step" id="step-4" style="display: none;">
                 <div class="card">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--hijau-islam); padding-bottom: 15px;">
                         <i class="fas fa-book" style="color: var(--hijau-islam); font-size: 24px;"></i>
-                        <h2 style="color: var(--hijau-islam); font-size: 24px; margin: 0; font-weight: bold;">Pilih Program</h2>
+                        <h2 style="color: var(--hijau-islam); font-size: 24px; margin: 0; font-weight: bold;">Pilih Jurusan (Khusus SMK)</h2>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-                        @if($programs->count() > 0)
-                            <div>
-                                <label for="program_id" style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 15px; font-size: 16px;">Program Pendidikan yang Diminati <span style="color: red;">*</span></label>
-                                <div style="display: grid; gap: 15px;">
-                                    @foreach($programs as $program)
-                                    <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
-                                        <input type="radio" name="program_id" value="{{ $program->id }}" required style="width: 20px; height: 20px; cursor: pointer;">
-                                        <div style="margin-left: 15px; flex: 1;">
-                                            <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">{{ $program->nama_program }}</h4>
-                                            <p style="color: var(--text-light); margin: 0; font-size: 14px;">{{ Str::limit($program->deskripsi, 100) }}</p>
-                                            <p style="color: var(--hijau-islam); font-size: 12px; margin-top: 5px; font-weight: 600;">Target Lulusan: {{ $program->kuota }} siswa</p>
-                                        </div>
-                                    </label>
-                                    @endforeach
-                                </div>
+                        <div>
+                            <label style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 15px; font-size: 16px;">Pilih Jurusan <span style="color: red;">*</span></label>
+                            <div style="display: grid; gap: 15px;">
+                                <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
+                                    <input type="radio" name="jurusan" value="Akuntansi" required style="width: 20px; height: 20px; cursor: pointer;" id="jurusan_akuntansi">
+                                    <div style="margin-left: 15px; flex: 1;">
+                                        <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">Akuntansi</h4>
+                                    </div>
+                                </label>
+                                <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.3s;" class="program-option">
+                                    <input type="radio" name="jurusan" value="OTKP" required style="width: 20px; height: 20px; cursor: pointer;" id="jurusan_otkp">
+                                    <div style="margin-left: 15px; flex: 1;">
+                                        <h4 style="color: var(--hijau-islam); margin: 0 0 5px 0; font-weight: bold;">OTKP (Otomatisasi Tata Kelola Perkantoran)</h4>
+                                    </div>
+                                </label>
                             </div>
-                        @endif
+                        </div>
                     </div>
 
                     <div style="background-color: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 8px; margin-top: 25px; display: flex; gap: 12px;">
@@ -305,22 +363,72 @@
 
 <script>
     let currentStep = 1;
-    const totalSteps = 3;
+    let totalSteps = 4;
+    let isSmk = false;
+
+    function handleJenjangChange() {
+        const jenjang = document.querySelector('input[name="jenjang"]:checked')?.value;
+        const nisnContainer = document.getElementById('nisn_container');
+        const nisnInput = document.getElementById('nisn');
+        const nisnStar = document.getElementById('nisn_required_star');
+        const indicatorStep4 = document.getElementById('indicator-step-4');
+        const btnNextStep3 = document.getElementById('btn-next-step-3');
+
+        if (jenjang === 'tk' || jenjang === 'sd') {
+            nisnInput.removeAttribute('required');
+            nisnStar.style.display = 'none';
+        } else {
+            nisnInput.setAttribute('required', 'required');
+            nisnStar.style.display = 'inline';
+        }
+
+        if (jenjang === 'smk') {
+            isSmk = true;
+            indicatorStep4.style.display = 'block';
+            btnNextStep3.innerHTML = 'Lanjutnya <i class="fas fa-arrow-right"></i>';
+            totalSteps = 4;
+        } else {
+            isSmk = false;
+            indicatorStep4.style.display = 'none';
+            btnNextStep3.innerHTML = '<i class="fas fa-check"></i> Selesaikan Pendaftaran';
+            totalSteps = 3;
+        }
+    }
+
+    function handleStep3Next() {
+        if (isSmk) {
+            nextStep();
+        } else {
+            document.getElementById('ppdbForm').submit();
+        }
+    }
 
     function showStep(step) {
-        for (let i = 1; i <= totalSteps; i++) {
+        for (let i = 1; i <= 4; i++) {
             const stepElement = document.getElementById(`step-${i}`);
             const indicator = document.querySelector(`.form-step-indicator[data-step="${i}"]`);
             
-            if (i === step) {
-                stepElement.style.display = 'block';
-                indicator.style.opacity = '1';
-            } else {
-                stepElement.style.display = 'none';
-                if (i < step) {
-                    indicator.style.opacity = '1';
+            if (stepElement) {
+                if (i === step) {
+                    stepElement.style.display = 'block';
+                    if(indicator) {
+                        indicator.style.opacity = '1';
+                        indicator.querySelector('div').style.backgroundColor = 'var(--hijau-islam)';
+                        indicator.querySelector('h3').style.color = 'var(--hijau-islam)';
+                    }
                 } else {
-                    indicator.style.opacity = '0.5';
+                    stepElement.style.display = 'none';
+                    if(indicator) {
+                        if (i < step) {
+                            indicator.style.opacity = '1';
+                            indicator.querySelector('div').style.backgroundColor = 'var(--hijau-islam)';
+                            indicator.querySelector('h3').style.color = 'var(--hijau-islam)';
+                        } else {
+                            indicator.style.opacity = '0.5';
+                            indicator.querySelector('div').style.backgroundColor = '#ccc';
+                            indicator.querySelector('h3').style.color = '#999';
+                        }
+                    }
                 }
             }
         }
@@ -339,6 +447,11 @@
             showStep(currentStep - 1);
         }
     }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', function() {
+        handleJenjangChange();
+    });
 </script>
 
 @endsection

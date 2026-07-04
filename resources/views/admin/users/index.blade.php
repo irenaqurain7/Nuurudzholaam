@@ -48,6 +48,48 @@
             </div>
         </div>
 
+        <!-- Filter Form -->
+        <div class="filter-toolbar">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="filter-form">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NISN, NIP..." class="search-input">
+                </div>
+                <div class="filter-group">
+                    <select name="role" class="filter-select" id="filter-role" onchange="this.form.submit()">
+                        <option value="">Semua Role</option>
+                        <option value="siswa" {{ request('role') == 'siswa' ? 'selected' : '' }}>Siswa</option>
+                        <option value="guru" {{ request('role') == 'guru' ? 'selected' : '' }}>Guru</option>
+                    </select>
+                    
+                    <select name="jenjang" class="filter-select" id="filter-jenjang" onchange="this.form.submit()">
+                        <option value="">Semua Jenjang</option>
+                        <option value="TK" {{ request('jenjang') == 'TK' ? 'selected' : '' }}>TK</option>
+                        <option value="SD" {{ request('jenjang') == 'SD' ? 'selected' : '' }}>SD</option>
+                        <option value="SMP" {{ request('jenjang') == 'SMP' ? 'selected' : '' }}>SMP</option>
+                        <option value="SMK" {{ request('jenjang') == 'SMK' ? 'selected' : '' }}>SMK</option>
+                    </select>
+
+                    <button type="submit" class="btn-filter"><i class="fas fa-filter"></i> Cari</button>
+                    
+                    @if(request()->hasAny(['search', 'role', 'jenjang']))
+                        <a href="{{ route('admin.users.index') }}" class="btn-reset">
+                            <i class="fas fa-times"></i> Reset
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+        @if(request()->hasAny(['search', 'role', 'jenjang']) && (request('search') != '' || request('role') != '' || request('jenjang') != ''))
+            <div class="active-filters">
+                <span class="active-filters-label">Filter aktif:</span>
+                @if(request('role')) <span class="filter-tag">Role: {{ ucfirst(request('role')) }}</span> @endif
+                @if(request('jenjang')) <span class="filter-tag">Jenjang: {{ request('jenjang') }}</span> @endif
+                @if(request('search')) <span class="filter-tag">Pencarian: "{{ request('search') }}"</span> @endif
+            </div>
+        @endif
+
         @if($users->count() > 0)
             <div class="table-wrap">
                 <table class="users-table">
@@ -55,7 +97,7 @@
                         <tr>
                             <th>Nama</th>
                             <th>Email</th>
-                            <th>Role</th>
+                            <th>Role / Jenjang</th>
                             <th>NISN / NIP</th>
                             <th>Status</th>
                             <th class="action-col">Aksi</th>
@@ -77,11 +119,26 @@
                                 </td>
                                 <td><span class="email-cell">{{ $user->email }}</span></td>
                                 <td>
-                                    <span class="role-badge role-{{ $user->role }}">
-                                        {{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'guru' ? 'Guru' : 'Orang Tua') }}
+                                    <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                                        <span class="role-badge role-{{ $user->role }}">
+                                            {{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'guru' ? 'Guru' : 'Orang Tua') }}
+                                        </span>
+                                        @if($user->role === 'siswa' && $user->student)
+                                            <span class="jenjang-badge"><i class="fas fa-graduation-cap"></i> {{ $user->student->jenjang }}</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="nisn-cell">
+                                        @if($user->role === 'siswa')
+                                            {{ $user->student->nisn ?? '—' }}
+                                        @elseif($user->role === 'guru')
+                                            {{ $user->teacher->nip ?? '—' }}
+                                        @else
+                                            —
+                                        @endif
                                     </span>
                                 </td>
-                                <td><span class="nisn-cell">{{ $user->nisn ?? $user->nip ?? '—' }}</span></td>
                                 <td>
                                     <span class="status-badge {{ $user->is_active ? 'active' : 'inactive' }}">
                                         <i class="fas fa-circle"></i>
@@ -126,7 +183,7 @@
             </div>
 
             <div class="pagination-wrap">
-                {{ $users->links() }}
+                {{ $users->links('partials.pagination') }}
             </div>
         @else
             <div class="empty-state">
@@ -289,6 +346,141 @@
 
     .table-wrap {
         overflow-x: auto;
+    }
+
+    /* Filter Styles */
+    .filter-toolbar {
+        margin-bottom: 20px;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 14px;
+        color: #9ca3a0;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 14px 10px 36px;
+        border: 1px solid #e2ece8;
+        border-radius: 12px;
+        font-size: 14px;
+        background: #fcfdfc;
+        transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #2d4438;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .filter-select {
+        padding: 10px 32px 10px 14px;
+        border: 1px solid #e2ece8;
+        border-radius: 12px;
+        background: #fcfdfc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a7e6b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
+        appearance: none;
+        font-size: 14px;
+        color: #1c2d25;
+        min-width: 140px;
+    }
+
+    .btn-filter, .btn-reset {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-filter {
+        background: #2d4438;
+        color: white;
+    }
+
+    .btn-filter:hover {
+        background: #1c2d25;
+    }
+
+    .btn-reset {
+        background: #f8f9fa;
+        color: #e11d48;
+        border: 1px solid #ffe4e6;
+    }
+
+    .btn-reset:hover {
+        background: #ffe4e6;
+    }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        background: #f4f7f5;
+        border-radius: 10px;
+        border-left: 4px solid #2d4438;
+    }
+
+    .active-filters-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #5a7e6b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 4px;
+    }
+
+    .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        background: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #1c2d25;
+        border: 1px solid #e2ece8;
+    }
+
+    .jenjang-badge {
+        font-size: 11px;
+        background: #f1f5f9;
+        color: #475569;
+        padding: 2px 8px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
     }
 
     .users-table {
@@ -541,6 +733,96 @@
         margin-top: 24px;
     }
 
+    /* Hide the mobile pagination container since we want a unified layout */
+    .pagination-wrap nav > div:first-child {
+        display: none !important;
+    }
+
+    /* Style the desktop pagination container */
+    .pagination-wrap nav > div:last-child {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    /* Style the "Showing X to Y of Z results" text */
+    .pagination-wrap nav p {
+        margin: 0;
+        font-size: 14px;
+        color: #5a7e6b;
+        font-weight: 600;
+    }
+
+    /* Style the pagination list container */
+    .pagination-wrap nav span.relative {
+        display: inline-flex;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid #e2ece8;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(28, 45, 37, 0.04);
+    }
+
+    /* Style page numbers and arrows */
+    .pagination-wrap nav span.relative a,
+    .pagination-wrap nav span.relative span[aria-current="page"] > span,
+    .pagination-wrap nav span.relative span[disabled] > span,
+    .pagination-wrap nav span.relative a > span,
+    .pagination-wrap nav span.relative span.relative {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 14px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        color: #2d4438;
+        border-right: 1px solid #e2ece8;
+        background: #ffffff;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+
+    .pagination-wrap nav span.relative a:last-child,
+    .pagination-wrap nav span.relative span:last-child,
+    .pagination-wrap nav span.relative a > span:last-child {
+        border-right: none;
+    }
+
+    /* Hover effect */
+    .pagination-wrap nav span.relative a:hover {
+        background: #f4f7f5;
+        color: #1c2d25;
+    }
+
+    /* Active page style */
+    .pagination-wrap nav span.relative span[aria-current="page"] > span {
+        background: #2d4438;
+        color: #ffffff;
+        border-color: #2d4438;
+    }
+
+    /* Disabled arrow style */
+    .pagination-wrap nav span.relative span[disabled] > span,
+    .pagination-wrap nav span.relative span.relative.text-gray-300 {
+        color: #cbd5e1;
+        cursor: not-allowed;
+        background: #f8faf9;
+    }
+
+    /* Constrain the SVGs */
+    .pagination-wrap nav svg {
+        width: 18px !important;
+        height: 18px !important;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
     .empty-state {
         text-align: center;
         padding: 50px 16px;
@@ -611,4 +893,30 @@
         }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('filter-role');
+        const jenjangSelect = document.getElementById('filter-jenjang');
+
+        function updateJenjangState() {
+            if (roleSelect && roleSelect.value === 'guru') {
+                jenjangSelect.disabled = true;
+                // If the user already selected a jenjang before switching to Guru, clear it in UI
+                jenjangSelect.value = '';
+                jenjangSelect.style.opacity = '0.5';
+                jenjangSelect.style.cursor = 'not-allowed';
+            } else if (jenjangSelect) {
+                jenjangSelect.disabled = false;
+                jenjangSelect.style.opacity = '1';
+                jenjangSelect.style.cursor = 'pointer';
+            }
+        }
+
+        if (roleSelect && jenjangSelect) {
+            // Initialize on load
+            updateJenjangState();
+        }
+    });
+</script>
 @endsection

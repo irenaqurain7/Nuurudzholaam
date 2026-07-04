@@ -142,7 +142,7 @@
         <!-- Pagination -->
         @if($groupedSchedulesPaginated->hasPages())
             <div class="pagination-wrapper">
-                {{ $groupedSchedulesPaginated->links() }}
+                {{ $groupedSchedulesPaginated->links('partials.pagination') }}
             </div>
         @endif
     </div>
