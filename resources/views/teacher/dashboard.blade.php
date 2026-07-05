@@ -1,6 +1,10 @@
 @extends('teacher.layout')
 
 @section('teacher-content')
+@php
+    $teacherUser = auth()->user();
+    $teacherPhoto = $teacherUser->profile_photo ?? null;
+@endphp
 <style>
     :root {
         --primary: #365B47; /* requested primary */
@@ -55,17 +59,106 @@
     .brand-block { display:flex; flex-direction:column; gap:6px; }
     .school-name { font-size:32px; font-weight:700; color:#203A2F; line-height:1; }
 
+    .search-wrap { position: relative; }
+
     .search-bar {
         width:420px; height:48px; border-radius:30px; background:#F5F7F6; display:flex; align-items:center; gap:12px; padding:0 16px; box-shadow: 0 6px 18px rgba(54,91,71,0.04); border: none; outline: none;
     }
     .search-bar input { border:0; background:transparent; outline:none; width:100%; font-size:14px; color:var(--text-dark); }
     .search-bar svg { opacity:0.7; }
 
+    .search-results {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(31,45,37,0.12);
+        overflow: hidden;
+        display: none;
+        z-index: 80;
+    }
+
+    .search-results.show { display: block; }
+
+    .search-result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: var(--text-dark);
+        text-decoration: none;
+        border-bottom: 1px solid #EEF2F1;
+    }
+
+    .search-result-item:last-child { border-bottom: 0; }
+    .search-result-item:hover { background: #F4F7F6; }
+    .search-result-name { font-weight: 700; }
+    .search-result-meta { font-size: 12px; color: var(--text-muted); }
+    .search-empty { padding: 14px 16px; color: var(--text-muted); font-size: 13px; }
+
     .site-right { display:flex; align-items:center; gap:24px; }
     .date-text { font-size:14px; color:var(--text-dark); }
 
     .notif { width:44px; height:44px; border-radius:10px; background:#F4F7F6; display:flex; align-items:center; justify-content:center; position:relative; cursor:pointer; }
     .notif-badge { position:absolute; top:6px; right:6px; background:#E23B3B; color:#fff; font-size:12px; font-weight:700; width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
+
+    .notif-wrap { position: relative; }
+    .notif-link {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: #F4F7F6;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        color: #203A2F;
+        text-decoration: none;
+    }
+    .notif-link:hover { background: #E8ECEF; }
+
+    .notif-dropdown {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        width: 320px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 20px 40px rgba(31,45,37,0.12);
+        overflow: hidden;
+        display: none;
+        z-index: 120;
+    }
+
+    .notif-dropdown.show { display: block; }
+    .notif-dropdown-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+    .notif-dropdown-title { font-weight: 700; color: var(--text-dark); }
+    .notif-dropdown-link { color: #1F4D3B; text-decoration: none; font-weight: 600; font-size: 13px; }
+    .notif-item {
+        display: block;
+        padding: 14px 16px;
+        color: var(--text-dark);
+        text-decoration: none;
+        border-bottom: 1px solid #EEF2F1;
+    }
+    .notif-item:hover { background: #F4F7F6; }
+    .notif-item:last-child { border-bottom: 0; }
+    .notif-item-title { font-weight: 700; margin-bottom: 4px; }
+    .notif-item-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .notif-empty { padding: 16px; color: var(--text-muted); font-size: 13px; }
 
     .profile { display:flex; align-items:center; gap:12px; cursor:pointer; }
     .profile .avatar { width:40px; height:40px; border-radius:50%; overflow:hidden; }
@@ -600,9 +693,12 @@
         <img src="{{ asset('images/logo.png') }}" alt="logo" class="school-logo" onerror="this.style.display='none'" />
 
         <div class="brand-block">
-            <div class="search-bar" role="search">
+            <div class="search-wrap">
+            <form class="search-bar" id="teacherSearchForm" role="search" action="{{ route('teacher.students') }}" method="GET">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="#203A2F" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35"/><circle cx="11" cy="11" r="6" stroke="#203A2F" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
-                <input type="search" placeholder="Cari siswa, kelas, mapel..." aria-label="Cari" />
+                <input type="search" name="q" id="teacherSearchInput" placeholder="Cari siswa, kelas, mapel..." aria-label="Cari" autocomplete="off" />
+            </form>
+            <div class="search-results" id="teacherSearchResults" aria-live="polite"></div>
             </div>
         </div>
     </div>
@@ -610,15 +706,34 @@
     <div class="site-right">
         <div class="date-text">{{ \Carbon\Carbon::now()->translatedFormat('l, j F Y') }}</div>
 
-        <div class="notif" title="Notifikasi">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 17H9v-6a3 3 0 10-6 0v6H1" stroke="#203A2F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div class="notif-badge">3</div>
+        <div class="notif-wrap" id="notifWrap">
+            <a href="{{ route('teacher.informasi') }}" class="notif-link" title="Lihat Informasi">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 17H9v-6a3 3 0 10-6 0v6H1" stroke="#203A2F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                @if(!empty($recentAnnouncements) && $recentAnnouncements->count() > 0)
+                    <div class="notif-badge">{{ $recentAnnouncements->count() }}</div>
+                @endif
+            </a>
+            <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-dropdown-header">
+                    <div class="notif-dropdown-title">Informasi Terbaru</div>
+                    <a href="{{ route('teacher.informasi') }}" class="notif-dropdown-link">Buka semua</a>
+                </div>
+                @forelse($recentAnnouncements ?? collect() as $announcement)
+                    <a href="{{ route('teacher.informasi') }}" class="notif-item">
+                        <div class="notif-item-title">{{ $announcement->title }}</div>
+                        <div class="notif-item-text">{{ Str::limit(strip_tags($announcement->content), 90) }}</div>
+                    </a>
+                @empty
+                    <div class="notif-empty">Tidak ada informasi terbaru.</div>
+                @endforelse
+            </div>
         </div>
 
         <div class="profile" id="profileToggle">
             <div class="avatar">
-                @if(!empty(auth()->user()->photo))
-                    <img src="{{ asset('storage/'.auth()->user()->photo) }}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" />
+                @if(!empty($teacherPhoto))
+                    <img src="{{ asset('storage/' . $teacherPhoto) }}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;background:#DDEFE7;color:#203A2F;font-weight:700;">{{ mb_substr($teacherUser->name ?? 'G', 0, 1) }}</div>
                 @else
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z" fill="#DDEFE7"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6v1H4v-1z" fill="#DDEFE7"/></svg>
                 @endif
@@ -802,6 +917,129 @@
 
             document.addEventListener('click', function(){
                 dropdown.style.display = 'none';
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            const notifWrap = document.getElementById('notifWrap');
+            const notifDropdown = document.getElementById('notifDropdown');
+
+            if (!notifWrap || !notifDropdown) {
+                return;
+            }
+
+            notifWrap.addEventListener('mouseenter', function () {
+                notifDropdown.classList.add('show');
+            });
+
+            notifWrap.addEventListener('mouseleave', function () {
+                notifDropdown.classList.remove('show');
+            });
+
+            notifWrap.addEventListener('click', function (event) {
+                if (event.target.closest('.notif-dropdown a')) {
+                    return;
+                }
+
+                notifDropdown.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!notifWrap.contains(event.target)) {
+                    notifDropdown.classList.remove('show');
+                }
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            const input = document.getElementById('teacherSearchInput');
+            const form = document.getElementById('teacherSearchForm');
+            const results = document.getElementById('teacherSearchResults');
+
+            if (!input || !form || !results) {
+                return;
+            }
+
+            let timer = null;
+
+            const hideResults = function () {
+                results.classList.remove('show');
+                results.innerHTML = '';
+            };
+
+            const renderResults = function (items) {
+                if (!items.length) {
+                    results.innerHTML = '<div class="search-empty">Tidak ada hasil ditemukan.</div>';
+                    results.classList.add('show');
+                    return;
+                }
+
+                results.innerHTML = items.map(function (item) {
+                    const classLabel = item.class ? `<div class="search-result-meta">Kelas ${item.class}</div>` : '';
+                    return `
+                        <a href="${item.url}" class="search-result-item">
+                            <div>
+                                <div class="search-result-name">${item.name}</div>
+                                <div class="search-result-meta">NISN ${item.nisn ?? '-'}</div>
+                            </div>
+                            <div class="text-end">
+                                ${classLabel}
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+
+                results.classList.add('show');
+            };
+
+            input.addEventListener('input', function () {
+                const query = this.value.trim();
+
+                clearTimeout(timer);
+
+                if (query.length < 1) {
+                    hideResults();
+                    return;
+                }
+
+                timer = setTimeout(function () {
+                    fetch(`{{ route('teacher.students.search') }}?q=${encodeURIComponent(query)}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(function (response) { return response.json(); })
+                        .then(function (items) {
+                            renderResults(Array.isArray(items) ? items : []);
+                        })
+                        .catch(function () {
+                            results.innerHTML = '<div class="search-empty">Gagal memuat hasil pencarian.</div>';
+                            results.classList.add('show');
+                        });
+                }, 180);
+            });
+
+            input.addEventListener('focus', function () {
+                if (results.children.length) {
+                    results.classList.add('show');
+                }
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!results.contains(event.target) && event.target !== input) {
+                    hideResults();
+                }
+            });
+
+            form.addEventListener('submit', function (event) {
+                const query = input.value.trim();
+
+                if (!query) {
+                    event.preventDefault();
+                    hideResults();
+                }
             });
         })();
     </script>
