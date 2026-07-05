@@ -12,6 +12,7 @@
     $semester = $semester ?? '-';
     $academicYear = $academicYear ?? '-';
     $returnTo = url()->full();
+    $storeGradeUrl = route('teacher.grades.store');
 @endphp
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -364,17 +365,19 @@
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
                         <span class="badge text-bg-light border rounded-pill px-3 py-2">{{ $rows->count() }} siswa</span>
-                        <button type="button"
-                                class="btn btn-success rounded-pill px-3 js-open-grade-modal"
-                                data-action="{{ route('teacher.grades.store') }}"
-                                data-method=""
-                                data-title="Tambah Nilai Baru"
-                                data-student-id="{{ $rows->first()['student']->id ?? '' }}"
-                                data-grade=""
-                                data-notes=""
-                                data-grade-id="">
-                            <i class="bi bi-plus-circle me-1"></i> Tambah Nilai
-                        </button>
+                        @if ($rows->isNotEmpty())
+                            <button type="button"
+                                    class="btn btn-success rounded-pill px-3 js-open-grade-modal"
+                                    data-action="{{ route('teacher.grades.store') }}"
+                                    data-method=""
+                                    data-title="Tambah Nilai Baru"
+                                    data-student-id="{{ $rows->first()['student']->id ?? '' }}"
+                                    data-grade=""
+                                    data-notes=""
+                                    data-grade-id="">
+                                <i class="bi bi-plus-circle me-1"></i> Tambah Nilai
+                            </button>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -427,7 +430,10 @@
                                                 </button>
 
                                                 @if ($row['grade_id'])
-                                                    <form method="POST" action="{{ route('teacher.grades.delete', $row['grade_id']) }}" onsubmit="return confirm('Hapus nilai {{ $row['student']->user->name ?? 'ini' }}?');">
+                                                    <form method="POST"
+                                                          action="{{ route('teacher.grades.delete', $row['grade_id']) }}"
+                                                          class="js-delete-grade"
+                                                          data-confirm="{{ 'Hapus nilai ' . ($row['student']->user->name ?? 'ini') . '?' }}">
                                                         @csrf
                                                         @method('DELETE')
                                                         <input type="hidden" name="return_to" value="{{ $returnTo }}">
@@ -514,6 +520,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const storeUrl = '{{ $storeGradeUrl }}';
         const modalElement = document.getElementById('gradeModal');
         const form = document.getElementById('gradeForm');
         const methodField = form ? form.querySelector('input[name="_method"]') : null;
@@ -522,6 +529,16 @@
         const valueInput = document.getElementById('gradeValueInput');
         const notesInput = document.getElementById('gradeNotesInput');
 
+        document.querySelectorAll('.js-delete-grade').forEach(function (formElement) {
+            formElement.addEventListener('submit', function (event) {
+                const message = this.dataset.confirm || 'Hapus nilai ini?';
+
+                if (!window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        });
+
         if (!modalElement || !form || !methodField || !titleElement || !studentSelect || !valueInput || !notesInput || typeof bootstrap === 'undefined') {
             return;
         }
@@ -529,7 +546,7 @@
         const modal = new bootstrap.Modal(modalElement);
 
         const resetForm = function () {
-            form.action = '{{ route('teacher.grades.store') }}';
+            form.action = storeUrl;
             methodField.value = '';
             titleElement.textContent = 'Tambah Nilai Baru';
             valueInput.value = '';
@@ -538,7 +555,7 @@
 
         document.querySelectorAll('.js-open-grade-modal').forEach(function (button) {
             button.addEventListener('click', function () {
-                form.action = this.dataset.action || '{{ route('teacher.grades.store') }}';
+                form.action = this.dataset.action || storeUrl;
                 methodField.value = this.dataset.method || '';
                 titleElement.textContent = this.dataset.title || 'Tambah Nilai Baru';
                 studentSelect.value = this.dataset.studentId || '';
