@@ -3,7 +3,10 @@
 @section('content')
 <style>
     /* Hide navbar and footer from app layout for teacher dashboard */
-    .navbar {
+    body > .navbar,
+    body > .footer,
+    body > header,
+    body > nav {
         display: none;
     }
     .footer {
@@ -27,6 +30,14 @@
         box-sizing: border-box;
     }
 
+    html,
+    body {
+        width: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+        background-color: var(--bg-light);
+    }
+
     body {
         background-color: var(--bg-light);
     }
@@ -34,7 +45,7 @@
     /* Main layout structure */
     .teacher-dashboard-wrapper {
         display: flex;
-        height: 100vh;
+        min-height: 100vh;
         background-color: var(--bg-light);
     }
 
@@ -146,6 +157,7 @@
         display: flex;
         flex-direction: column;
         background-color: var(--bg-light);
+        min-width: 0;
     }
 
     .teacher-topbar {
@@ -182,7 +194,11 @@
     .teacher-content-area {
         flex: 1;
         overflow-y: auto;
-        padding: 40px;
+        padding: 24px;
+    }
+
+    .teacher-content-area > *:first-child {
+        margin-top: 0;
     }
 
     .teacher-content-area::-webkit-scrollbar {
@@ -260,7 +276,7 @@
         }
 
         .teacher-content-area {
-            padding: 20px;
+            padding: 16px;
         }
     }
 </style>

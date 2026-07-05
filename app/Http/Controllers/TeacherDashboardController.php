@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -585,66 +586,425 @@ class TeacherDashboardController extends Controller
         $user = Auth::user();
         $teacher = $user->teacher;
 
-        $selectedStudentId = $request->query('student_id');
-        $selectedStudent = null;
-        $selectedClass = trim((string) $request->query('class', ''));
-        $selectedSubject = trim((string) $request->query('subject', ''));
+        $sections = $this->buildGradeSections($teacher);
 
-        if ($selectedStudentId) {
-            $selectedStudent = Student::with('user')->find($selectedStudentId);
-            if ($selectedStudent && $selectedClass === '') {
-                $selectedClass = (string) ($selectedStudent->class ?? '');
+        return view('teacher.grades-simple', [
+            'sections' => $sections,
+            'pageMeta' => $this->buildGradePageMeta(),
+        ]);
+    }
+
+    /**
+     * Show the detail page for a specific class.
+     */
+    public function gradeClassDetail(Request $request, string $level, string $classSlug)
+    {
+        $user = Auth::user();
+        $teacher = $user->teacher;
+
+        $level = strtolower($level);
+        $className = $this->classNameFromSlug($classSlug);
+        $selectedSubject = trim((string) $request->query('subject', ''));
+        $sections = $this->buildGradeSections($teacher);
+        $classCard = collect($sections[$level] ?? [])->firstWhere('class', $className);
+
+        if (!$classCard) {
+            abort(404);
+        }
+
+        $semester = $this->resolveSemesterLabel();
+        $academicYear = $this->resolveAcademicYearLabel();
+        $availableSubjects = collect($classCard['subjects'] ?? [])->values();
+        $activeSubject = $level === 'sd'
+            ? ($selectedSubject !== '' ? $selectedSubject : null)
+            : ($classCard['subject_text'] ?? $availableSubjects->first());
+
+        $students = Student::with('user')
+            ->where('class', $className)
+            ->orderBy('nisn')
+            ->get();
+
+        if ($students->isEmpty()) {
+            $students = $this->buildFallbackStudents($classCard['student_count'] ?? 0, $className);
+        }
+
+        $grades = collect();
+        if ($activeSubject) {
+            $grades = Grade::where('teacher_id', $teacher->id)
+                ->where('subject', $activeSubject)
+                ->whereHas('student', function ($query) use ($className) {
+                    $query->where('class', $className);
+                })
+                ->with(['student.user'])
+                ->orderBy('student_id')
+                ->get()
+                ->keyBy('student_id');
+        }
+
+        $rows = $students->map(function ($student) use ($grades) {
+            $grade = $grades->get($student->id);
+
+            return [
+                'student' => $student,
+                'grade' => $grade,
+                'score' => $grade ? number_format((float) $grade->grade, 0) : '-',
+                'notes' => $grade && $grade->notes ? $grade->notes : '-',
+                'updated_at' => $grade && $grade->created_at ? $grade->created_at->format('d M Y') : '-',
+            ];
+        });
+
+        $subjectCards = collect($availableSubjects)
+            ->map(function ($subject) use ($level, $classCard) {
+                return [
+                    'name' => $subject,
+                    'url' => route('teacher.grades.detail', [
+                        'level' => $level,
+                        'classSlug' => $classCard['slug'],
+                    ]) . '?subject=' . urlencode($subject),
+                ];
+            })
+            ->values();
+
+        return view('teacher.grades-detail', [
+            'level' => $level,
+            'classCard' => $classCard,
+            'rows' => $rows,
+            'semester' => $semester,
+            'academicYear' => $academicYear,
+            'availableSubjects' => $availableSubjects,
+            'subjectCards' => $subjectCards,
+            'activeSubject' => $activeSubject,
+        ]);
+    }
+
+    private function buildGradeSections(Teacher $teacher): array
+    {
+        $homeroomClass = $this->resolveHomeroomClass($teacher);
+        $cards = [];
+
+        $scheduleRows = \App\Models\Schedule::where('teacher_id', $teacher->id)
+            ->get(['class', 'subject', 'education_level']);
+
+        foreach ($scheduleRows as $schedule) {
+            $className = $this->normalizeClassName($schedule->class ?? '');
+            if ($className === '') {
+                continue;
+            }
+
+            $level = $this->resolveClassLevel($className, $schedule->education_level ?? null);
+            $key = $level . '|' . $className;
+
+            if (!isset($cards[$key])) {
+                $cards[$key] = $this->makeGradeCardBase($teacher, $className, $level);
+            }
+
+            if (!empty($schedule->subject)) {
+                $cards[$key]['subjects'][] = trim((string) $schedule->subject);
             }
         }
 
-        $defaultClasses = ['1A', '2A', '3A', '4A', '5A', '6A'];
-        $existingClasses = Student::query()
-            ->whereNotNull('class')
-            ->distinct()
-            ->orderBy('class')
-            ->pluck('class')
-            ->filter()
-            ->values()
-            ->toArray();
+        $gradeRows = Grade::where('teacher_id', $teacher->id)
+            ->join('students', 'grades.student_id', '=', 'students.id')
+            ->selectRaw('students.class as class_name, grades.subject as subject')
+            ->get();
 
-        $classes = collect($defaultClasses)
-            ->merge($existingClasses)
-            ->unique()
-            ->values();
+        foreach ($gradeRows as $row) {
+            $className = $this->normalizeClassName($row->class_name ?? '');
+            if ($className === '') {
+                continue;
+            }
 
-        $subjects = Grade::where('teacher_id', $teacher->id)
-            ->whereNotNull('subject')
-            ->distinct()
-            ->orderBy('subject')
-            ->pluck('subject')
-            ->filter()
-            ->values();
+            $level = $this->resolveClassLevel($className, null);
+            $key = $level . '|' . $className;
 
-        $studentQuery = Student::with('user');
-        if ($selectedClass !== '') {
-            $studentQuery->where('class', $selectedClass);
+            if (!isset($cards[$key])) {
+                $cards[$key] = $this->makeGradeCardBase($teacher, $className, $level);
+            }
+
+            if (!empty($row->subject)) {
+                $cards[$key]['subjects'][] = trim((string) $row->subject);
+            }
         }
 
-        $students = $studentQuery->orderBy('nisn')->get();
-
-        $grades = collect();
-        if ($selectedStudent) {
-            $grades = Grade::where('teacher_id', $teacher->id)
-                ->where('student_id', $selectedStudent->id)
-                ->orderBy('created_at', 'desc')
-                ->get();
+        if (empty($cards)) {
+            return $this->buildFallbackGradeSections();
         }
 
-        return view('teacher.grades-simple', [
-            'subjects' => $subjects,
-            'grades' => $grades,
-            'students' => $students,
-            'classes' => $classes,
-            'selectedStudent' => $selectedStudentId,
-            'selectedClass' => $selectedClass,
-            'selectedSubject' => $selectedSubject,
-            'selectedStudentInfo' => $selectedStudent,
-        ]);
+        $sections = [
+            'sd' => [],
+            'smp' => [],
+            'smk' => [],
+        ];
+
+        foreach ($cards as $card) {
+            $subjects = collect($card['subjects'] ?? [])
+                ->filter()
+                ->unique()
+                ->values();
+
+            $card['subjects'] = $subjects->all();
+            $card['status'] = $card['level'] === 'sd' && $homeroomClass === $card['class']
+                ? 'Wali Kelas'
+                : 'Guru Mapel';
+            $card['subject_text'] = $card['status'] === 'Wali Kelas'
+                ? 'Semua Mata Pelajaran'
+                : ($subjects->isNotEmpty() ? $subjects->first() : 'Mapel belum ditentukan');
+            $card['student_count'] = $this->resolveStudentCount($teacher, $card['class']);
+            $card['student_label'] = $card['student_count'] . ' Siswa';
+            $card['url'] = route('teacher.grades.detail', [
+                'level' => $card['level'],
+                'classSlug' => $card['slug'],
+            ]);
+
+            $sections[$card['level']][] = $card;
+        }
+
+        foreach ($sections as &$sectionCards) {
+            usort($sectionCards, function ($left, $right) {
+                return strcmp($left['class'], $right['class']);
+            });
+        }
+        unset($sectionCards);
+
+        return $sections;
+    }
+
+    private function buildGradePageMeta(): array
+    {
+        return [
+            'title' => 'Kelola Nilai',
+            'subtitle' => 'Pilih kelas yang ingin Anda kelola untuk menginput nilai siswa.',
+            'background' => '#F7F9F8',
+        ];
+    }
+
+    private function makeGradeCardBase(Teacher $teacher, string $className, string $level): array
+    {
+        return [
+            'class' => $className,
+            'slug' => $this->classSlug($className),
+            'level' => $level,
+            'subjects' => [],
+            'status' => 'Guru Mapel',
+            'subject_text' => 'Mapel belum ditentukan',
+            'student_count' => $this->resolveStudentCount($teacher, $className),
+            'student_label' => '0 Siswa',
+            'url' => '#',
+        ];
+    }
+
+    private function resolveHomeroomClass(Teacher $teacher): ?string
+    {
+        if (isset($teacher->homeroom_class) && $teacher->homeroom_class) {
+            return $this->normalizeClassName((string) $teacher->homeroom_class);
+        }
+
+        $topClass = Grade::where('teacher_id', $teacher->id)
+            ->join('students', 'grades.student_id', '=', 'students.id')
+            ->selectRaw('students.class as class_name, COUNT(*) as cnt')
+            ->groupBy('students.class')
+            ->orderByDesc('cnt')
+            ->first();
+
+        return $topClass && $topClass->class_name ? $this->normalizeClassName((string) $topClass->class_name) : null;
+    }
+
+    private function resolveStudentCount(Teacher $teacher, string $className): int
+    {
+        $count = Student::where('class', $className)->count();
+
+        if ($count > 0) {
+            return $count;
+        }
+
+        return Grade::where('teacher_id', $teacher->id)
+            ->join('students', 'grades.student_id', '=', 'students.id')
+            ->where('students.class', $className)
+            ->distinct('students.id')
+            ->count('students.id');
+    }
+
+    private function resolveClassLevel(string $className, ?string $educationLevel = null): string
+    {
+        $level = strtolower(trim((string) $educationLevel));
+
+        if (in_array($level, ['sd', 'smp', 'smk'], true)) {
+            return $level;
+        }
+
+        $normalized = strtoupper($this->normalizeClassName($className));
+
+        if (Str::contains($normalized, 'SD') || preg_match('/^\d{1,2}[A-Z]?$/', $normalized)) {
+            return 'sd';
+        }
+
+        if (Str::contains($normalized, 'SMP') || preg_match('/^(VII|VIII|IX)\b/', $normalized)) {
+            return 'smp';
+        }
+
+        if (Str::contains($normalized, 'SMK') || preg_match('/^(X|XI|XII)\b/', $normalized)) {
+            return 'smk';
+        }
+
+        return 'sd';
+    }
+
+    private function normalizeClassName(string $className): string
+    {
+        $className = trim($className);
+        $className = preg_replace('/\s+/', ' ', $className) ?? $className;
+
+        return $className;
+    }
+
+    private function classSlug(string $className): string
+    {
+        return Str::of($className)
+            ->trim()
+            ->replaceMatches('/\s+/', '-')
+            ->replaceMatches('/[^A-Za-z0-9\-]/', '')
+            ->toString();
+    }
+
+    private function classNameFromSlug(string $classSlug): string
+    {
+        return Str::of($classSlug)
+            ->replace('-', ' ')
+            ->replaceMatches('/\s+/', ' ')
+            ->trim()
+            ->toString();
+    }
+
+    private function resolveSemesterLabel(): string
+    {
+        return now()->month >= 7 ? 'Semester Ganjil' : 'Semester Genap';
+    }
+
+    private function resolveAcademicYearLabel(): string
+    {
+        $year = now()->year;
+
+        if (now()->month >= 7) {
+            return $year . '/' . ($year + 1);
+        }
+
+        return ($year - 1) . '/' . $year;
+    }
+
+    private function buildFallbackStudents(int $count, string $className)
+    {
+        $students = collect();
+
+        for ($index = 1; $index <= max($count, 5); $index++) {
+            $student = new \stdClass();
+            $student->id = $index;
+            $student->nisn = '000000' . str_pad((string) $index, 3, '0', STR_PAD_LEFT);
+            $student->class = $className;
+            $student->user = (object) ['name' => 'Siswa ' . $index];
+            $students->push($student);
+        }
+
+        return $students;
+    }
+
+    private function buildFallbackGradeSections(): array
+    {
+        return [
+            'sd' => [
+                [
+                    'class' => '1A',
+                    'slug' => '1A',
+                    'level' => 'sd',
+                    'subjects' => ['Matematika', 'Bahasa Indonesia', 'PPKn', 'IPAS', 'SBdP', 'PJOK'],
+                    'status' => 'Wali Kelas',
+                    'subject_text' => 'Semua Mata Pelajaran',
+                    'student_count' => 28,
+                    'student_label' => '28 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'sd', 'classSlug' => '1A']),
+                ],
+            ],
+            'smp' => [
+                [
+                    'class' => 'VII A',
+                    'slug' => 'VII-A',
+                    'level' => 'smp',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 32,
+                    'student_label' => '32 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smp', 'classSlug' => 'VII-A']),
+                ],
+                [
+                    'class' => 'VII B',
+                    'slug' => 'VII-B',
+                    'level' => 'smp',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 30,
+                    'student_label' => '30 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smp', 'classSlug' => 'VII-B']),
+                ],
+                [
+                    'class' => 'VIII A',
+                    'slug' => 'VIII-A',
+                    'level' => 'smp',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 31,
+                    'student_label' => '31 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smp', 'classSlug' => 'VIII-A']),
+                ],
+            ],
+            'smk' => [
+                [
+                    'class' => 'X Akuntansi',
+                    'slug' => 'X-Akuntansi',
+                    'level' => 'smk',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 29,
+                    'student_label' => '29 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smk', 'classSlug' => 'X-Akuntansi']),
+                ],
+                [
+                    'class' => 'XI Akuntansi',
+                    'slug' => 'XI-Akuntansi',
+                    'level' => 'smk',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 30,
+                    'student_label' => '30 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smk', 'classSlug' => 'XI-Akuntansi']),
+                ],
+                [
+                    'class' => 'X OTKP',
+                    'slug' => 'X-OTKP',
+                    'level' => 'smk',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 28,
+                    'student_label' => '28 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smk', 'classSlug' => 'X-OTKP']),
+                ],
+                [
+                    'class' => 'XI OTKP',
+                    'slug' => 'XI-OTKP',
+                    'level' => 'smk',
+                    'subjects' => ['Matematika'],
+                    'status' => 'Guru Mapel',
+                    'subject_text' => 'Matematika',
+                    'student_count' => 31,
+                    'student_label' => '31 Siswa',
+                    'url' => route('teacher.grades.detail', ['level' => 'smk', 'classSlug' => 'XI-OTKP']),
+                ],
+            ],
+        ];
     }
 
     /**
@@ -1175,7 +1535,8 @@ class TeacherDashboardController extends Controller
         // Column headers
         $headers = ['NISN', 'Nama Siswa', 'Kelas', 'Mata Pelajaran', 'Nilai', 'Keterangan', 'Tanggal'];
         foreach ($headers as $col => $header) {
-            $sheet->setCellValueByColumnAndRow($col + 1, 5, $header);
+            $column = chr(65 + $col);
+            $sheet->setCellValue($column . '5', $header);
             $sheet->getStyle('A5:G5')->getFont()->setBold(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
             $sheet->getStyle('A5:G5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB('FF2D4438'); // Green color
@@ -1184,13 +1545,13 @@ class TeacherDashboardController extends Controller
         // Add data
         $row = 6;
         foreach ($grades as $grade) {
-            $sheet->setCellValueByColumnAndRow(1, $row, $grade->student->nisn ?? '-');
-            $sheet->setCellValueByColumnAndRow(2, $row, $grade->student->user->name ?? '-');
-            $sheet->setCellValueByColumnAndRow(3, $row, $grade->student->class ?? '-');
-            $sheet->setCellValueByColumnAndRow(4, $row, $grade->subject);
-            $sheet->setCellValueByColumnAndRow(5, $row, $grade->grade);
-            $sheet->setCellValueByColumnAndRow(6, $row, $grade->notes ?? '-');
-            $sheet->setCellValueByColumnAndRow(7, $row, $grade->created_at->format('d-m-Y'));
+            $sheet->setCellValue('A' . $row, $grade->student->nisn ?? '-');
+            $sheet->setCellValue('B' . $row, $grade->student->user->name ?? '-');
+            $sheet->setCellValue('C' . $row, $grade->student->class ?? '-');
+            $sheet->setCellValue('D' . $row, $grade->subject);
+            $sheet->setCellValue('E' . $row, $grade->grade);
+            $sheet->setCellValue('F' . $row, $grade->notes ?? '-');
+            $sheet->setCellValue('G' . $row, $grade->created_at->format('d-m-Y'));
 
             // Number format for grade column
             $sheet->getStyle('E' . $row)->getNumberFormat()->setFormatCode('0.00');

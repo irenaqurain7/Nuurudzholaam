@@ -205,6 +205,9 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
 
     // Grades
     Route::get('/grades', [TeacherDashboardController::class, 'grades'])->name('grades');
+    Route::get('/grades/{level}/{classSlug}', [TeacherDashboardController::class, 'gradeClassDetail'])
+        ->whereIn('level', ['sd', 'smp', 'smk'])
+        ->name('grades.detail');
     Route::get('/grades/edit/{id?}', [TeacherDashboardController::class, 'editGrade'])->name('grades.edit');
     Route::post('/grades', [TeacherDashboardController::class, 'storeGrade'])->name('grades.store');
     Route::put('/grades/{id}', [TeacherDashboardController::class, 'storeGrade'])->name('grades.update');
