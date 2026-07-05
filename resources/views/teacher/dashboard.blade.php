@@ -11,7 +11,7 @@
         --text-dark: #203A2F;
         --text-muted: #667A70;
         --border: #E8ECEF;
-        --bg-light: #F5F7F6;
+        --bg-light: #F5F7FA;
         --putih: #FFFFFF;
     }
 
@@ -300,90 +300,243 @@
     .action-card:hover .action-arrow { transform: translateX(4px); }
     .section-heading { font-weight:700; color:var(--text-dark); }
 
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+    body {
+        background-color: #F5F7FA !important;
+    }
+    .teacher-dashboard-wrapper, .teacher-main-content {
+        background-color: #F5F7FA !important;
+    }
+
     .summary-section {
         margin-bottom: 2rem;
         animation: fadeSlideUp 0.65s ease forwards;
     }
 
-    .summary-section .section-title {
-        font-size: 1.15rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: var(--text-dark);
-    }
-
-    .summary-section .section-subtitle {
-        font-size: 0.95rem;
-        color: var(--text-muted);
-        margin-bottom: 1.75rem;
-    }
-
-    .summary-card {
-        background: var(--putih);
-        border-radius: 20px;
-        padding: 24px;
-        height: 140px;
-        box-shadow: 0 18px 40px rgba(38, 55, 42, 0.08);
-        border: none;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        overflow: hidden;
-        opacity: 0;
-        transform: translateY(18px);
+    /* Modern Redesigned Summary Card */
+    .modern-summary-card {
+        font-family: 'Poppins', sans-serif;
+        background-color: #ffffff;
+        border-radius: 24px;
+        padding: 36px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 2rem;
         animation: fadeSlideUp 0.7s ease forwards;
     }
 
-    .summary-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 24px 60px rgba(38, 55, 42, 0.12);
+    .summary-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
     }
 
-    .summary-card:nth-child(1) {
-        animation-delay: 0.05s;
-    }
-    .summary-card:nth-child(2) {
-        animation-delay: 0.12s;
-    }
-    .summary-card:nth-child(3) {
-        animation-delay: 0.18s;
-    }
-    .summary-card:nth-child(4) {
-        animation-delay: 0.24s;
+    .greeting-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
 
-    .summary-icon {
-        width: 60px;
-        height: 60px;
+    .sun-icon-wrapper {
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
-        background: #E8F5E9;
-        display: inline-flex;
+        background-color: #FFF9E6;
+        display: flex;
         align-items: center;
         justify-content: center;
-        color: #2E5D4B;
-        font-size: 30px;
+        flex-shrink: 0;
     }
 
-    .summary-value {
-        font-size: 36px;
+    .sun-icon {
+        width: 24px;
+        height: 24px;
+        color: #FFB300;
+    }
+
+    .greeting-text-block {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .greeting-title {
+        font-size: 20px;
         font-weight: 700;
-        margin: 0.75rem 0 0.25rem;
-        color: var(--text-dark);
-    }
-
-    .summary-label {
-        font-size: 16px;
-        font-weight: 600;
+        color: #1A1F23;
         margin: 0;
-        color: var(--text-dark);
+        line-height: 1.25;
     }
 
-    .summary-note {
+    .greeting-subtitle {
+        font-size: 14px;
+        color: #8A92A6;
+        margin: 4px 0 0 0;
+        font-weight: 400;
+    }
+
+    .date-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #ffffff;
+        border: 1px solid #E9ECEF;
+        border-radius: 12px;
+        padding: 8px 16px;
+        color: #2D3748;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    .date-badge svg {
+        color: #4A5568;
+    }
+
+    .card-divider {
+        height: 1px;
+        background-color: #E9ECEF;
+        border: none;
+        margin: 24px 0;
+    }
+
+    .statistics-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .stat-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 8px;
+    }
+
+    .stat-icon-box {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
+
+    .col-kelas .stat-icon-box {
+        background-color: #E2F6EA;
+        color: #1A8F50;
+    }
+
+    .col-siswa .stat-icon-box {
+        background-color: #E8F2FF;
+        color: #1B84FF;
+    }
+
+    .col-mapel .stat-icon-box {
+        background-color: #F3E8FF;
+        color: #8A2BE2;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #8A92A6;
+        margin: 0 0 4px 0;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1A1F23;
+        margin: 0;
+        line-height: 1.1;
+    }
+
+    .vertical-divider {
+        width: 1px;
+        background-color: #E9ECEF;
+        align-self: stretch;
+        margin: 8px 0;
+    }
+
+    .status-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 4px 0;
+    }
+
+    .status-info-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #E8F4FF;
+        color: #1B84FF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .status-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .status-section-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1A1F23;
+        margin: 0 0 4px 0;
+    }
+
+    .status-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .status-indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #10B981;
+        display: inline-block;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    .status-indicator-text {
         font-size: 13px;
-        color: #8A8A8A;
-        margin: 0.5rem 0 0;
-        line-height: 1.5;
+        color: #8A92A6;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .summary-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .statistics-row {
+            flex-direction: column;
+            gap: 24px;
+        }
+        .vertical-divider {
+            display: none;
+        }
+        .date-badge {
+            width: 100%;
+            justify-content: center;
+        }
+        .modern-summary-card {
+            padding: 24px;
+        }
     }
 
     @keyframes fadeSlideUp {
@@ -488,48 +641,115 @@
 
 <div class="page-content">
 
-    <section class="summary-section">
-        <div class="section-title">Ringkasan Hari Ini</div>
-        <div class="section-subtitle">Informasi singkat mengenai aktivitas mengajar hari ini.</div>
+    @php
+        $kelasHariIni = $todayCount ?? $jumlahKelasHariIni ?? 0;
+        $totalSiswaCount = $totalStudents ?? $totalSiswa ?? 0;
+        $mataPelajaranCount = \App\Models\Schedule::where('teacher_id', $teacher->id ?? 0)->distinct('subject')->count('subject') 
+            ?: (\App\Models\Grade::where('teacher_id', $teacher->id ?? 0)->distinct('subject')->count('subject') ?: 1);
+    @endphp
 
-        <div class="row g-3">
-            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                <div class="summary-card h-100">
-                    <div class="summary-icon"><i class="bi bi-calendar-week"></i></div>
-                    <div>
-                        <p class="summary-value">{{ $jumlahKelasHariIni ?? 0 }}</p>
-                        <p class="summary-label">Kelas Hari Ini</p>
-                        <p class="summary-note">Jadwal mengajar hari ini.</p>
+    <section class="summary-section">
+        <div class="modern-summary-card">
+            <!-- HEADER -->
+            <div class="summary-card-header">
+                <div class="greeting-container">
+                    <div class="sun-icon-wrapper">
+                        <!-- Sun Icon -->
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-2c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v1c0 .55.45 1 1 1zm0 14c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1s1-.45 1-1v-1c0-.55-.45-1-1-1zm8.66-8.66l-.7-.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l.7.7c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41zm-15.55 7.77l-.7-.7c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l.7.7c.39.39.39 1.02 0 1.41-.39.39-1.02.39-1.41 0zm0-11.31c.39-.39.39-1.02 0-1.41l-.7-.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l.7.7c.39.39 1.02.39 1.41 0zm15.55 11.31c-.39.39-.39 1.02 0 1.41l.7.7c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-.7-.7c-.39-.39-1.02-.39-1.41 0zM21 11h-1c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1s-.45-1-1-1zM5 12c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1s.45 1 1 1h1c.55 0 1-.45 1-1z"/>
+                        </svg>
+                    </div>
+                    <div class="greeting-text-block">
+                        <h2 class="greeting-title" style="font-family: 'Poppins', sans-serif;">Selamat Pagi, Guru! 👋</h2>
+                        <span class="greeting-subtitle" style="font-family: 'Poppins', sans-serif;">Semangat mengajar hari ini!</span>
                     </div>
                 </div>
-            </div>
-            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                <div class="summary-card h-100">
-                    <div class="summary-icon"><i class="bi bi-people-fill"></i></div>
-                    <div>
-                        <p class="summary-value">{{ $totalSiswa ?? 0 }}</p>
-                        <p class="summary-label">Total Siswa</p>
-                        <p class="summary-note">Jumlah siswa yang diajar.</p>
-                    </div>
+                <div class="date-badge">
+                    <!-- Calendar Icon -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span style="font-family: 'Poppins', sans-serif;">{{ \Carbon\Carbon::now()->translatedFormat('l, j F Y') }}</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                <div class="summary-card h-100">
-                    <div class="summary-icon"><i class="bi bi-journal-check"></i></div>
-                    <div>
-                        <p class="summary-value">{{ $belumDinilai ?? 0 }}</p>
-                        <p class="summary-label">Belum Dinilai</p>
-                        <p class="summary-note">Tugas yang belum dinilai.</p>
+
+            <hr class="card-divider">
+
+            <!-- STATISTICS -->
+            <div class="statistics-row">
+                <!-- Column 1 -->
+                <div class="stat-column col-kelas">
+                    <div class="stat-icon-box">
+                        <!-- Calendar Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
                     </div>
+                    <span class="stat-label" style="font-family: 'Poppins', sans-serif;">Kelas Hari Ini</span>
+                    <h3 class="stat-value" style="font-family: 'Poppins', sans-serif;">{{ $kelasHariIni }}</h3>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <!-- Column 2 -->
+                <div class="stat-column col-siswa">
+                    <div class="stat-icon-box">
+                        <!-- Users Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <span class="stat-label" style="font-family: 'Poppins', sans-serif;">Total Siswa</span>
+                    <h3 class="stat-value" style="font-family: 'Poppins', sans-serif;">{{ $totalSiswaCount }}</h3>
+                </div>
+
+                <div class="vertical-divider"></div>
+
+                <!-- Column 3 -->
+                <div class="stat-column col-mapel">
+                    <div class="stat-icon-box">
+                        <!-- BookOpen Icon -->
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <span class="stat-label" style="font-family: 'Poppins', sans-serif;">Mata Pelajaran</span>
+                    <h3 class="stat-value" style="font-family: 'Poppins', sans-serif;">{{ $mataPelajaranCount }}</h3>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                <div class="summary-card h-100">
-                    <div class="summary-icon"><i class="bi bi-clock-history"></i></div>
-                    <div>
-                        <p class="summary-value">{{ $jamMengajar ?? 0 }}</p>
-                        <p class="summary-label">Jam Mengajar</p>
-                        <p class="summary-note">Total jam mengajar hari ini.</p>
+
+            <hr class="card-divider">
+
+            <!-- STATUS SECTION -->
+            <div class="status-container">
+                <div class="status-info-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                </div>
+                <div class="status-details">
+                    <span class="status-section-title" style="font-family: 'Poppins', sans-serif;">Status Hari Ini</span>
+                    <div class="status-badge-row">
+                        <span class="status-indicator-dot"></span>
+                        <span class="status-indicator-text" style="font-family: 'Poppins', sans-serif;">
+                            @if($kelasHariIni > 0)
+                                Ada {{ $kelasHariIni }} jadwal mengajar hari ini.
+                            @else
+                                Tidak ada jadwal mengajar hari ini.
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>

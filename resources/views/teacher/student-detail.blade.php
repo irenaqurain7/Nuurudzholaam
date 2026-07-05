@@ -1,236 +1,236 @@
 @extends('teacher.layout')
 
 @section('teacher-content')
+@php
+    use Carbon\Carbon;
+
+    $name    = $student->user->name ?? '-';
+    $nisn    = $student->nisn ?? '-';
+    $class   = $student->class ?? '-';
+    $email   = $student->user->email ?? '-';
+    $phone   = $student->user->phone ?? '-';
+    $address = $student->user->address ?? '-';
+    $photo   = $student->user->profile_photo ?? null;
+
+    // Extended fields (may not exist — show dash gracefully)
+    $nik         = $student->user->nik         ?? ($student->nik         ?? '-');
+    $gender      = $student->user->gender      ?? ($student->gender      ?? null);
+    $birthPlace  = $student->user->birth_place ?? ($student->birth_place ?? '-');
+    $birthDate   = $student->user->birth_date  ?? ($student->birth_date  ?? null);
+    $fatherName  = $student->user->father_name ?? ($student->father_name ?? '-');
+    $motherName  = $student->user->mother_name ?? ($student->mother_name ?? '-');
+    $parentPhone = $student->user->parent_phone?? ($student->parent_phone?? '-');
+
+    // Jenjang
+    $jenjang = '-';
+    if ($class !== '-') {
+        if (preg_match('/^(VII|VIII|IX|7|8|9)\b/i', $class))         $jenjang = 'SMP';
+        elseif (preg_match('/^(X|XI|XII|10|11|12)\b|TKJ|RPL|AK\b/i', $class)) $jenjang = 'SMK';
+        else                                                             $jenjang = 'SD';
+    }
+
+    // Gender guess fallback
+    if (!$gender) {
+        $low = mb_strtolower($name);
+        $female = ['siti','nurul','ayu','yunita','rahma','vani','ajeng','eti','neng','syaidah',
+                   'mega','dea','widya','mela','novi','suryani','asti','dinda','anita','indah',
+                   'putri','gustiani','hidayah','kanesha','ayra','selva','ismania','citra',
+                   'lestari','sari','dewi','ratih','wulan','dian','rini','sri','tuti','nina',
+                   'maya','linda','ratna','aulia','safira','nisa','zahra','nadia','amalia',
+                   'fatimah','aisyah','khadijah','aminah','maryam','zainab','asma','hafsah'];
+        $gender = 'Laki-laki';
+        foreach ($female as $kw) { if (mb_strpos($low,$kw) !== false) { $gender = 'Perempuan'; break; } }
+    }
+
+    $initial = mb_strtoupper(mb_substr($name, 0, 1));
+@endphp
+
 <style>
-    .student-detail-page {
-        max-width: 1280px;
-        margin: 0 auto;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-    .back-link {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        border-radius: 999px;
-        padding: .55rem .95rem;
-        font-weight: 700;
-    }
+    .sd-page { font-family: 'Poppins', sans-serif; color: #111827; max-width: 900px; }
 
-    .student-card {
-        border: 0;
-        border-radius: 22px;
+    /* Back link */
+    .sd-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        color: #1F4D3B; font-size: .88rem; font-weight: 600;
+        text-decoration: none; border: 1.5px solid #1F4D3B;
+        border-radius: 8px; padding: 6px 14px;
+        transition: background .15s, color .15s;
+        margin-bottom: 28px;
+    }
+    .sd-back:hover { background: #1F4D3B; color: #fff; }
+
+    /* Card */
+    .sd-card {
+        background: #fff;
+        border: 1px solid #E5E7EB;
+        border-radius: 16px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.05);
         overflow: hidden;
-        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+    }
+    .sd-card-head {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #F3F4F6;
+        font-size: .78rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .07em;
+        color: #6B7280;
     }
 
-    .student-card .card-header,
-    .note-card .card-header {
-        border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-        padding: 1rem 1.25rem;
-    }
-
-    .student-photo {
-        width: 118px;
-        height: 118px;
-        border-radius: 50%;
+    /* Profile section */
+    .sd-avatar {
+        width: 88px; height: 88px; border-radius: 50%;
         object-fit: cover;
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+        border: 3px solid #E5E7EB;
+    }
+    .sd-avatar-init {
+        width: 88px; height: 88px; border-radius: 50%;
+        background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+        color: #1F4D3B; font-size: 2rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .sd-student-name { font-size: 1.35rem; font-weight: 700; color: #111827; }
+    .sd-class-pill {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: #ECFDF5; color: #1F4D3B;
+        border-radius: 999px; padding: 4px 12px;
+        font-size: .8rem; font-weight: 600;
+    }
+    .sd-status-pill {
+        display: inline-block;
+        background: #ECFDF5; color: #059669;
+        border-radius: 999px; padding: 4px 12px;
+        font-size: .8rem; font-weight: 600;
     }
 
-    .student-initial {
-        width: 118px;
-        height: 118px;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #edf5f0, #dce8e1);
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-        color: var(--hijau-islam);
+    /* Info rows */
+    .sd-info-row {
+        display: flex; padding: 14px 24px;
+        border-bottom: 1px solid #F3F4F6;
+        font-size: .9rem;
     }
+    .sd-info-row:last-child { border-bottom: none; }
+    .sd-info-label {
+        width: 180px; flex-shrink: 0;
+        color: #6B7280; font-size: .83rem; font-weight: 500;
+    }
+    .sd-info-value { color: #111827; font-weight: 500; }
 
-    .student-name {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #102018;
-        margin-bottom: .15rem;
-    }
+    /* Gender icon */
+    .g-laki     { color: #1D4ED8; }
+    .g-perempuan{ color: #9D174D; }
 
-    .student-class-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: .35rem;
-        padding: .45rem .85rem;
-        border-radius: 999px;
-        background: #edf5f0;
-        color: var(--hijau-islam);
-        font-weight: 700;
-        font-size: .85rem;
+    /* Note */
+    .sd-note {
+        background: #F0FDF4; border: 1px solid #BBF7D0;
+        border-radius: 12px; padding: 14px 18px;
+        font-size: .87rem; color: #166534;
     }
-
-    .info-list .list-group-item {
-        padding: 1rem 1.15rem;
-        border-color: rgba(15, 23, 42, 0.06);
-    }
-
-    .info-label {
-        display: block;
-        font-size: .82rem;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        color: #6b7280;
-        margin-bottom: .25rem;
-    }
-
-    .note-card,
-    .grade-card {
-        border: 0;
-        border-radius: 22px;
-        overflow: hidden;
-        box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
-    }
-
-    .grade-card .table thead th {
-        background: #f6faf8;
-        color: var(--hijau-islam);
-        border-bottom: 1px solid #e7efea;
-        white-space: nowrap;
-    }
-
-    .grade-card .table tbody td {
-        vertical-align: middle;
-    }
-
-    .grade-meta {
-        color: #667085;
-        font-size: .88rem;
-    }
-
-    .grade-empty {
-        border: 1px dashed #d9e4dd;
-        border-radius: 18px;
-        padding: 1rem 1.1rem;
-        background: #fbfdfc;
-    }
-
-    @media (max-width: 991px) {
-        .student-photo,
-        .student-initial {
-            width: 96px;
-            height: 96px;
-        }
-    }
+    .sd-note strong { color: #15803D; }
 </style>
 
-<div class="row mb-4">
-    <div class="col-md-12">
-        <a href="{{ route('teacher.students') }}" class="btn btn-outline-secondary btn-sm back-link">
-            <i class="fas fa-arrow-left"></i> Kembali ke Daftar Siswa
-        </a>
-    </div>
-</div>
+<div class="sd-page">
 
-<div class="row g-4 student-detail-page">
-    <!-- Student Info -->
-    <div class="col-md-4">
-        <div class="card student-card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Informasi Siswa</h5>
-            </div>
-            <div class="card-body text-center py-4">
-                @if($student->user->profile_photo)
-                    <img src="{{ asset('storage/' . $student->user->profile_photo) }}" alt="{{ $student->user->name }}" class="student-photo mb-3">
-                @else
-                    <div class="student-initial mb-3">
-                        <i class="fas fa-user fa-3x text-muted"></i>
-                    </div>
-                @endif
-                <div class="student-name">{{ $student->user->name }}</div>
-                <span class="student-class-pill"><i class="fas fa-graduation-cap"></i>{{ $student->class }}</span>
-            </div>
-            <div class="list-group list-group-flush info-list">
-                <div class="list-group-item">
-                    <small class="info-label">NISN</small>
-                    <div class="fw-bold">{{ $student->nisn }}</div>
-                </div>
-                <div class="list-group-item">
-                    <small class="info-label">Email</small>
-                    <div>{{ $student->user->email }}</div>
-                </div>
-                <div class="list-group-item">
-                    <small class="info-label">No. Telepon</small>
-                    <div>{{ $student->user->phone ?? '-' }}</div>
-                </div>
-                <div class="list-group-item">
-                    <small class="info-label">Alamat</small>
-                    <div>{{ $student->user->address ?? '-' }}</div>
+    {{-- Back --}}
+    <a href="{{ route('teacher.students') }}" class="sd-back">
+        <i class="fas fa-arrow-left"></i> Kembali ke Daftar Siswa
+    </a>
+
+    {{-- Profile card --}}
+    <div class="sd-card mb-4">
+        <div class="sd-card-head">Informasi Siswa</div>
+        <div class="p-5 d-flex align-items-center gap-4 flex-wrap"
+             style="border-bottom: 1px solid #F3F4F6;">
+            {{-- Avatar --}}
+            @if($photo)
+                <img src="{{ asset('storage/' . $photo) }}" alt="{{ $name }}" class="sd-avatar">
+            @else
+                <div class="sd-avatar-init">{{ $initial }}</div>
+            @endif
+
+            {{-- Name + badges --}}
+            <div>
+                <div class="sd-student-name mb-2">{{ $name }}</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="sd-class-pill">
+                        <i class="fas fa-graduation-cap"></i> Kelas {{ $class }}
+                    </span>
+                    <span class="sd-class-pill" style="background:#EFF6FF; color:#1D4ED8;">
+                        {{ $jenjang }}
+                    </span>
+                    <span class="sd-status-pill">Aktif</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Student Grades -->
-    <div class="col-md-8">
-        <div class="card grade-card">
-            <div class="card-header bg-light">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h5 class="mb-0">Detail Nilai</h5>
-                        <div class="grade-meta">Menampilkan nilai siswa dalam mode lihat saja.</div>
-                    </div>
-                    <span class="badge bg-success-subtle text-success-emphasis">{{ $grades->count() }} data</span>
-                </div>
-            </div>
-            <div class="card-body">
-                @if($grades->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Mata Pelajaran</th>
-                                    <th>Nilai</th>
-                                    <th>Keterangan</th>
-                                    <th>Tanggal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($grades as $grade)
-                                    <tr>
-                                        <td><strong>{{ $grade->subject }}</strong></td>
-                                        <td>
-                                            <span class="badge bg-{{ $grade->grade >= 75 ? 'success' : ($grade->grade >= 70 ? 'warning' : 'danger') }}">
-                                                {{ number_format($grade->grade, 2) }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $grade->notes ?? '-' }}</td>
-                                        <td><small class="text-muted">{{ $grade->created_at->format('d M Y') }}</small></td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="row g-3 mt-3">
-                        <div class="col-md-6">
-                            <div class="grade-empty">
-                                <small class="info-label mb-1">Rata-rata Nilai</small>
-                                <div class="fw-bold" style="color: var(--hijau-islam); font-size: 1.05rem;">{{ number_format($grades->avg('grade'), 2) }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="grade-empty">
-                                <small class="info-label mb-1">Total Mata Pelajaran</small>
-                                <div class="fw-bold" style="color: var(--hijau-islam); font-size: 1.05rem;">{{ $grades->count() }}</div>
-                            </div>
-                        </div>
-                    </div>
+        {{-- Info rows --}}
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-id-badge me-2" style="color:#1F4D3B;opacity:.7;"></i>NISN</span>
+            <span class="sd-info-value font-monospace">{{ $nisn }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-id-card me-2" style="color:#1F4D3B;opacity:.7;"></i>NIK</span>
+            <span class="sd-info-value font-monospace">{{ $nik }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label">
+                @if($gender === 'Perempuan')
+                    <i class="fas fa-venus me-2 g-perempuan"></i>
                 @else
-                    <div class="alert alert-info mb-0">
-                        <i class="fas fa-info-circle me-1"></i> Belum ada nilai yang tersedia untuk siswa ini.
-                    </div>
+                    <i class="fas fa-mars me-2 g-laki"></i>
                 @endif
-            </div>
+                Jenis Kelamin
+            </span>
+            <span class="sd-info-value">{{ $gender }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-map-marker-alt me-2" style="color:#1F4D3B;opacity:.7;"></i>Tempat Lahir</span>
+            <span class="sd-info-value">{{ $birthPlace }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-calendar me-2" style="color:#1F4D3B;opacity:.7;"></i>Tanggal Lahir</span>
+            <span class="sd-info-value">
+                @if($birthDate)
+                    {{ \Carbon\Carbon::parse($birthDate)->translatedFormat('d F Y') }}
+                @else
+                    —
+                @endif
+            </span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-home me-2" style="color:#1F4D3B;opacity:.7;"></i>Alamat</span>
+            <span class="sd-info-value">{{ $address }}</span>
         </div>
     </div>
+
+    {{-- Data orang tua --}}
+    <div class="sd-card mb-4">
+        <div class="sd-card-head">Data Orang Tua / Wali</div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-user me-2" style="color:#1F4D3B;opacity:.7;"></i>Nama Ayah</span>
+            <span class="sd-info-value">{{ $fatherName }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-user me-2" style="color:#9D174D;opacity:.7;"></i>Nama Ibu</span>
+            <span class="sd-info-value">{{ $motherName }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-phone me-2" style="color:#1F4D3B;opacity:.7;"></i>No. HP Orang Tua</span>
+            <span class="sd-info-value">{{ $parentPhone }}</span>
+        </div>
+        <div class="sd-info-row">
+            <span class="sd-info-label"><i class="fas fa-envelope me-2" style="color:#1F4D3B;opacity:.7;"></i>Email</span>
+            <span class="sd-info-value">{{ $email }}</span>
+        </div>
+    </div>
+
+    {{-- Note --}}
+    <div class="sd-note">
+        <i class="fas fa-info-circle me-2"></i>
+        Halaman ini hanya menampilkan <strong>data administrasi siswa</strong>.
+        Untuk melihat nilai siswa, gunakan menu <strong>Kelola Nilai</strong>.
+    </div>
+
 </div>
 @endsection

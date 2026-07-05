@@ -1,4 +1,4 @@
-﻿@extends('teacher.layout')
+@extends('teacher.layout')
 
 @section('teacher-content')
 <style>
@@ -102,7 +102,7 @@
     .calendar-grid {
         min-width: 1000px;
         display: grid;
-        grid-template-columns: 90px repeat(6, minmax(180px, 1fr));
+        grid-template-columns: 90px repeat(5, minmax(180px, 1fr));
         gap: 1px;
         background: var(--border);
         border-radius: 18px;
@@ -131,11 +131,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 100px;
+        min-height: 75px;
     }
 
     .calendar-cell {
-        min-height: 100px;
+        min-height: 75px;
         padding: 0.85rem;
         background: #fff;
     }
@@ -306,7 +306,7 @@
 
     @media (max-width: 767px) {
         .filter-row .col-12 { margin-bottom: 0.5rem; }
-        .calendar-grid { min-width: 100%; grid-template-columns: 70px repeat(6, minmax(140px, 1fr)); }
+        .calendar-grid { min-width: 100%; grid-template-columns: 70px repeat(5, minmax(140px, 1fr)); }
         .calendar-header { font-size: 0.9rem; }
         .time-label { font-size: 0.8rem; min-height: 80px; }
         .lesson-card { margin-bottom: 0.65rem; }
@@ -318,8 +318,12 @@
     use Carbon\Carbon;
 
     $schedulesCollection = collect($schedules ?? []);
-    $dayOrder = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    $hours = collect(range(7,16))->map(fn($h) => str_pad($h, 2, '0', STR_PAD_LEFT).':00')->all();
+    $dayOrder = ['Senin','Selasa','Rabu','Kamis','Jumat'];
+    $hours = [
+        '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', 
+        '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', 
+        '13:30', '14:00'
+    ];
 
     function normalizeDay($value) {
         $value = strtolower(trim((string)$value));
@@ -407,56 +411,20 @@
 @endphp
 
 <div class="schedule-page">
-    <div class="page-header">
-        <h1>Jadwal Mengajar</h1>
-        <p>Kelola agenda mengajar mingguan dengan filter cepat, kalender jadwal, dan ringkasan statistik.</p>
-    </div>
-
-    <div class="row g-3 filter-row mb-4">
-        <div class="col-12 col-md-6 col-lg-2">
-            <label class="form-label">Hari</label>
-            <select class="form-select">
-                <option selected>Semua Hari</option>
-                @foreach($dayOrder as $day)
-                    <option>{{ $day }}</option>
-                @endforeach
-            </select>
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1>Jadwal Mengajar</h1>
+            <p>Kelola agenda mengajar mingguan dengan kalender jadwal dan ringkasan statistik.</p>
         </div>
-        <div class="col-12 col-md-6 col-lg-2">
-            <label class="form-label">Semester</label>
-            <select class="form-select">
-                <option selected>Ganjil</option>
-                <option>Genap</option>
-            </select>
-        </div>
-        <div class="col-12 col-md-6 col-lg-2">
-            <label class="form-label">Tahun Ajaran</label>
-            <select class="form-select">
-                <option selected>2025 / 2026</option>
-                <option>2024 / 2025</option>
-            </select>
-        </div>
-        <div class="col-12 col-md-6 col-lg-2">
-            <label class="form-label">Mata Pelajaran</label>
-            <select class="form-select">
-                <option selected>Semua Mapel</option>
-                @foreach($schedulesCollection->pluck('subject')->filter()->unique()->take(10) as $subject)
-                    <option>{{ $subject }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-12 col-md-6 col-lg-2">
-            <label class="form-label">Kelas</label>
-            <select class="form-select">
-                <option selected>Semua Kelas</option>
-                @foreach($schedulesCollection->pluck('class')->filter()->unique()->take(10) as $class)
-                    <option>{{ $class }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-12 col-md-6 col-lg-2 d-flex align-items-end gap-2">
-            <button class="btn btn-outline-secondary w-100">Cetak Jadwal</button>
-            <button class="btn btn-primary w-100">Export PDF</button>
+        <div>
+            <button class="btn btn-primary" onclick="window.print()" style="min-height: 46px; border-radius: 12px; font-weight: 600; padding: 0 24px; background: var(--primary); border-color: var(--primary); display: inline-flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>Cetak Jadwal</span>
+            </button>
         </div>
     </div>
 
@@ -466,7 +434,7 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-3">
                     <div>
                         <div class="section-title">Kalender Mingguan</div>
-                        <div class="section-note">Tampilan jam 07.00–16.00 untuk Senin sampai Sabtu.</div>
+                        <div class="section-note">Tampilan jam 06.30–14.00 untuk Senin sampai Jumat.</div>
                     </div>
                     <div class="badge-pill">{{ $schedulesCollection->count() }} sesi minggu ini</div>
                 </div>
