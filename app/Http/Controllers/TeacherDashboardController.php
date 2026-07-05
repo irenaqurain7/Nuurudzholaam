@@ -64,13 +64,8 @@ class TeacherDashboardController extends Controller
             }
         }
 
-        // Compute today's name in Indonesian and count sessions for today
-        $dayMap = [
-            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
-        ];
-        $todayEnglish = \Carbon\Carbon::now()->format('l');
-        $todayName = $dayMap[$todayEnglish] ?? $todayEnglish;
+        // Compute today's DB day name and count sessions for today
+        $todayName = \Carbon\Carbon::now()->format('l');
 
         $todayCount = \App\Models\Schedule::where('teacher_id', $teacher->id)
             ->where('day', $todayName)
@@ -239,18 +234,11 @@ class TeacherDashboardController extends Controller
             }
         }
 
-        // If no class selected, show unified timeline for today across all classes
+        // If no class selected, show the full weekly schedule across all classes
         if ($selectedClass === '') {
-            $dayMap = [
-                'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
-                'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu', 'Sunday' => 'Minggu'
-            ];
-            $todayEnglish = \Carbon\Carbon::now()->format('l');
-            $todayName = $dayMap[$todayEnglish] ?? $todayEnglish;
-
             $schedules = \App\Models\Schedule::where('teacher_id', $teacher->id)
-                ->where('day', $todayName)
                 ->with('student')
+                ->orderByRaw("FIELD(day, 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')")
                 ->orderBy('start_time')
                 ->get();
         }
@@ -343,7 +331,7 @@ class TeacherDashboardController extends Controller
 
         $inserted = 0;
         foreach ($json as $group) {
-            $day = $group['day'] ?? '';
+            $day = $this->normalizeScheduleDayForDb($group['day'] ?? '');
             foreach ($group['items'] as $item) {
                 $subj = strtolower($item['subject'] ?? '');
                 if (preg_match('/kelas[^0-9]*\b' . preg_quote($selectedClass, '/') . '\b/i', $subj)) {
@@ -606,11 +594,15 @@ class TeacherDashboardController extends Controller
         $className = $this->classNameFromSlug($classSlug);
         $selectedSubject = trim((string) $request->query('subject', ''));
         $sections = $this->buildGradeSections($teacher);
-        $classCard = collect($sections[$level] ?? [])->firstWhere('class', $className);
+        $classCard = collect($sections[$level] ?? [])->first(function (array $card) use ($className) {
+            return strtoupper($this->normalizeClassName((string) ($card['class'] ?? ''))) === strtoupper($this->normalizeClassName($className));
+        });
 
         if (!$classCard) {
             abort(404);
         }
+
+        $className = (string) ($classCard['class'] ?? $className);
 
         $semester = $this->resolveSemesterLabel();
         $academicYear = $this->resolveAcademicYearLabel();
@@ -646,6 +638,7 @@ class TeacherDashboardController extends Controller
 
             return [
                 'student' => $student,
+                'grade_id' => $grade ? $grade->id : null,
                 'grade' => $grade,
                 'score' => $grade ? number_format((float) $grade->grade, 0) : '-',
                 'notes' => $grade && $grade->notes ? $grade->notes : '-',
@@ -891,6 +884,22 @@ class TeacherDashboardController extends Controller
         return ($year - 1) . '/' . $year;
     }
 
+    private function normalizeScheduleDayForDb(string $day): string
+    {
+        $day = strtolower(trim($day));
+
+        return match ($day) {
+            'senin', 'monday' => 'Monday',
+            'selasa', 'tuesday' => 'Tuesday',
+            'rabu', 'wednesday' => 'Wednesday',
+            'kamis', 'thursday' => 'Thursday',
+            'jumat', "jum'at", 'friday' => 'Friday',
+            'sabtu', 'saturday' => 'Saturday',
+            'minggu', 'sunday' => 'Sunday',
+            default => $day,
+        };
+    }
+
     private function buildFallbackStudents(int $count, string $className)
     {
         $students = collect();
@@ -1072,13 +1081,19 @@ class TeacherDashboardController extends Controller
             return redirect()->route('teacher.students.show', $validated['student_id'])->with('success', $message);
         }
 
+        $returnTo = $request->input('return_to');
+
+        if ($returnTo) {
+            return redirect()->to($returnTo)->with('success', $message);
+        }
+
         return redirect()->route('teacher.grades')->with('success', $message);
     }
 
     /**
      * Delete grade
      */
-    public function deleteGrade($id)
+    public function deleteGrade(Request $request, $id)
     {
         $user = Auth::user();
         $teacher = $user->teacher;
@@ -1089,6 +1104,13 @@ class TeacherDashboardController extends Controller
         }
 
         $grade->delete();
+
+        $returnTo = $request->input('return_to');
+
+        if ($returnTo) {
+            return redirect()->to($returnTo)->with('success', 'Nilai berhasil dihapus');
+        }
+
         return redirect()->route('teacher.grades')->with('success', 'Nilai berhasil dihapus');
     }
 

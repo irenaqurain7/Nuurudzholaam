@@ -11,6 +11,7 @@
     $activeSubject = $activeSubject ?? null;
     $semester = $semester ?? '-';
     $academicYear = $academicYear ?? '-';
+    $returnTo = url()->full();
 @endphp
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -214,6 +215,24 @@
         font-weight: 700;
     }
 
+    .grade-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .grade-control-box {
+        background: linear-gradient(135deg, rgba(31, 77, 59, 0.04), rgba(46, 125, 99, 0.02));
+        border: 1px solid rgba(31, 77, 59, 0.08);
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+    }
+
+    .grade-control-box strong {
+        color: #163827;
+    }
+
     .empty-state {
         border: 1px dashed rgba(100, 116, 139, 0.26);
         border-radius: 16px;
@@ -343,9 +362,31 @@
                         <h2 class="panel-title mb-1">Tabel Nilai Siswa</h2>
                         <div class="text-muted small">{{ $classCard['class'] }} @if($activeSubject) • {{ $activeSubject }} @endif</div>
                     </div>
-                    <span class="badge text-bg-light border rounded-pill px-3 py-2">{{ $rows->count() }} siswa</span>
+                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                        <span class="badge text-bg-light border rounded-pill px-3 py-2">{{ $rows->count() }} siswa</span>
+                        <button type="button"
+                                class="btn btn-success rounded-pill px-3 js-open-grade-modal"
+                                data-action="{{ route('teacher.grades.store') }}"
+                                data-method=""
+                                data-title="Tambah Nilai Baru"
+                                data-student-id="{{ $rows->first()['student']->id ?? '' }}"
+                                data-grade=""
+                                data-notes=""
+                                data-grade-id="">
+                            <i class="bi bi-plus-circle me-1"></i> Tambah Nilai
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body p-0">
+                    <div class="grade-control-box mx-3 mt-3">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <div>
+                                <strong>Kelola nilai langsung dari tabel</strong>
+                                <div class="text-muted small">Klik Edit untuk memperbarui nilai, atau Hapus untuk menghapus input yang salah.</div>
+                            </div>
+                            <div class="text-muted small">Perubahan akan kembali ke halaman ini.</div>
+                        </div>
+                    </div>
                     <div class="table-responsive table-wrap">
                         <table class="table table-modern align-middle mb-0">
                             <thead>
@@ -356,6 +397,7 @@
                                     <th style="width: 120px;">Nilai</th>
                                     <th>Catatan</th>
                                     <th style="width: 140px;">Update</th>
+                                    <th style="width: 180px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -370,10 +412,36 @@
                                         <td><span class="score-pill">{{ $row['score'] }}</span></td>
                                         <td>{{ $row['notes'] }}</td>
                                         <td>{{ $row['updated_at'] }}</td>
+                                        <td>
+                                            <div class="grade-actions">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-success js-open-grade-modal"
+                                                        data-action="{{ $row['grade_id'] ? route('teacher.grades.update', $row['grade_id']) : route('teacher.grades.store') }}"
+                                                        data-method="{{ $row['grade_id'] ? 'PUT' : '' }}"
+                                                        data-title="{{ $row['grade_id'] ? 'Edit Nilai' : 'Tambah Nilai' }}"
+                                                        data-student-id="{{ $row['student']->id }}"
+                                                        data-grade="{{ $row['grade'] ? $row['grade']->grade : '' }}"
+                                                        data-notes="{{ e($row['grade'] && $row['grade']->notes ? $row['grade']->notes : '') }}"
+                                                        data-grade-id="{{ $row['grade_id'] ?? '' }}">
+                                                    <i class="bi bi-pencil-square me-1"></i> {{ $row['grade_id'] ? 'Edit' : 'Tambah' }}
+                                                </button>
+
+                                                @if ($row['grade_id'])
+                                                    <form method="POST" action="{{ route('teacher.grades.delete', $row['grade_id']) }}" onsubmit="return confirm('Hapus nilai {{ $row['student']->user->name ?? 'ini' }}?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <input type="hidden" name="return_to" value="{{ $returnTo }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="bi bi-trash me-1"></i> Hapus
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6">
+                                        <td colspan="7">
                                             <div class="empty-state my-3">
                                                 Belum ada data siswa atau nilai untuk kelas ini.
                                             </div>
@@ -385,7 +453,103 @@
                     </div>
                 </div>
             </section>
+
+            <div class="modal fade" id="gradeModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content border-0 rounded-4 shadow">
+                        <form method="POST" action="{{ route('teacher.grades.store') }}" id="gradeForm">
+                            @csrf
+                            <input type="hidden" name="return_to" value="{{ $returnTo }}">
+                            <input type="hidden" name="_method" value="">
+                            <div class="modal-header border-0 pb-0">
+                                <div>
+                                    <h5 class="modal-title fw-bold text-success mb-1">Tambah Nilai Baru</h5>
+                                    <div class="text-muted small">Gunakan form ini untuk menambah atau mengubah nilai siswa.</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-3">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Siswa</label>
+                                        <select name="student_id" class="form-select" id="gradeStudentSelect" required>
+                                            @foreach ($rows as $row)
+                                                <option value="{{ $row['student']->id }}">
+                                                    {{ $row['student']->user->name ?? 'Nama siswa' }} @if($row['student']->nisn) - {{ $row['student']->nisn }} @endif
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Mata Pelajaran</label>
+                                        @if($level === 'sd')
+                                            <input type="text" class="form-control" value="{{ $activeSubject }}" readonly>
+                                            <input type="hidden" name="subject" value="{{ $activeSubject }}" id="gradeSubjectInput">
+                                        @else
+                                            <input type="text" class="form-control" value="{{ $activeSubject }}" readonly>
+                                            <input type="hidden" name="subject" value="{{ $activeSubject }}" id="gradeSubjectInput">
+                                        @endif
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Nilai</label>
+                                        <input type="number" name="grade" class="form-control" id="gradeValueInput" min="0" max="100" step="0.01" placeholder="Contoh: 88">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Catatan</label>
+                                        <textarea name="notes" class="form-control" id="gradeNotesInput" rows="3" placeholder="Opsional"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold">Simpan Nilai</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         @endif
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('gradeModal');
+        const form = document.getElementById('gradeForm');
+        const methodField = form ? form.querySelector('input[name="_method"]') : null;
+        const titleElement = modalElement ? modalElement.querySelector('.modal-title') : null;
+        const studentSelect = document.getElementById('gradeStudentSelect');
+        const valueInput = document.getElementById('gradeValueInput');
+        const notesInput = document.getElementById('gradeNotesInput');
+
+        if (!modalElement || !form || !methodField || !titleElement || !studentSelect || !valueInput || !notesInput || typeof bootstrap === 'undefined') {
+            return;
+        }
+
+        const modal = new bootstrap.Modal(modalElement);
+
+        const resetForm = function () {
+            form.action = '{{ route('teacher.grades.store') }}';
+            methodField.value = '';
+            titleElement.textContent = 'Tambah Nilai Baru';
+            valueInput.value = '';
+            notesInput.value = '';
+        };
+
+        document.querySelectorAll('.js-open-grade-modal').forEach(function (button) {
+            button.addEventListener('click', function () {
+                form.action = this.dataset.action || '{{ route('teacher.grades.store') }}';
+                methodField.value = this.dataset.method || '';
+                titleElement.textContent = this.dataset.title || 'Tambah Nilai Baru';
+                studentSelect.value = this.dataset.studentId || '';
+                valueInput.value = this.dataset.grade || '';
+                notesInput.value = this.dataset.notes || '';
+                modal.show();
+            });
+        });
+
+        modalElement.addEventListener('hidden.bs.modal', resetForm);
+        resetForm();
+    });
+</script>
 @endsection

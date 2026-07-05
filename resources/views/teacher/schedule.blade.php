@@ -155,7 +155,19 @@
         position: relative;
         overflow: hidden;
         margin-bottom: 0.75rem;
+        min-height: 178px;
     }
+
+    .lesson-card.lesson-short { min-height: 128px; }
+    .lesson-card.lesson-medium { min-height: 178px; }
+    .lesson-card.lesson-long { min-height: 228px; }
+
+    .lesson-card.tone-matematika { border-left-color: #2F4F3E; background: #e9f4eb; }
+    .lesson-card.tone-bahasa { border-left-color: #456652; background: #edf7f0; }
+    .lesson-card.tone-ipa { border-left-color: #3598b6; background: #eaf4fb; }
+    .lesson-card.tone-ips { border-left-color: #d37c1f; background: #fff2e3; }
+    .lesson-card.tone-pjok { border-left-color: #6b8d2d; background: #eff4e3; }
+    .lesson-card.tone-default { border-left-color: #7d5aa3; background: #f1edfb; }
 
     .lesson-card:hover {
         transform: translateY(-3px);
@@ -207,6 +219,29 @@
         font-size: 0.78rem;
         padding: 0.55rem 0.75rem;
         border-radius: 10px;
+    }
+
+    .lesson-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 42px;
+        padding: 0.55rem 0.9rem;
+        border-radius: 12px;
+        background: var(--primary);
+        color: #fff;
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 8px 18px rgba(47,79,62,0.16);
+    }
+
+    .lesson-link:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 22px rgba(47,79,62,0.2);
     }
 
     .lesson-actions .btn-outline-primary {
@@ -327,12 +362,13 @@
 
     function normalizeDay($value) {
         $value = strtolower(trim((string)$value));
-        if ($value === 'jumat' || strpos($value, "jum'at") !== false) return 'Jumat';
-        if (strpos($value, 'senin') !== false) return 'Senin';
-        if (strpos($value, 'selasa') !== false) return 'Selasa';
-        if (strpos($value, 'rabu') !== false) return 'Rabu';
-        if (strpos($value, 'kamis') !== false) return 'Kamis';
-        if (strpos($value, 'sabtu') !== false) return 'Sabtu';
+        if ($value === 'jumat' || strpos($value, "jum'at") !== false || $value === 'friday') return 'Jumat';
+        if (strpos($value, 'senin') !== false || $value === 'monday') return 'Senin';
+        if (strpos($value, 'selasa') !== false || $value === 'tuesday') return 'Selasa';
+        if (strpos($value, 'rabu') !== false || $value === 'wednesday') return 'Rabu';
+        if (strpos($value, 'kamis') !== false || $value === 'thursday') return 'Kamis';
+        if (strpos($value, 'sabtu') !== false || $value === 'saturday') return 'Sabtu';
+        if ($value === 'minggu' || $value === 'sunday') return 'Minggu';
         return '';
     }
 
@@ -366,6 +402,34 @@
         return '#f1edfb';
     }
 
+    function subjectToneClass($subject) {
+        $subject = strtolower($subject);
+        if (strpos($subject, 'matematika') !== false) return 'tone-matematika';
+        if (strpos($subject, 'bahasa') !== false) return 'tone-bahasa';
+        if (strpos($subject, 'ipa') !== false) return 'tone-ipa';
+        if (strpos($subject, 'ips') !== false) return 'tone-ips';
+        if (strpos($subject, 'pjok') !== false || strpos($subject, 'penjaskes') !== false) return 'tone-pjok';
+        return 'tone-default';
+    }
+
+    function gradeDetailUrl($className) {
+        $className = trim((string) $className);
+        $normalized = strtoupper(preg_replace('/\s+/', ' ', $className));
+        $normalized = preg_replace('/^KELAS\s+/', '', $normalized);
+
+        if (preg_match('/^(X|XI|XII)\b/', $normalized) || preg_match('/\b(OTKP|AKUNTANSI|TKJ|RPL|AK)\b/', $normalized)) {
+            $level = 'smk';
+        } elseif (preg_match('/^(VII|VIII|IX|7|8|9)\b/', $normalized)) {
+            $level = 'smp';
+        } else {
+            $level = 'sd';
+        }
+
+        $slug = preg_replace('/[^A-Z0-9\-]/', '', str_replace(' ', '-', $normalized));
+
+        return route('teacher.grades.detail', ['level' => $level, 'classSlug' => $slug]);
+    }
+
     function calculateDuration($start, $end) {
         $start = formatHour($start);
         $end = formatHour($end);
@@ -377,6 +441,13 @@
         } catch (Exception $e) {
             return 0;
         }
+    }
+
+    function lessonHeightClass($start, $end) {
+        $duration = calculateDuration($start, $end);
+        if ($duration >= 1.75) return 'lesson-long';
+        if ($duration >= 1.0) return 'lesson-medium';
+        return 'lesson-short';
     }
 
     $grid = [];
@@ -456,8 +527,9 @@
                                             $kelas = trim((string)($item->class ?? ($item->student->class ?? '-')));
                                             $room = trim((string)($item->room ?? '-'));
                                             $timeText = trim(formatHour($item->start_time ?? '') . ' - ' . formatHour($item->end_time ?? ''));
+                                            $heightClass = lessonHeightClass($item->start_time ?? '', $item->end_time ?? '');
                                         @endphp
-                                        <div class="lesson-card" style="border-color: {{ subjectBorderColor($subject) }}; background: {{ subjectBackground($subject) }};">
+                                        <div class="lesson-card {{ subjectToneClass($subject) }} {{ $heightClass }}">
                                             <div class="lesson-subj">{{ $subject }}</div>
                                             <div class="lesson-meta">{{ $kelas }} • {{ $timeText }} • {{ $room }}</div>
                                             <div class="lesson-tags">
@@ -465,9 +537,7 @@
                                                 <span class="lesson-tag">{{ $room ?: 'Ruang belum ditetapkan' }}</span>
                                             </div>
                                             <div class="lesson-actions">
-                                                <a href="#" class="btn btn-outline-primary">Input Absensi</a>
-                                                <a href="#" class="btn btn-outline-primary">Input Nilai</a>
-                                                <a href="#" class="btn btn-primary">Lihat Detail</a>
+                                                <a href="{{ gradeDetailUrl($kelas) }}" class="lesson-link">Lihat Detail</a>
                                             </div>
                                         </div>
                                     @endforeach
