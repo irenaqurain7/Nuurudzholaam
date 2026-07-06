@@ -4,6 +4,27 @@
 @section('page-title', 'Wizard Upload Jadwal - Langkah 2 dari 3')
 
 @section('content')
+@php
+    $classOptions = [];
+    if ($educationLevel === 'TK') {
+        $classOptions = ['TK-A', 'TK-B'];
+    } elseif ($educationLevel === 'SD') {
+        $classOptions = ['1', '2', '3', '4', '5', '6'];
+    } elseif ($educationLevel === 'SMP') {
+        $classOptions = ['7', '8', '9'];
+    } elseif ($educationLevel === 'SMK') {
+        $classOptions = ['10-RPL', '10-TKJ', '11-RPL', '11-TKJ', '12-RPL', '12-TKJ'];
+    }
+
+    $dayOptions = [
+        'Monday' => 'Senin',
+        'Tuesday' => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday' => 'Kamis',
+        'Friday' => 'Jumat',
+        'Saturday' => 'Sabtu',
+    ];
+@endphp
 <div class="admin-page">
     <!-- Header -->
     <div class="page-header">
@@ -46,7 +67,7 @@
                         <a href="{{ asset('templates/Template_' . $educationLevel . '.csv') }}" class="btn-download-template">
                             <i class="fas fa-file-csv"></i> Download Template CSV ({{ $educationLevel }})
                         </a>
-                        
+
                         <form method="POST" action="{{ route('admin.schedule.student.wizard.step2.store') }}" enctype="multipart/form-data" class="mt-4">
                             @csrf
                             <div class="form-group">
@@ -145,7 +166,14 @@
             <!-- Preview Card -->
             <div class="form-container">
                 <h2 class="section-title">Preview Jadwal (Sementara)</h2>
-                
+
+                @if ($errors->has('wizard_item'))
+                    <div class="alert-message alert-danger">{{ $errors->first('wizard_item') }}</div>
+                @endif
+                @if (session('success'))
+                    <div class="alert-message alert-success">{{ session('success') }}</div>
+                @endif
+
                 @if(count($previewItems) > 0)
                     <div class="table-responsive mt-3 mb-4">
                         <table class="admin-table">
@@ -156,11 +184,17 @@
                                     <th width="25%">Mata Pelajaran</th>
                                     <th width="15%">Hari</th>
                                     <th width="15%">Waktu</th>
-                                    <th width="25%">Guru</th>
+                                    <th width="20%">Guru</th>
+                                    <th width="10%">Status</th>
+                                    <th width="10%">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($previewItems as $i => $it)
+                                    @php
+                                        $validationRow = $previewValidation[$i] ?? null;
+                                        $isConflict = ($validationRow['status'] ?? 'valid') === 'conflict';
+                                    @endphp
                                     <tr>
                                         <td>{{ $i+1 }}</td>
                                         <td><strong>{{ $it['class'] ?? '-' }}</strong></td>
@@ -168,13 +202,105 @@
                                         <td>
                                             @php
                                                 $dayStr = $it['day'] ?? '-';
-                                                $daysId = ['Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu'];
-                                                $displayDay = $daysId[$dayStr] ?? $dayStr;
+                                                $displayDay = $dayOptions[$dayStr] ?? $dayStr;
                                             @endphp
                                             {{ $displayDay }}
                                         </td>
                                         <td>{{ ($it['start_time'] ?? '-') . ' - ' . ($it['end_time'] ?? '-') }}</td>
                                         <td>{{ $it['teacher'] ?? '-' }}</td>
+                                        <td>
+                                            @if($isConflict)
+                                                <span class="badge badge-danger">Konflik</span>
+                                            @else
+                                                <span class="badge badge-success">Valid</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="row-actions">
+                                                <button type="button" class="btn-action btn-edit" onclick="toggleEditRow({{ $i }})">
+                                                    <i class="fas fa-pen"></i> Edit
+                                                </button>
+                                                <form method="POST" action="{{ route('admin.schedule.student.wizard.item.delete', $i) }}" onsubmit="return confirm('Hapus baris ini dari preview?')">
+                                                    @csrf
+                                                    <button type="submit" class="btn-action btn-delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit-row-{{ $i }}" class="edit-row" style="display:none;">
+                                        <td colspan="8">
+                                            <div class="edit-panel">
+                                                <form method="POST" action="{{ route('admin.schedule.student.wizard.item.update', $i) }}">
+                                                    @csrf
+                                                    <div class="form-row-3 mb-3">
+                                                        <div class="form-group">
+                                                            <label class="form-label">Kelas</label>
+                                                            <select name="class" class="form-control" required>
+                                                                @foreach($classOptions as $classOption)
+                                                                    <option value="{{ $classOption }}" @selected(($it['class'] ?? '') === $classOption)>{{ $classOption }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Mata Pelajaran</label>
+                                                            <input name="subject" class="form-control" value="{{ $it['subject'] ?? '' }}" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Guru</label>
+                                                            <select name="teacher_id" class="form-control" required>
+                                                                <option value="">Pilih Guru</option>
+                                                                @foreach($teachers as $teacher)
+                                                                    <option value="{{ $teacher->id }}" @selected((string)($it['teacher_id'] ?? '') === (string)$teacher->id)>
+                                                                        {{ $teacher->user->name ?? 'Unknown' }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-row-3 mb-3">
+                                                        <div class="form-group">
+                                                            <label class="form-label">Hari</label>
+                                                            <select name="day" class="form-control" required>
+                                                                @foreach($dayOptions as $dayKey => $dayLabel)
+                                                                    <option value="{{ $dayKey }}" @selected(($it['day'] ?? '') === $dayKey)>{{ $dayLabel }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Jam Mulai</label>
+                                                            <input type="time" name="start_time" class="form-control" value="{{ \Illuminate\Support\Str::of((string)($it['start_time'] ?? ''))->limit(5, '') }}" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Jam Selesai</label>
+                                                            <input type="time" name="end_time" class="form-control" value="{{ \Illuminate\Support\Str::of((string)($it['end_time'] ?? ''))->limit(5, '') }}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-3">
+                                                        <label class="form-label">Ruangan</label>
+                                                        <input name="room" class="form-control" value="{{ $it['room'] ?? '' }}" placeholder="Contoh: Lab Komputer">
+                                                    </div>
+
+                                                    @if($isConflict)
+                                                        <div class="conflict-inline">
+                                                            @foreach(($validationRow['reasons'] ?? []) as $reason)
+                                                                <div>• {{ $reason }}</div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+
+                                                    <div class="edit-actions">
+                                                        <button type="button" class="btn-cancel" onclick="toggleEditRow({{ $i }})">
+                                                            Batal
+                                                        </button>
+                                                        <button type="submit" class="btn-submit">
+                                                            Simpan Perubahan
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -297,10 +423,22 @@
 .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #E2ECE8; }
 .admin-table th { padding: 12px 16px; font-size: 12px; }
 .admin-table td { padding: 12px 16px; }
+.alert-message { padding: 0.85rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; font-weight: 500; }
+.alert-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+.alert-danger { background: #FEF2F2; border: 1px solid #fecaca; color: #b91c1c; }
+.row-actions { display: flex; align-items: center; gap: 0.5rem; }
+.btn-action { border: 1px solid #E2ECE8; background: white; color: #2D4438; border-radius: 6px; padding: 0.35rem 0.6rem; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; }
+.btn-edit:hover { border-color: #709D88; color: #709D88; }
+.btn-delete { color: #b91c1c; }
+.btn-delete:hover { border-color: #fecaca; background: #FEF2F2; }
+.edit-panel { background: #F9FAFB; border: 1px solid #E2ECE8; border-radius: 8px; padding: 1rem; }
+.edit-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem; }
+.conflict-inline { margin-top: 0.75rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: #b91c1c; background: #FEF2F2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.6rem 0.75rem; }
 
 @media (max-width: 768px) {
     .form-row-3 { grid-template-columns: 1fr; }
     .wizard-stepper { display: none; }
+    .edit-actions { flex-direction: column; }
 }
 </style>
 
@@ -308,6 +446,17 @@
 function updateFileName(input) {
     const fileName = input.files[0] ? input.files[0].name : 'Pilih berkas atau tarik ke sini';
     document.getElementById('file-name').textContent = fileName;
+}
+
+function toggleEditRow(index) {
+    const row = document.getElementById(`edit-row-${index}`);
+    if (!row) return;
+
+    const isHidden = row.style.display === 'none' || row.style.display === '';
+    document.querySelectorAll('.edit-row').forEach((item) => {
+        item.style.display = 'none';
+    });
+    row.style.display = isHidden ? 'table-row' : 'none';
 }
 </script>
 @endsection

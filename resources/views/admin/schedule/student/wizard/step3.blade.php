@@ -40,7 +40,7 @@
                 $valid = collect($validation)->where('status','valid')->count();
                 $conflicts = $total - $valid;
             @endphp
-            
+
             <div class="stats-grid mb-4">
                 <div class="stat-card">
                     <div class="stat-icon" style="background: rgba(112,157,136,0.1); color: #709D88;"><i class="fas fa-list-ul"></i></div>
@@ -68,7 +68,7 @@
             <!-- Detail Card -->
             <div class="form-container mb-4">
                 <h2 class="section-title">Detail Validasi Rekaman</h2>
-                
+
                 @if($conflicts > 0)
                     <div class="alert alert-warning mb-4" style="background: #FFFBEB; border: 1px solid #FEF3C7; border-radius: 8px; padding: 1rem; display: flex; gap: 1rem; align-items: flex-start; color: #B45309;">
                         <i class="fas fa-exclamation-circle" style="font-size: 1.5rem; margin-top: 0.1rem;"></i>
@@ -127,7 +127,7 @@
                         </a>
                         <div style="display: flex; gap: 1rem;">
                             <a href="{{ route('admin.schedule.student.wizard.step2') }}" class="btn-outline">
-                                <i class="fas fa-redo"></i> Unggah Ulang Berkas
+                                <i class="fas fa-pen"></i> Edit Data Konflik
                             </a>
                             <button type="submit" class="btn-submit {{ $conflicts > 0 ? 'disabled' : '' }}" @if($conflicts > 0) disabled @endif>
                                 <i class="fas fa-paper-plane"></i> Publikasikan Jadwal

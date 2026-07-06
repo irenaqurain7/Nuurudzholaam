@@ -129,6 +129,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
         Route::get('/wizard/step-3', [AdminController::class, 'scheduleStudentWizardStep3'])->name('wizard.step3');
 
+        Route::post('/wizard/item/{index}/update', [AdminController::class, 'scheduleStudentWizardUpdateItem'])->whereNumber('index')->name('wizard.item.update');
+        Route::post('/wizard/item/{index}/delete', [AdminController::class, 'scheduleStudentWizardDeleteItem'])->whereNumber('index')->name('wizard.item.delete');
+
         Route::post('/wizard/publish', [AdminController::class, 'scheduleStudentPublish'])->name('wizard.publish');
 
         // Keep existing CRUD for listing/editing/deleting legacy student schedules

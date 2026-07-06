@@ -1115,10 +1115,12 @@ class AdminController extends Controller
         $educationLevel = session('wizard_education_level');
 
         $previewItems = session('wizard_items', []);
+        $service = new ScheduleImportService();
+        $previewValidation = $service->validateConflicts($previewItems);
 
         $teachers = \App\Models\Teacher::with('user')->get();
 
-        return view('admin.schedule.student.wizard.step2', compact('uploadMethod','educationLevel','previewItems','teachers'));
+        return view('admin.schedule.student.wizard.step2', compact('uploadMethod','educationLevel','previewItems','previewValidation','teachers'));
     }
 
     public function scheduleStudentWizardStoreStep2(Request $request)
@@ -1218,6 +1220,95 @@ class AdminController extends Controller
         session(['wizard_items' => $items]);
 
         return redirect()->route('admin.schedule.student.wizard.step2');
+    }
+
+    public function scheduleStudentWizardUpdateItem(Request $request, $index)
+    {
+        $items = session('wizard_items', []);
+
+        if (!array_key_exists((int) $index, $items)) {
+            return redirect()->route('admin.schedule.student.wizard.step2')->withErrors(['wizard_item' => 'Data jadwal yang dipilih tidak ditemukan.']);
+        }
+
+        $validated = $request->validate([
+            'class' => 'required|string',
+            'subject' => 'required|string',
+            'day' => 'required|string|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
+            'start_time' => 'required|string',
+            'end_time' => 'required|string',
+            'teacher_id' => 'required|exists:teachers,id',
+            'room' => 'nullable|string',
+        ], [
+            'teacher_id.required' => 'Guru wajib dipilih',
+            'teacher_id.exists' => 'Guru tidak valid',
+            'day.in' => 'Hari tidak valid',
+        ]);
+
+        $startTime = $this->normalizeWizardTime($validated['start_time']);
+        $endTime = $this->normalizeWizardTime($validated['end_time']);
+
+        if (!$startTime || !$endTime) {
+            return redirect()->route('admin.schedule.student.wizard.step2')->withErrors(['wizard_item' => 'Format jam harus HH:MM (contoh: 07:30).']);
+        }
+
+        if (strtotime($startTime) >= strtotime($endTime)) {
+            return redirect()->route('admin.schedule.student.wizard.step2')->withErrors(['wizard_item' => 'Jam selesai harus lebih besar dari jam mulai.']);
+        }
+
+        $teacher = \App\Models\Teacher::with('user')->find($validated['teacher_id']);
+
+        $items[(int) $index] = [
+            'class' => trim((string) $validated['class']),
+            'subject' => trim((string) $validated['subject']),
+            'day' => $validated['day'],
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'teacher_id' => $teacher->id,
+            'teacher' => $teacher->user->name ?? 'Unknown',
+            'room' => isset($validated['room']) ? trim((string) $validated['room']) : null,
+        ];
+
+        session(['wizard_items' => array_values($items)]);
+
+        return redirect()->route('admin.schedule.student.wizard.step2')->with('success', 'Baris jadwal berhasil diperbarui.');
+    }
+
+    public function scheduleStudentWizardDeleteItem($index)
+    {
+        $items = session('wizard_items', []);
+
+        if (!array_key_exists((int) $index, $items)) {
+            return redirect()->route('admin.schedule.student.wizard.step2')->withErrors(['wizard_item' => 'Data jadwal yang dipilih tidak ditemukan.']);
+        }
+
+        unset($items[(int) $index]);
+        session(['wizard_items' => array_values($items)]);
+
+        return redirect()->route('admin.schedule.student.wizard.step2')->with('success', 'Baris jadwal berhasil dihapus.');
+    }
+
+    protected function normalizeWizardTime(?string $time): ?string
+    {
+        $time = trim((string) $time);
+
+        if ($time === '') {
+            return null;
+        }
+
+        if (preg_match('/^\d{2}:\d{2}$/', $time)) {
+            return $time;
+        }
+
+        if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $time)) {
+            return substr($time, 0, 5);
+        }
+
+        $parsed = strtotime($time);
+        if ($parsed === false) {
+            return null;
+        }
+
+        return date('H:i', $parsed);
     }
 
     // WIZARD STEP 3: Review & validation
