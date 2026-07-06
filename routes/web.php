@@ -153,6 +153,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/download-template', [AdminController::class, 'usersDownloadTemplate'])->name('download-template');
     Route::post('/import', [AdminController::class, 'usersImport'])->name('import');
+    Route::post('/validate-import', [AdminController::class, 'usersValidateImport'])->name('validate-import');
+    Route::post('/process-import', [AdminController::class, 'usersProcessImport'])->name('process-import');
     });
 });
 

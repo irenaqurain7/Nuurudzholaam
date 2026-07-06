@@ -14,8 +14,10 @@ use App\Models\Teacher;
 use App\Models\Schedule;
 use App\Exports\PPDBExcelExport;
 use App\Services\PPDBExportService;
+use App\Services\BulkUserValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -1369,7 +1371,7 @@ class AdminController extends Controller
         return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal berhasil dipublikasikan.');
     }
 
-    // 1. Fungsi Download Template CSV
+    // 1. Fungsi Download Template CSV (Updated dengan NISN/NIP, Jenjang, Kelas)
 public function usersDownloadTemplate()
 {
     $headers = [
@@ -1380,65 +1382,106 @@ public function usersDownloadTemplate()
         "Expires"             => "0"
     ];
 
-    $columns = ['Nama Lengkap', 'Email', 'Password', 'Role (siswa/guru)', 'No Telepon', 'Alamat'];
+    // Updated columns dengan NISN/NIP, Jenjang, Kelas
+    $columns = ['Nama Lengkap', 'Email', 'Password', 'Role (siswa/guru)', 'NISN/NIP', 'Jenjang (Siswa) / Spesialisasi (Guru)', 'Kelas / -', 'No Telepon', 'Alamat'];
 
     $callback = function() use($columns) {
         $file = fopen('php://output', 'w');
         fputcsv($file, $columns);
-        fputcsv($file, ['Ahmad Fauzi', 'ahmad@nuurudzholaam.sch.id', 'rahasia123', 'siswa', '08123456789', 'Purwakarta']);
-        fputcsv($file, ['Siti Aminah', 'siti@nuurudzholaam.sch.id', 'passwordguru', 'guru', '08987654321', 'Bungursari']);
+        // Contoh data siswa: NISN 13 digit, Jenjang: TK/SD/SMP/SMA/SMK, Kelas: sesuai
+        fputcsv($file, ['Ahmad Fauzi', 'ahmad@nuurudzholaam.sch.id', 'rahasia123', 'siswa', '0012345678901', 'SD', '5A', '08123456789', 'Purwakarta']);
+        // Contoh data guru: NIP 18 digit, Spesialisasi, Kelas: -
+        fputcsv($file, ['Siti Aminah', 'siti@nuurudzholaam.sch.id', 'passwordguru', 'guru', '123456789012345678', 'Matematika', '-', '08987654321', 'Bungursari']);
         fclose($file);
     };
 
     return response()->stream($callback, 200, $headers);
     }
-    // 2. Fungsi Proses File CSV
-    public function usersImport(Request $request)
+    // 2. Validasi File & Preview sebelum import
+    public function usersValidateImport(Request $request)
     {
         $request->validate([
             'file_excel' => 'required|mimes:csv,txt|max:2048',
         ]);
 
         $file = $request->file('file_excel');
-        $handle = fopen($file->getRealPath(), "r");
-        fgetcsv($handle); // Lewati header kolom
+        $validator = new \App\Services\BulkUserValidator();
+        $result = $validator->parseAndValidate($file);
 
-        $suksesCount = 0;
+        return view('admin.users.import-preview', [
+            'valid_rows' => $result['valid_rows'] ?? [],
+            'invalid_rows' => $result['invalid_rows'] ?? [],
+            'warnings' => $result['warnings'] ?? [],
+            'summary' => $result['summary'] ?? ['total' => 0, 'valid' => 0, 'invalid' => 0],
+            'validation_errors' => $result['errors'] ?? [],
+        ]);
+    }
 
-        while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            if (empty($row[0]) || empty($row[1])) {
-                continue;
-            }
+    // 3. Proses simpan data setelah validasi berhasil
+    public function usersProcessImport(Request $request)
+    {
+        $request->validate([
+            'validated_data' => 'required|json',
+        ]);
 
-            $user = User::create([
-                'name'     => $row[0],
-                'email'    => $row[1],
-                'password' => Hash::make($row[2]),
-                'role'     => strtolower($row[3]), // Menyimpan sebagai 'siswa' atau 'guru'
-                'phone'    => $row[4] ?? null,
-                'address'  => $row[5] ?? null,
-            ]);
-
-            if ($user->role === 'siswa') {
-                \App\Models\Student::create([
-                    'user_id' => $user->id,
-                    'nisn' => '-' . $user->id,
-                    'class' => '-'
-                ]);
-            } elseif ($user->role === 'guru') {
-                \App\Models\Teacher::create([
-                    'user_id' => $user->id,
-                    'nip' => '-' . $user->id,
-                    'specialization' => '-'
-                ]);
-            }
-
-            $suksesCount++;
+        $validatedData = json_decode($request->validated_data, true);
+        if (!is_array($validatedData)) {
+            return redirect()->back()->withErrors(['Data validasi tidak valid.']);
         }
 
-        fclose($handle);
+        $suksesCount = 0;
+        $errorCount = 0;
 
-        return redirect()->back()->with('success', "Berhasil menambahkan $suksesCount data secara massal!");
+        foreach ($validatedData as $row) {
+            try {
+                $user = User::create([
+                    'name'     => $row['name'],
+                    'email'    => $row['email'],
+                    'password' => Hash::make($row['password']),
+                    'role'     => $row['role'],
+                    'phone'    => $row['phone'],
+                    'address'  => $row['address'],
+                    'nisn'     => $row['role'] === 'siswa' ? $row['nisn_nip'] : null,
+                    'nip'      => $row['role'] === 'guru' ? $row['nisn_nip'] : null,
+                    'class'    => $row['role'] === 'siswa' ? $row['kelas'] : null,
+                    'is_active' => true,
+                ]);
+
+                if ($row['role'] === 'siswa') {
+                    Student::create([
+                        'user_id' => $user->id,
+                        'nisn' => $row['nisn_nip'],
+                        'class' => $row['kelas'] ?? '-'
+                    ]);
+                } elseif ($row['role'] === 'guru') {
+                    Teacher::create([
+                        'user_id' => $user->id,
+                        'nip' => $row['nisn_nip'],
+                        'specialization' => $row['jenjang_spesialisasi']
+                    ]);
+                }
+
+                $suksesCount++;
+            } catch (\Exception $e) {
+                $errorCount++;
+                Log::error('Error importing user: ' . $e->getMessage(), $row);
+            }
+        }
+
+        $message = "Berhasil menambahkan $suksesCount data";
+        if ($errorCount > 0) {
+            $message .= ", tetapi $errorCount data gagal disimpan.";
+        } else {
+            $message .= " secara massal!";
+        }
+
+        return redirect()->route('admin.users.index')->with('success', $message);
+    }
+
+    // Backward compatibility: usersImport sekarang redirect ke validateImport
+    public function usersImport(Request $request)
+    {
+        return $this->usersValidateImport($request);
     }
 
 }

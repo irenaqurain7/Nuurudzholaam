@@ -201,7 +201,7 @@
         </div>
 
         <p class="import-subtitle">
-            Fitur ini digunakan untuk memasukkan data siswa atau guru dalam jumlah banyak secara bersamaan. Silakan unduh template format berkas terlebih dahulu agar struktur data sesuai.
+            Fitur ini digunakan untuk memasukkan data siswa atau guru dalam jumlah banyak secara bersamaan. Silakan unduh template format berkas terlebih dahulu agar struktur data sesuai. Sistem akan melakukan validasi otomatis sebelum data disimpan ke database.
         </p>
 
         <div class="form-grid two-col alignment-stretch" style="margin-bottom: 0; margin-top: 20px;">
@@ -213,13 +213,13 @@
                 </a>
             </div>
 
-            <form action="{{ route('admin.users.import') }}" method="POST" enctype="multipart/form-data" class="field-group">
+            <form action="{{ route('admin.users.validate-import') }}" method="POST" enctype="multipart/form-data" class="field-group">
                 @csrf
-                <label for="file_excel">2. Pilih & Upload Berkas</label>
+                <label for="file_excel">2. Pilih & Upload Berkas (Validasi Otomatis)</label>
                 <div class="import-upload-group">
                     <input type="file" id="file_excel" name="file_excel" required accept=".csv, text/csv">
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-upload"></i> Proses Import
+                        <i class="fas fa-upload"></i> Preview & Validasi
                     </button>
                 </div>
             </form>
@@ -578,7 +578,7 @@
     function toggleJenjangFields() {
         const jenjang = document.getElementById('jenjang').value;
         const nisnGroup = document.getElementById('nisn-field-group');
-        
+
         if (jenjang === 'TK') {
             nisnGroup.style.display = 'none';
         } else {
@@ -591,9 +591,9 @@
     function populateClassOptions(jenjang) {
         const classSelect = document.getElementById('class');
         const selectedValue = classSelect.getAttribute('data-old-value') || classSelect.value;
-        
+
         classSelect.innerHTML = '';
-        
+
         if (classOptions[jenjang]) {
             classOptions[jenjang].forEach(option => {
                 const optElement = document.createElement('option');
