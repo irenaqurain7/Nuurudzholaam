@@ -26,19 +26,6 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Create test students
-        User::updateOrCreate(
-            ['email' => 'siswa@example.com'],
-            [
-                'name' => 'Test Siswa',
-                'username' => 'siswa',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-                'role' => 'siswa',
-                'is_active' => true,
-            ]
-        );
-
         // Create test guru
         User::updateOrCreate(
             ['email' => 'guru@example.com'],

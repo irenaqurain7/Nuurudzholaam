@@ -15,29 +15,6 @@ class CreateDemoStudentSeeder extends Seeder
      */
     public function run(): void
     {
-        // Buat user siswa
-        $user = User::firstOrCreate(
-            ['email' => 'siswa@example.com'],
-            [
-                'name' => 'Siswa Demo',
-                'password' => Hash::make('password'),
-                'role' => 'siswa',
-                'phone' => '08123456789',
-                'address' => 'Jalan Demo No. 123',
-            ]
-        );
-
-        // Buat student record jika belum ada
-        Student::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'nisn' => '1234567890123',
-                'class' => '10',
-            ]
-        );
-
-        echo "\n✅ Demo student created!\n";
-        echo "Email: siswa@example.com\n";
-        echo "Password: password\n";
+        // Demo student seeding telah dinonaktifkan untuk mencegah data dummy muncul di admin.
     }
 }
