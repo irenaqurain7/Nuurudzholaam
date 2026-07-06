@@ -14,24 +14,61 @@
     </div>
 
     <!-- Filters & Search -->
-    <div class="management-toolbar">
+    <form method="GET" action="{{ route('admin.ppdb.index') }}" class="management-toolbar">
         <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" placeholder="Cari nama, email, atau no telepon..." class="search-input">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Cari nama, email, atau no telepon..."
+                class="search-input"
+            >
         </div>
         <div class="filter-group">
-            <select class="filter-select">
+            <select class="filter-select" name="status">
                 <option value="">Semua Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                <option value="pending" @selected(request('status') === 'pending')>Pending</option>
+                <option value="diterima" @selected(request('status') === 'diterima')>Diterima</option>
+                <option value="ditolak" @selected(request('status') === 'ditolak')>Ditolak</option>
+            </select>
+            <select class="filter-select" name="jenjang">
+                <option value="">Semua Jenjang</option>
+                <option value="tk" @selected(request('jenjang') === 'tk')>TK</option>
+                <option value="sd" @selected(request('jenjang') === 'sd')>SD</option>
+                <option value="smp" @selected(request('jenjang') === 'smp')>SMP</option>
+                <option value="smk" @selected(request('jenjang') === 'smk')>SMK</option>
             </select>
         </div>
-        <a href="{{ route('admin.ppdb.index') }}" class="btn-export">
-            <i class="fas fa-sync"></i>
-            Refresh
-        </a>
-    </div>
+        <div class="toolbar-actions">
+            <a href="{{ route('admin.ppdb.index') }}" class="btn-export btn-refresh">
+                <i class="fas fa-sync"></i>
+                Refresh
+            </a>
+            @php
+                $exportParams = array_filter(request()->except('page'), function ($value) {
+                    return $value !== null && $value !== '';
+                });
+            @endphp
+            <div class="export-dropdown">
+                <button type="button" class="btn-export btn-export-toggle">
+                    <i class="fas fa-file-export"></i>
+                    Export
+                    <i class="fas fa-chevron-down export-caret"></i>
+                </button>
+                <div class="export-menu">
+                    <a href="{{ route('admin.ppdb.export.excel', $exportParams) }}" class="export-item">
+                        <i class="fas fa-file-excel" style="color: #1f9d55;"></i>
+                        Export Excel (.xlsx)
+                    </a>
+                    <a href="{{ route('admin.ppdb.export.pdf', $exportParams) }}" class="export-item">
+                        <i class="fas fa-file-pdf" style="color: #dc3545;"></i>
+                        Export PDF (.pdf)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
 
     <!-- Statistics -->
     <div class="mini-stats">
@@ -59,7 +96,7 @@
             </div>
             <div class="mini-stat-content">
                 <p class="mini-stat-label">Approved</p>
-                <p class="mini-stat-value">{{ $registrations->where('status', 'approved')->count() }}</p>
+                <p class="mini-stat-value">{{ $registrations->where('status', 'diterima')->count() }}</p>
             </div>
         </div>
         <div class="mini-stat">
@@ -68,7 +105,7 @@
             </div>
             <div class="mini-stat-content">
                 <p class="mini-stat-label">Rejected</p>
-                <p class="mini-stat-value">{{ $registrations->where('status', 'rejected')->count() }}</p>
+                <p class="mini-stat-value">{{ $registrations->where('status', 'ditolak')->count() }}</p>
             </div>
         </div>
     </div>
@@ -110,10 +147,10 @@
                     <td>
                         @if($reg->status == 'pending')
                             <span class="badge badge-warning">Pending</span>
-                        @elseif($reg->status == 'approved')
-                            <span class="badge badge-success">Approved</span>
+                        @elseif($reg->status == 'diterima')
+                            <span class="badge badge-success">Diterima</span>
                         @else
-                            <span class="badge badge-danger">Rejected</span>
+                            <span class="badge badge-danger">Ditolak</span>
                         @endif
                     </td>
                     <td>
@@ -215,6 +252,14 @@
         gap: 10px;
     }
 
+    .toolbar-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-left: auto;
+        flex-wrap: wrap;
+    }
+
     .filter-select {
         padding: 10px 15px;
         border: 1px solid #e2e8f0;
@@ -249,6 +294,61 @@
     .btn-export:hover {
         background: var(--hijau-islam);
         color: white;
+    }
+
+    .btn-refresh {
+        white-space: nowrap;
+    }
+
+    .export-dropdown {
+        position: relative;
+    }
+
+    .btn-export-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .export-caret {
+        font-size: 11px;
+        transition: transform 0.2s ease;
+    }
+
+    .export-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 210px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+        padding: 8px;
+        display: none;
+        z-index: 15;
+    }
+
+    .export-dropdown:hover .export-menu,
+    .export-dropdown:focus-within .export-menu {
+        display: block;
+    }
+
+    .export-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--text-dark);
+        text-decoration: none;
+        font-size: 14px;
+        transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .export-item:hover {
+        background: #f8fafc;
+        color: var(--hijau-islam);
     }
 
     /* Mini Statistics */
@@ -457,6 +557,17 @@
 
         .search-box {
             min-width: 100%;
+        }
+
+        .toolbar-actions {
+            width: 100%;
+            margin-left: 0;
+            justify-content: flex-start;
+        }
+
+        .export-menu {
+            left: 0;
+            right: auto;
         }
 
         .data-table {

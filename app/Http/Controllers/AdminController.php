@@ -13,12 +13,15 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Schedule;
+use App\Exports\PPDBExcelExport;
+use App\Services\PPDBExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\ScheduleImportService;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AdminController extends Controller
 {
@@ -38,8 +41,8 @@ class AdminController extends Controller
 
         // PPDB progress statistics
         $ppdbPending = \App\Models\PPDBRegistration::where('status', 'pending')->count();
-        $ppdbApproved = \App\Models\PPDBRegistration::where('status', 'approved')->count();
-        $ppdbRejected = \App\Models\PPDBRegistration::where('status', 'rejected')->count();
+        $ppdbApproved = \App\Models\PPDBRegistration::where('status', 'diterima')->count();
+        $ppdbRejected = \App\Models\PPDBRegistration::where('status', 'ditolak')->count();
 
         // Latest registrations (max 5)
         $latestRegistrations = \App\Models\PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(5)->get();
@@ -56,7 +59,7 @@ class AdminController extends Controller
         $todayIndonesian = $dayMap[$todayEnglish] ?? $todayEnglish;
 
         $todayTeacherSchedule = \App\Models\Schedule::whereIn('day', [$todayEnglish, $todayIndonesian])->count();
-        
+
         $todayStudentSchedule = 0;
         $studentSchedulesToday = \App\Models\StudentSchedule::whereIn('day', [$todayEnglish, $todayIndonesian])->get();
         if ($studentSchedulesToday->isNotEmpty()) {
@@ -122,9 +125,14 @@ class AdminController extends Controller
     }
 
     // PPDB REGISTRATIONS
-    public function ppdbIndex()
+    public function ppdbIndex(Request $request, PPDBExportService $ppdbExportService)
     {
-        $registrations = PPDBRegistration::orderBy('tgl_daftar', 'desc')->paginate(15);
+        $registrations = $ppdbExportService->filteredQuery($request)
+            ->orderBy('tgl_daftar', 'desc')
+            ->orderByDesc('id')
+            ->paginate(15)
+            ->withQueryString();
+
         return view('admin.ppdb.index', compact('registrations'));
     }
 
@@ -141,10 +149,67 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Status pendaftar diperbarui.');
     }
 
-    public function ppdbExport()
+    public function ppdbExport(Request $request, PPDBExportService $ppdbExportService)
     {
-        // TODO: Implement Excel export
-        return redirect()->back()->with('info', 'Fitur export sedang dalam pengembangan.');
+        return $this->ppdbExportExcel($request, $ppdbExportService);
+    }
+
+    public function ppdbExportExcel(Request $request, PPDBExportService $ppdbExportService)
+    {
+        $registrations = $ppdbExportService->filteredQuery($request)
+            ->orderBy('tgl_daftar', 'desc')
+            ->orderByDesc('id')
+            ->get();
+
+        $rows = $ppdbExportService->mapExportRows($registrations);
+
+        $school = SchoolInfo::first();
+        $export = new PPDBExcelExport(
+            $rows,
+            $school?->nama_sekolah ?? config('app.name', 'Sekolah Nururudzholam'),
+            now()->format('d-m-Y')
+        );
+
+        $filename = 'data_pendaftar_ppdb_' . now()->format('Y-m-d_His') . '.xlsx';
+
+        return response()->streamDownload(function () use ($export) {
+            $export->output();
+        }, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function ppdbExportPdf(Request $request, PPDBExportService $ppdbExportService)
+    {
+        $registrations = $ppdbExportService->filteredQuery($request)
+            ->orderBy('tgl_daftar', 'desc')
+            ->orderByDesc('id')
+            ->get();
+
+        $school = SchoolInfo::first();
+
+        $logoBase64 = null;
+        if ($school && $school->logo) {
+            $logoPath = storage_path('app/public/' . $school->logo);
+
+            if (file_exists($logoPath)) {
+            $logoBase64 = 'data:' . mime_content_type($logoPath) . ';base64,' . base64_encode(file_get_contents($logoPath));
+            }
+        }
+
+        $rows = $ppdbExportService->mapExportRows($registrations);
+
+        $pdf = Pdf::loadView('admin.ppdb.export-pdf', [
+            'school' => $school,
+            'logoBase64' => $logoBase64,
+            'rows' => $rows,
+            'totalData' => $rows->count(),
+            'exportDate' => now()->format('d-m-Y H:i'),
+        ])->setPaper('a4', 'landscape');
+
+        $filename = 'data_pendaftar_ppdb_' . now()->format('Y-m-d_His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     // PROGRAMS
@@ -740,12 +805,12 @@ class AdminController extends Controller
     {
         // 1. Fetch all teachers (role = guru) first, apply search filter if any
         $teachersQuery = \App\Models\User::where('role', 'guru');
-        
+
         if ($request->filled('search_guru')) {
             $search = $request->search_guru;
             $teachersQuery->where('name', 'like', '%' . $search . '%');
         }
-        
+
         $teachers = $teachersQuery->get();
         $groupedSchedules = [];
 
@@ -759,7 +824,7 @@ class AdminController extends Controller
                     'specialization' => '-'
                 ]);
             }
-            
+
             $teacherId = $teacher->id;
             $groupedSchedules[$teacherId] = [
                 'teacher_id' => $teacherId,
@@ -800,8 +865,8 @@ class AdminController extends Controller
 
         foreach ($schedules as $schedule) {
             $teacherId = $schedule->teacher_id;
-            
-            // Skip if teacher_id is null or if this teacher wasn't found in our predefined list 
+
+            // Skip if teacher_id is null or if this teacher wasn't found in our predefined list
             // (e.g. if their role changed but schedule remained, though rare)
             if (!$teacherId || !isset($groupedSchedules[$teacherId])) continue;
 
@@ -829,7 +894,7 @@ class AdminController extends Controller
         // Detect conflicts for each teacher
         foreach ($groupedSchedules as $teacherId => &$data) {
             $teacherSchedules = collect($data['schedules']);
-            
+
             // Group by day to check overlaps
             $byDay = $teacherSchedules->groupBy('day');
             $hasConflict = false;
@@ -837,7 +902,7 @@ class AdminController extends Controller
             foreach ($byDay as $day => $dailySchedules) {
                 // Sort by start_time
                 $sorted = $dailySchedules->sortBy('start_time')->values();
-                
+
                 for ($i = 0; $i < $sorted->count() - 1; $i++) {
                     $current = $sorted[$i];
                     $next = $sorted[$i + 1];
@@ -860,7 +925,7 @@ class AdminController extends Controller
             $data['classes_str'] = implode(', ', array_keys($data['total_classes']));
             $data['total_classes'] = count($data['total_classes']);
             $data['subjects_str'] = implode(', ', array_keys($data['subjects']));
-            
+
             // Format total duration (hours and minutes)
             $hours = floor($data['total_minutes'] / 60);
             $minutes = $data['total_minutes'] % 60;
@@ -876,25 +941,25 @@ class AdminController extends Controller
         // Convert array to pagination-like structure or just pass as array since it's grouped.
         // If we need pagination, we can manually slice it. For now, we'll pass the full grouped array.
         // A custom paginator can be created if needed, but for dashboard grouping, array is fine.
-        
+
         // Paginate the grouped results
         $page = $request->get('page', 1);
         $perPage = 15;
         $offset = ($page - 1) * $perPage;
         $paginatedItems = array_slice($groupedSchedules, $offset, $perPage);
         $groupedSchedulesPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
-            $paginatedItems, 
-            count($groupedSchedules), 
-            $perPage, 
-            $page, 
+            $paginatedItems,
+            count($groupedSchedules),
+            $perPage,
+            $page,
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
         return view('admin.schedule.teacher.index', compact(
-            'groupedSchedulesPaginated', 
-            'totalGuru', 
-            'guruMemilikiJadwal', 
-            'totalJadwal', 
+            'groupedSchedulesPaginated',
+            'totalGuru',
+            'guruMemilikiJadwal',
+            'totalJadwal',
             'totalKonflik'
         ));
     }
@@ -906,15 +971,15 @@ class AdminController extends Controller
         }])->findOrFail($id);
 
         $schedules = $teacher->schedules;
-        
+
         $subjects = [];
         $classes = [];
         $totalMinutes = 0;
-        
+
         foreach ($schedules as $schedule) {
             if ($schedule->subject) $subjects[$schedule->subject] = true;
             if ($schedule->class) $classes[$schedule->class] = true;
-            
+
             if ($schedule->start_time && $schedule->end_time) {
                 $start = \Carbon\Carbon::parse($schedule->start_time);
                 $end = \Carbon\Carbon::parse($schedule->end_time);
@@ -925,7 +990,7 @@ class AdminController extends Controller
         $subjectsStr = implode(', ', array_keys($subjects));
         $classesStr = implode(', ', array_keys($classes));
         $totalClasses = count($classes);
-        
+
         $hours = floor($totalMinutes / 60);
         $minutes = $totalMinutes % 60;
         $formattedDuration = ($hours > 0 ? $hours . ' Jam ' : '') . ($minutes > 0 ? $minutes . ' Menit' : '');
@@ -1087,7 +1152,7 @@ class AdminController extends Controller
         $educationLevel = session('wizard_education_level');
 
         $previewItems = session('wizard_items', []);
-        
+
         $teachers = \App\Models\Teacher::with('user')->get();
 
         return view('admin.schedule.student.wizard.step2', compact('uploadMethod','educationLevel','previewItems','teachers'));
@@ -1105,7 +1170,8 @@ class AdminController extends Controller
             $file = $request->file('file');
 
             try {
-                $array = Excel::toArray([], $file);
+                $spreadsheet = IOFactory::load($file->getRealPath());
+                $array = $spreadsheet->getActiveSheet()->toArray();
                 // take first sheet
                 $rows = $array[0] ?? [];
 
@@ -1115,7 +1181,7 @@ class AdminController extends Controller
                 foreach ($rows as $index => $row) {
                     // skip header heuristically
                     if ($index === 0) continue;
-                    
+
                     $teacherName = trim($row[5] ?? '');
                     if (empty($teacherName)) {
                         return redirect()->back()->withErrors(['file' => "Baris ke-" . ($index + 1) . ": Nama Guru wajib diisi."]);

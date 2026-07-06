@@ -59,7 +59,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/ppdb', [AdminController::class, 'ppdbIndex'])->name('ppdb.index');
     Route::get('/ppdb/{id}', [AdminController::class, 'ppdbShow'])->name('ppdb.show');
     Route::patch('/ppdb/{id}/status/{status}', [AdminController::class, 'ppdbUpdateStatus'])->name('ppdb.updateStatus');
-    Route::get('/ppdb/export/excel', [AdminController::class, 'ppdbExport'])->name('ppdb.export');
+    Route::get('/ppdb/export/excel', [AdminController::class, 'ppdbExportExcel'])->name('ppdb.export.excel');
+    Route::get('/ppdb/export/pdf', [AdminController::class, 'ppdbExportPdf'])->name('ppdb.export.pdf');
 
     // Program Management
     Route::resource('program', \App\Http\Controllers\AdminController::class, ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy']])->names([
