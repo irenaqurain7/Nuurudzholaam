@@ -46,7 +46,6 @@ Route::get('/admin/demo-dashboard', [AdminController::class, 'dashboard'])->name
 Route::get('/admin/demo-ppdb', [AdminController::class, 'ppdbIndex'])->name('admin-demo.ppdb.index');
 Route::get('/admin/demo-program', [AdminController::class, 'programIndex'])->name('admin-demo.program.index');
 Route::get('/admin/demo-activity', [AdminController::class, 'activityIndex'])->name('admin-demo.activity.index');
-Route::get('/admin/demo-gallery', [AdminController::class, 'galleryIndex'])->name('admin-demo.gallery.index');
 Route::get('/admin/demo-announcement', [AdminController::class, 'announcementIndex'])->name('admin-demo.announcement.index');
 Route::get('/admin/demo-faq', [AdminController::class, 'faqIndex'])->name('admin-demo.faq.index');
 
@@ -87,12 +86,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/activity/{id}/edit', [AdminController::class, 'activityEdit'])->name('activity.edit');
     Route::put('/activity/{id}', [AdminController::class, 'activityUpdate'])->name('activity.update');
     Route::delete('/activity/{id}', [AdminController::class, 'activityDestroy'])->name('activity.destroy');
-
-    // Gallery Management
-    Route::get('/gallery', [AdminController::class, 'galleryIndex'])->name('gallery.index');
-    Route::get('/gallery/create', [AdminController::class, 'galleryCreate'])->name('gallery.create');
-    Route::post('/gallery', [AdminController::class, 'galleryStore'])->name('gallery.store');
-    Route::delete('/gallery/{id}', [AdminController::class, 'galleryDestroy'])->name('gallery.destroy');
 
     // Announcement Management
     Route::get('/announcement', [AdminController::class, 'announcementIndex'])->name('announcement.index');

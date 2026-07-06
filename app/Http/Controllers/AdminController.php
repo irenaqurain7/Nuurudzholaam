@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use App\Models\Announcement;
 use App\Models\FAQ;
-use App\Models\Gallery;
 use App\Models\PPDBRegistration;
 use App\Models\Program;
 use App\Models\SchoolInfo;
@@ -357,42 +356,6 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.activity.index')->with('success', 'Deskripsi kegiatan berhasil diperbarui.');
-    }
-
-    // GALLERIES
-    public function galleryIndex()
-    {
-        $galleries = Gallery::orderBy('tanggal', 'desc')->paginate(12);
-        return view('admin.gallery.index', compact('galleries'));
-    }
-
-    public function galleryCreate()
-    {
-        return view('admin.gallery.create');
-    }
-
-    public function galleryStore(Request $request)
-    {
-        $validated = $request->validate([
-            'judul' => 'required|string',
-            'deskripsi' => 'nullable|string',
-            'tanggal' => 'required|date',
-            'kategori' => 'required|in:kegiatan,acara,fasilitas,dokumentasi',
-            'gambar' => 'required|image|max:2048',
-        ]);
-
-        if ($request->hasFile('gambar')) {
-            $validated['gambar'] = $request->file('gambar')->store('galleries', 'public');
-        }
-
-        Gallery::create($validated);
-        return redirect()->route('admin.gallery.index')->with('success', 'Foto berhasil ditambahkan.');
-    }
-
-    public function galleryDestroy($id)
-    {
-        Gallery::findOrFail($id)->delete();
-        return redirect()->back()->with('success', 'Foto berhasil dihapus.');
     }
 
     // ANNOUNCEMENTS

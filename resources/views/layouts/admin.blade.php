@@ -675,11 +675,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.gallery.index') }}" class="{{ request()->routeIs('admin.gallery.*') ? 'active' : '' }}">
-                        <i class="fas fa-images"></i> Galeri
-                    </a>
-                </li>
-                <li>
                     <a href="{{ route('admin.faq.index') }}" class="{{ request()->routeIs('admin.faq.*') ? 'active' : '' }}">
                         <i class="fas fa-question-circle"></i> FAQ
                     </a>
