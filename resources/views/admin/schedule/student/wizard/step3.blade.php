@@ -88,8 +88,7 @@
                                 <th width="20%">Mata Pelajaran</th>
                                 <th width="15%">Waktu</th>
                                 <th width="20%">Pengajar</th>
-                                <th width="15%">Ruangan</th>
-                                <th width="15%">Status</th>
+                                <th width="30%">Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -100,7 +99,6 @@
                                     <td>{{ $row['subject'] ?? '-' }}</td>
                                     <td>{{ ($row['start_time'] ?? '-') . ' - ' . ($row['end_time'] ?? '-') }}</td>
                                     <td>{{ $row['teacher'] ?? '-' }}</td>
-                                    <td>{{ $row['room'] ?? '-' }}</td>
                                     <td>
                                         @if($row['status'] === 'valid')
                                             <span class="badge badge-success"><i class="fas fa-check mr-1"></i> Valid</span>

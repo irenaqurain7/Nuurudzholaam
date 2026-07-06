@@ -1179,7 +1179,7 @@ class AdminController extends Controller
                         $teachersCache[$teacherName] = ['id' => $teacherId, 'name' => $teacherRealName];
                     }
 
-                    // expecting columns: class,subject,day,start_time,end_time,teacher,room
+                    // expecting columns: class,subject,day,start_time,end_time,teacher
                     $items[] = [
                         'class' => $row[0] ?? null,
                         'subject' => $row[1] ?? null,
@@ -1188,7 +1188,6 @@ class AdminController extends Controller
                         'end_time' => $row[4] ?? null,
                         'teacher' => $teacherRealName,
                         'teacher_id' => $teacherId,
-                        'room' => $row[6] ?? null,
                     ];
                 }
 
@@ -1357,7 +1356,7 @@ class AdminController extends Controller
                     'day' => $row['day'] ?? null,
                     'start_time' => $row['start_time'] ?? null,
                     'end_time' => $row['end_time'] ?? null,
-                    'room' => $row['room'] ?? null,
+                    'room' => null,
                     'education_level' => $educationLevel,
                     'semester' => $semester,
                     'academic_year' => $academicYear,

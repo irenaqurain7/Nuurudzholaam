@@ -1,3 +1,3 @@
-class,subject,day,start_time,end_time,teacher,room
-1,Matematika,Monday,07:30,08:10,Ibu Sari,Ruangan 101
-1,Bahasa Indonesia,Monday,08:10,08:50,Bapak Rudi,Ruangan 101
+class,subject,day,start_time,end_time,teacher
+1,Matematika,Monday,07:30,08:10,Ibu Sari
+1,Bahasa Indonesia,Monday,08:10,08:50,Bapak Rudi
