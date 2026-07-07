@@ -110,6 +110,30 @@
         @endif
     </div>
 
+<form id="archivePpdbForm" method="POST" style="display:none;">
+    @csrf
+</form>
+
+<script>
+    function archivePPDB(id) {
+        var year = prompt('Masukkan tahun arsip (contoh: 2026) untuk pendaftar ini:');
+        if (year === null) return;
+        year = year.trim();
+        if (!/^[0-9]{4}$/.test(year)) {
+            alert('Tahun tidak valid. Gunakan format YYYY.');
+            return;
+        }
+        var form = document.getElementById('archivePpdbForm');
+        form.action = '/admin/ppdb/' + id + '/archive';
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'archive_year';
+        input.value = year;
+        form.appendChild(input);
+        form.submit();
+    }
+</script>
+
     <!-- Statistics Cards -->
     <section class="stats-grid">
         <article class="stat-card primary">
@@ -200,6 +224,9 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
+                                <button class="btn-icon-sm btn-archive" title="Arsipkan" onclick="archivePPDB({{ $reg->id }})">
+                                    <i class="fas fa-archive"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>

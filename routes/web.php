@@ -99,6 +99,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/ppdb-settings', [AdminController::class, 'ppdbSettingsEdit'])->name('ppdb.settings');
     Route::put('/ppdb-settings', [AdminController::class, 'ppdbSettingsUpdate'])->name('ppdb.settings.update');
 
+    // Archive routes (User & PPDB)
+    Route::get('/users/archive', [AdminController::class, 'usersArchiveIndex'])->name('users.archive');
+    Route::post('/users/{id}/archive', [AdminController::class, 'usersArchive'])->name('users.archive.store');
+    Route::post('/users/{id}/restore', [AdminController::class, 'usersRestore'])->name('users.restore');
+
+    Route::get('/ppdb/archive', [AdminController::class, 'ppdbArchiveIndex'])->name('ppdb.archive');
+    Route::post('/ppdb/archive-year', [AdminController::class, 'ppdbArchiveByYear'])->name('ppdb.archive.year');
+    Route::post('/ppdb/{id}/archive', [AdminController::class, 'ppdbArchive'])->name('ppdb.archive.store');
+    Route::post('/ppdb/{id}/restore', [AdminController::class, 'ppdbRestore'])->name('ppdb.restore');
     // School Info Management
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');

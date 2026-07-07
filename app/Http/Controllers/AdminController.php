@@ -129,12 +129,61 @@ class AdminController extends Controller
     public function ppdbIndex(Request $request, PPDBExportService $ppdbExportService)
     {
         $registrations = $ppdbExportService->filteredQuery($request)
+            ->where('is_archived', false)
             ->orderBy('tgl_daftar', 'desc')
             ->orderByDesc('id')
             ->paginate(15)
             ->withQueryString();
 
         return view('admin.ppdb.index', compact('registrations'));
+    }
+
+    // --- PPDB Archive ---
+    public function ppdbArchiveIndex(Request $request)
+    {
+        $query = PPDBRegistration::where('is_archived', true);
+
+        if ($request->filled('jenjang')) {
+            $query->where('jenjang', $request->jenjang);
+        }
+
+        if ($request->filled('archive_year')) {
+            $query->where('archive_year', $request->archive_year);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $registrations = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        return view('admin.ppdb.archive', compact('registrations'));
+    }
+
+    public function ppdbArchiveByYear(Request $request)
+    {
+        $year = $request->input('year');
+        if (!$year) return redirect()->back()->with('error', 'Tahun harus dipilih.');
+
+        PPDBRegistration::whereYear('created_at', $year)->update(['is_archived' => true, 'archive_year' => $year]);
+        return redirect()->back()->with('success', 'Semua pendaftar tahun ' . $year . ' berhasil diarsipkan.');
+    }
+
+    public function ppdbArchive(Request $request, $id)
+    {
+        $reg = PPDBRegistration::findOrFail($id);
+        $reg->is_archived = true;
+        $reg->archive_year = $request->input('archive_year', now()->year);
+        $reg->save();
+        return redirect()->back()->with('success', 'Data PPDB berhasil diarsipkan.');
+    }
+
+    public function ppdbRestore($id)
+    {
+        $reg = PPDBRegistration::findOrFail($id);
+        $reg->is_archived = false;
+        $reg->archive_year = null;
+        $reg->save();
+        return redirect()->back()->with('success', 'Data PPDB berhasil dikembalikan.');
     }
 
     public function ppdbShow($id)
@@ -600,7 +649,8 @@ class AdminController extends Controller
     // USER MANAGEMENT
     public function usersIndex(Request $request)
     {
-        $query = User::with(['student', 'teacher'])->where('role', '!=', 'admin');
+        // Exclude archived users from the active list
+        $query = User::with(['student', 'teacher'])->where('role', '!=', 'admin')->where('is_archived', false);
 
         // Search logic
         if ($request->filled('search')) {
@@ -810,6 +860,61 @@ class AdminController extends Controller
         $user->update(['password' => Hash::make($tempPassword)]);
 
         return redirect()->back()->with('success', 'Password telah direset ke: ' . $tempPassword . ' (harap segera ubah password saat login pertama)');
+    }
+
+    // --- User Archive ---
+    public function usersArchiveIndex(Request $request)
+    {
+        $query = User::with(['student', 'teacher'])->where('is_archived', true)->where('role', '!=', 'admin');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('jenjang')) {
+            $jenjang = $request->jenjang;
+            $query->whereHas('student', function ($q) use ($jenjang) {
+                $q->where('jenjang', $jenjang);
+            });
+        }
+
+        if ($request->filled('graduation_year')) {
+            $query->where('graduation_year', $request->graduation_year);
+        }
+
+        $users = $query->orderBy('graduation_year', 'desc')->paginate(15)->withQueryString();
+
+        return view('admin.users.archive', compact('users'));
+    }
+
+    public function usersArchive(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->role === 'admin') abort(403);
+
+        $user->is_archived = true;
+        $user->graduation_year = $request->input('graduation_year');
+        $user->archive_year = now()->year;
+        $user->save();
+
+        return redirect()->back()->with('success', 'User berhasil diarsipkan.');
+    }
+
+    public function usersRestore($id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->role === 'admin') abort(403);
+
+        $user->is_archived = false;
+        $user->graduation_year = null;
+        $user->archive_year = null;
+        $user->save();
+
+        return redirect()->back()->with('success', 'User berhasil dikembalikan ke daftar aktif.');
     }
 
     // TEACHER SCHEDULES (Monitoring Dashboard)

@@ -32,6 +32,8 @@ class PPDBRegistration extends Model
         'file_ijazah',
         'file_ktp',
         'status',
+        'is_archived',
+        'archive_year',
     ];
 
     protected $casts = [

@@ -32,6 +32,9 @@ class User extends Authenticatable
         'nip',
         'specialization',
         'is_active',
+        'is_archived',
+        'graduation_year',
+        'archive_year',
     ];
 
     /**

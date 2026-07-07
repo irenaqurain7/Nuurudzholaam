@@ -172,6 +172,10 @@
                                                         Hapus
                                                     </button>
                                                 </form>
+                                                <button class="dropdown-item" onclick="archiveUser({{ $user->id }})">
+                                                    <i class="fas fa-archive"></i>
+                                                    Arsipkan
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -198,6 +202,31 @@
         @endif
     </section>
 </div>
+
+<form id="archiveUserForm" method="POST" style="display:none;">
+    @csrf
+</form>
+
+<script>
+    function archiveUser(id) {
+        var year = prompt('Masukkan tahun kelulusan (contoh: 2026) untuk arsip:');
+        if (year === null) return;
+        year = year.trim();
+        if (!/^[0-9]{4}$/.test(year)) {
+            alert('Tahun tidak valid. Gunakan format YYYY.');
+            return;
+        }
+        var form = document.getElementById('archiveUserForm');
+        form.action = '/admin/users/' + id + '/archive';
+        // append hidden input for graduation_year
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'graduation_year';
+        input.value = year;
+        form.appendChild(input);
+        form.submit();
+    }
+</script>
 
 <style>
     .users-page {
