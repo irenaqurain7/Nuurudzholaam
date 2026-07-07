@@ -325,4 +325,34 @@
         padding: 20px;
     }
 </style>
+@push('scripts')
+<script>
+    function deleteProgram(id) {
+        if (!confirm('Yakin ingin menghapus program ini? Tindakan ini tidak dapat dibatalkan.')) {
+            return;
+        }
+
+        var baseUrl = "{{ url('admin/program') }}";
+
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = baseUrl + '/' + id;
+
+        var tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = '_token';
+        tokenInput.value = '{{ csrf_token() }}';
+        form.appendChild(tokenInput);
+
+        var methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+@endpush
 @endsection
