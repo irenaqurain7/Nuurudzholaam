@@ -16,25 +16,30 @@
 
     <!-- Search & Filter -->
     <div class="management-toolbar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Cari kegiatan..." class="search-input">
-        </div>
-        <div class="filter-group">
-            <select class="filter-select">
-                <option value="">Semua Kategori</option>
-                <option value="olahraga">Olahraga</option>
-                <option value="akademik">Akademik</option>
-                <option value="keagamaan">Keagamaan</option>
-                <option value="ekstrakurikuler">Ekstrakurikuler</option>
-            </select>
-            <select class="filter-select">
-                <option value="">Semua Visibility</option>
-                <option value="publik">Publik</option>
-                <option value="ortu">Orang Tua</option>
-                <option value="private">Private</option>
-            </select>
-        </div>
+        <form method="GET" action="{{ route('admin.activity.index') }}" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; width: 100%;">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kegiatan..." class="search-input">
+            </div>
+            <div class="filter-group">
+                <select name="kategori" class="filter-select" onchange="this.form.submit()">
+                    <option value="">Semua Kategori</option>
+                    <option value="kegiatan" {{ request('kategori') == 'kegiatan' ? 'selected' : '' }}>Kegiatan</option>
+                    <option value="dokumentasi" {{ request('kategori') == 'dokumentasi' ? 'selected' : '' }}>Dokumentasi</option>
+                    <option value="berita" {{ request('kategori') == 'berita' ? 'selected' : '' }}>Berita</option>
+                    <option value="pengumuman" {{ request('kategori') == 'pengumuman' ? 'selected' : '' }}>Pengumuman</option>
+                </select>
+                <select name="visibility" class="filter-select" onchange="this.form.submit()">
+                    <option value="">Semua Visibility</option>
+                    <option value="publik" {{ request('visibility') == 'publik' ? 'selected' : '' }}>Publik</option>
+                    <option value="siswa" {{ request('visibility') == 'siswa' ? 'selected' : '' }}>Siswa</option>
+                    <option value="guru" {{ request('visibility') == 'guru' ? 'selected' : '' }}>Guru</option>
+                </select>
+            </div>
+            @if(request()->anyFilled(['search', 'kategori', 'visibility']))
+                <a href="{{ route('admin.activity.index') }}" style="color: var(--text-light); text-decoration: none; font-size: 14px;"><i class="fas fa-times"></i> Reset</a>
+            @endif
+        </form>
     </div>
 
     <!-- Table View -->
@@ -60,10 +65,10 @@
                     <td>
                         @if($activity->visibility === 'publik')
                             <span class="badge badge-success">Publik</span>
-                        @elseif($activity->visibility === 'ortu')
-                            <span class="badge badge-info">Orang Tua</span>
+                        @elseif($activity->visibility === 'siswa')
+                            <span class="badge badge-info">Siswa</span>
                         @else
-                            <span class="badge badge-secondary">Private</span>
+                            <span class="badge badge-secondary">Guru</span>
                         @endif
                     </td>
                     <td>

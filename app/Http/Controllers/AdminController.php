@@ -214,9 +214,16 @@ class AdminController extends Controller
     }
 
     // PROGRAMS
-    public function programIndex()
+    public function programIndex(Request $request)
     {
-        $programs = Program::paginate(10);
+        $query = Program::query();
+
+        if ($request->filled('search')) {
+            $query->where('nama_program', 'like', '%' . $request->search . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $request->search . '%');
+        }
+
+        $programs = $query->paginate(10)->withQueryString();
         return view('admin.program.index', compact('programs'));
     }
 
@@ -230,8 +237,6 @@ class AdminController extends Controller
         $validated = $request->validate([
             'nama_program' => 'required|string',
             'deskripsi' => 'required|string',
-            'kurikulum' => 'nullable|string',
-            'kuota' => 'required|integer|min:1',
             'gambar' => 'nullable|image|max:2048',
         ]);
 
@@ -256,8 +261,6 @@ class AdminController extends Controller
         $validated = $request->validate([
             'nama_program' => 'required|string',
             'deskripsi' => 'required|string',
-            'kurikulum' => 'nullable|string',
-            'kuota' => 'required|integer|min:1',
             'gambar' => 'nullable|image|max:2048',
         ]);
 
@@ -276,9 +279,23 @@ class AdminController extends Controller
     }
 
     // ACTIVITIES
-    public function activityIndex()
+    public function activityIndex(Request $request)
     {
-        $activities = Activity::orderBy('tanggal', 'desc')->paginate(10);
+        $query = Activity::query();
+
+        if ($request->filled('search')) {
+            $query->where('judul', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('kategori')) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        if ($request->filled('visibility')) {
+            $query->where('visibility', $request->visibility);
+        }
+
+        $activities = $query->orderBy('tanggal', 'desc')->paginate(10)->withQueryString();
         return view('admin.activity.index', compact('activities'));
     }
 
@@ -417,9 +434,20 @@ class AdminController extends Controller
     }
 
     // FAQS
-    public function faqIndex()
+    public function faqIndex(Request $request)
     {
-        $faqs = FAQ::orderBy('urutan')->paginate(10);
+        $query = FAQ::query();
+
+        if ($request->filled('search')) {
+            $query->where('pertanyaan', 'like', '%' . $request->search . '%')
+                  ->orWhere('jawaban', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('kategori')) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        $faqs = $query->orderBy('urutan')->paginate(10)->withQueryString();
         return view('admin.faq.index', compact('faqs'));
     }
 

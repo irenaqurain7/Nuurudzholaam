@@ -48,7 +48,7 @@
             <select id="visibility" name="visibility" required>
                 <option value="">-- Pilih Visibilitas --</option>
                 <option value="publik" @if(old('visibility', $activity->visibility) === 'publik') selected @endif>Publik (Semua orang)</option>
-                <option value="ortu" @if(old('visibility', $activity->visibility) === 'ortu') selected @endif>Orang Tua</option>
+                <option value="siswa" @if(old('visibility', $activity->visibility) === 'siswa') selected @endif>Siswa</option>
                 <option value="guru" @if(old('visibility', $activity->visibility) === 'guru') selected @endif>Guru</option>
             </select>
         </div>

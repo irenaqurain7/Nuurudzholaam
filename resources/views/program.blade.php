@@ -15,37 +15,23 @@
 <div class="section" style="background-color: #f7fafc;">
     <div class="container">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-book"></i>
+            @forelse($programs as $program)
+                <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
+                    <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
+                        @if($program->gambar)
+                            <img src="{{ asset('storage/' . $program->gambar) }}" alt="{{ $program->nama_program }}" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px;">
+                        @else
+                            <i class="fas fa-book-open"></i>
+                        @endif
+                    </div>
+                    <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">{{ $program->nama_program }}</h3>
+                    <p style="color: var(--text-light); line-height: 1.6;">{{ Str::limit($program->deskripsi, 150) }}</p>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Tahfidz Zuz Amma</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Program menghafal Juz Amma (juz terakhir Al-Qur'an) dengan metode setor hafalan dan muroja'ah intensif, dibimbing oleh para guru.</p>
-            </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-leaf"></i>
+            @empty
+                <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--text-light); grid-column: 1 / -1;">
+                    <p style="color: var(--text-light); line-height: 1.6;">Belum ada program pendidikan yang tersedia saat ini.</p>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">TDBA (Tatanen di bale atikan)</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">TDBA (Tatanen di Bale Atikan) adalah program pembelajaran berbasis lingkungan yang mengajarkan peserta didik untuk bercocok tanam, peduli alam, dan membangun karakter yang mandiri serta bertanggung jawab.</p>
-            </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-hands-praying"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Sholat duha berjama'ah</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Sholat Dhuha Berjamaah merupakan kegiatan ibadah yang dilaksanakan bersama untuk menanamkan kedisiplinan, meningkatkan keimanan, serta membiasakan peserta didik mendekatkan diri kepada Allah SWT dalam kehidupan sehari-hari.</p>
-            </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Kurikulum berbasis pesantren dan formal</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Kurikulum Berbasis Pesantren dan Formal mengintegrasikan pendidikan umum dan keagamaan untuk membentuk peserta didik yang berilmu, berakhlak mulia, dan berkarakter Islami.</p>
-            </div>
+            @endforelse
         </div>
     </div>
 </div>

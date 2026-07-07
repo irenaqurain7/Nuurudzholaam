@@ -62,14 +62,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/ppdb/export/pdf', [AdminController::class, 'ppdbExportPdf'])->name('ppdb.export.pdf');
 
     // Program Management
-    Route::resource('program', \App\Http\Controllers\AdminController::class, ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy']])->names([
-        'index' => 'admin.program.index',
-        'create' => 'admin.program.create',
-        'store' => 'admin.program.store',
-        'edit' => 'admin.program.edit',
-        'update' => 'admin.program.update',
-        'destroy' => 'admin.program.destroy',
-    ]);
 
     Route::get('/program', [AdminController::class, 'programIndex'])->name('program.index');
     Route::get('/program/create', [AdminController::class, 'programCreate'])->name('program.create');

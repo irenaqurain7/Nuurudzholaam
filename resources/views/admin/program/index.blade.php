@@ -16,10 +16,15 @@
 
     <!-- Search & Filter -->
     <div class="management-toolbar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Cari nama program..." class="search-input">
-        </div>
+        <form method="GET" action="{{ route('admin.program.index') }}" style="display: flex; width: 100%; gap: 15px; align-items: center;">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau deskripsi program..." class="search-input">
+            </div>
+            @if(request('search'))
+                <a href="{{ route('admin.program.index') }}" style="color: var(--text-light); text-decoration: none; font-size: 14px;"><i class="fas fa-times"></i> Reset</a>
+            @endif
+        </form>
     </div>
 
     <!-- Data Grid View -->
@@ -40,16 +45,7 @@
                 <h3>{{ $program->nama_program }}</h3>
                 <p class="card-description">{{ Str::limit($program->deskripsi, 100) }}</p>
 
-                <div class="card-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Kuota</span>
-                        <span class="meta-value">{{ $program->kuota }} Siswa</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Kurikulum</span>
-                        <span class="meta-value">{{ $program->kurikulum ?? 'Belum ditentukan' }}</span>
-                    </div>
-                </div>
+
 
                 <div class="card-actions">
                     <a href="{{ route('admin.program.edit', $program->id) }}" class="btn-action-card btn-edit-card">

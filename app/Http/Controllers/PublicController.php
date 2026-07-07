@@ -83,8 +83,9 @@ class PublicController extends Controller
     public function program()
     {
         $school = $this->schoolInfo();
+        $programs = Program::all();
 
-        return view('program', compact('school'));
+        return view('program', compact('school', 'programs'));
     }
 
     public function profil()

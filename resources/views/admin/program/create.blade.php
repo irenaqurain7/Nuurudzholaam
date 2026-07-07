@@ -25,16 +25,6 @@
         </div>
 
         <div class="form-group">
-            <label for="kurikulum">Kurikulum</label>
-            <textarea id="kurikulum" name="kurikulum">{{ old('kurikulum') }}</textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="kuota">Kuota Siswa *</label>
-            <input type="number" id="kuota" name="kuota" value="{{ old('kuota', 30) }}" min="1" required>
-        </div>
-
-        <div class="form-group">
             <label for="gambar">Gambar (Opsional)</label>
             <input type="file" id="gambar" name="gambar" accept="image/*">
             <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">Format: JPG, PNG. Ukuran maksimal: 2MB</p>

@@ -26,16 +26,6 @@
         </div>
 
         <div class="form-group">
-            <label for="kurikulum">Kurikulum</label>
-            <textarea id="kurikulum" name="kurikulum">{{ old('kurikulum', $program->kurikulum) }}</textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="kuota">Kuota Siswa *</label>
-            <input type="number" id="kuota" name="kuota" value="{{ old('kuota', $program->kuota) }}" min="1" required>
-        </div>
-
-        <div class="form-group">
             <label for="gambar">Gambar (Opsional)</label>
             @if($program->gambar)
             <p style="font-size: 12px; color: var(--text-light); margin-bottom: 10px;">

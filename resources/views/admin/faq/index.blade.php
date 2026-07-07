@@ -16,20 +16,24 @@
 
     <!-- Search & Filter -->
     <div class="management-toolbar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Cari FAQ..." class="search-input">
-        </div>
-        <div class="filter-group">
-            <select class="filter-select">
-                <option value="">Semua Kategori</option>
-                <option value="pendaftaran">Pendaftaran</option>
-                <option value="program">Program</option>
-                <option value="biaya">Biaya</option>
-                <option value="fasilitas">Fasilitas</option>
-                <option value="lainnya">Lainnya</option>
-            </select>
-        </div>
+        <form method="GET" action="{{ route('admin.faq.index') }}" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; width: 100%;">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari FAQ..." class="search-input">
+            </div>
+            <div class="filter-group">
+                <select name="kategori" class="filter-select" onchange="this.form.submit()">
+                    <option value="">Semua Kategori</option>
+                    <option value="umum" {{ request('kategori') == 'umum' ? 'selected' : '' }}>Umum</option>
+                    <option value="ppdb" {{ request('kategori') == 'ppdb' ? 'selected' : '' }}>PPDB</option>
+                    <option value="akademik" {{ request('kategori') == 'akademik' ? 'selected' : '' }}>Akademik</option>
+                    <option value="fasilitas" {{ request('kategori') == 'fasilitas' ? 'selected' : '' }}>Fasilitas</option>
+                </select>
+            </div>
+            @if(request()->anyFilled(['search', 'kategori']))
+                <a href="{{ route('admin.faq.index') }}" style="color: var(--text-light); text-decoration: none; font-size: 14px;"><i class="fas fa-times"></i> Reset</a>
+            @endif
+        </form>
     </div>
 
     <!-- FAQ List -->
