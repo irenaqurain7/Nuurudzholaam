@@ -506,13 +506,13 @@ class AdminController extends Controller
     public function schoolInfoUpdate(Request $request)
     {
         $validated = $request->validate([
-            'nama_sekolah' => 'required|string',
-            'deskripsi' => 'required|string',
+            'nama_sekolah' => 'nullable|string',
+            'deskripsi' => 'nullable|string',
             'visi' => 'nullable|string',
             'misi' => 'nullable|string',
-            'alamat' => 'required|string',
-            'no_telepon' => 'required|string',
-            'email' => 'required|email',
+            'alamat' => 'nullable|string',
+            'no_telepon' => 'nullable|string',
+            'email' => 'nullable|email',
             'website' => 'nullable|string',
             'logo' => 'nullable|image|max:2048',
             'gambar_utama' => 'nullable|image|max:2048',
@@ -527,21 +527,36 @@ class AdminController extends Controller
 
         $school = SchoolInfo::first() ?? new SchoolInfo();
 
+        $updates = [];
+
+        // Only set fields that were provided (non-empty) to avoid overwriting existing data with empty values
+        $fields = ['nama_sekolah','deskripsi','visi','misi','alamat','no_telepon','email','website','pilar_pendidikan','ppdb_start_date','ppdb_end_date'];
+        foreach ($fields as $f) {
+            if ($request->filled($f)) {
+                $updates[$f] = $request->input($f);
+            }
+        }
+
+        // Files: logo and gambar_utama
         if ($request->hasFile('logo')) {
-            $validated['logo'] = $request->file('logo')->store('school', 'public');
+            $updates['logo'] = $request->file('logo')->store('school', 'public');
         }
 
         if ($request->hasFile('gambar_utama')) {
-            $validated['gambar_utama'] = $request->file('gambar_utama')->store('school', 'public');
+            $updates['gambar_utama'] = $request->file('gambar_utama')->store('school', 'public');
         }
 
-        // Handle checkbox conversion
-        $validated['ppdb_active'] = $request->has('ppdb_active');
+        // Checkbox: always set based on presence
+        $updates['ppdb_active'] = $request->has('ppdb_active');
 
         if ($school->exists) {
-            $school->update($validated);
+            if (!empty($updates)) {
+                $school->update($updates);
+            }
         } else {
-            SchoolInfo::create($validated);
+            // For create, use validated values (some may be null)
+            $createData = array_merge($validated, ['ppdb_active' => $request->has('ppdb_active')]);
+            SchoolInfo::create($createData);
         }
 
         return redirect()->back()->with('success', 'Informasi sekolah berhasil diperbarui.');
