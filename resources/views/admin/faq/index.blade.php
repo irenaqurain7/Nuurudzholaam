@@ -462,4 +462,31 @@
         }
     }
 </style>
+
+@push('scripts')
+<script>
+    function deleteFaq(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus FAQ ini?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `{{ url('admin/faq') }}/${id}`;
+            
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = '{{ csrf_token() }}';
+            
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'DELETE';
+            
+            form.appendChild(csrf);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+@endpush
 @endsection
