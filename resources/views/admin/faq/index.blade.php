@@ -78,7 +78,7 @@
 
     <!-- Pagination -->
     <div class="pagination-wrapper">
-        {{ $faqs->links() }}
+        {{ $faqs->links('partials.pagination') }}
     </div>
 </div>
 
@@ -335,7 +335,97 @@
     .pagination-wrapper {
         display: flex;
         justify-content: center;
-        padding: 20px;
+        padding: 22px 0 8px;
+        margin-top: 10px;
+        width: 100%;
+    }
+
+    .pagination-wrapper nav {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination-wrapper .custom-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0;
+        width: 100%;
+    }
+
+    .pagination-wrapper .page-numbers {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .pagination-wrapper .page-item {
+        margin: 0;
+    }
+
+    .pagination-wrapper .page-link {
+        min-width: 34px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        color: var(--text-dark);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        line-height: 1;
+        text-decoration: none;
+        box-shadow: none;
+        transition: all 0.2s ease;
+    }
+
+    .pagination-wrapper .page-link.active,
+    .pagination-wrapper .page-item.active .page-link {
+        background: #3b5d50;
+        border-color: #3b5d50;
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .pagination-wrapper .page-link:hover:not(.disabled):not(.active) {
+        background: #e6f2ed;
+        border-color: #3b5d50;
+        color: #3b5d50;
+    }
+
+    .pagination-wrapper .page-link.disabled {
+        background: #ffffff;
+        border-color: #d1d5db;
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 1;
+    }
+
+    .pagination-wrapper .page-link i,
+    .pagination-wrapper .page-link svg {
+        width: 14px !important;
+        height: 14px !important;
+        max-width: 14px;
+        max-height: 14px;
+        flex-shrink: 0;
+        font-size: 14px !important;
+        line-height: 1;
+    }
+
+    .pagination-wrapper .page-link span {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .pagination-wrapper .custom-pagination .page-link {
+        box-shadow: none;
     }
 
     @media (max-width: 768px) {
@@ -354,6 +444,21 @@
         .btn-action-faq {
             width: 100%;
             justify-content: center;
+        }
+
+        .pagination-wrapper {
+            padding-top: 20px;
+        }
+
+        .pagination-wrapper .page-link {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            font-size: 13px;
+        }
+
+        .pagination-wrapper .page-numbers {
+            gap: 4px;
         }
     }
 </style>
