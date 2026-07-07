@@ -25,7 +25,7 @@
     $jenjang = '-';
     if ($class !== '-') {
         if (preg_match('/^(VII|VIII|IX|7|8|9)\b/i', $class))         $jenjang = 'SMP';
-        elseif (preg_match('/^(X|XI|XII|10|11|12)\b|TKJ|RPL|AK\b/i', $class)) $jenjang = 'SMK';
+        elseif (preg_match('/^(X|XI|XII|10|11|12)\b|OTKP|AKUNTANSI/i', $class)) $jenjang = 'SMK';
         elseif (preg_match('/^(TK|tk|paud|PAUD)/i', $class))         $jenjang = 'TK';
         else                                                           $jenjang = 'SD';
     }

@@ -13,7 +13,7 @@
     } elseif ($educationLevel === 'SMP') {
         $classOptions = ['7', '8', '9'];
     } elseif ($educationLevel === 'SMK') {
-        $classOptions = ['10-RPL', '10-TKJ', '11-RPL', '11-TKJ', '12-RPL', '12-TKJ'];
+        $classOptions = ['10-OTKP', '10-AKUNTANSI', '11-OTKP', '11-AKUNTANSI', '12-OTKP', '12-AKUNTANSI'];
     }
 
     $dayOptions = [
@@ -109,12 +109,12 @@
                                         <option value="8">8</option>
                                         <option value="9">9</option>
                                     @elseif($educationLevel === 'SMK')
-                                        <option value="10-RPL">10-RPL</option>
-                                        <option value="10-TKJ">10-TKJ</option>
-                                        <option value="11-RPL">11-RPL</option>
-                                        <option value="11-TKJ">11-TKJ</option>
-                                        <option value="12-RPL">12-RPL</option>
-                                        <option value="12-TKJ">12-TKJ</option>
+                                        <option value="10-OTKP">10-OTKP</option>
+                                        <option value="10-AKUNTANSI">10-AKUNTANSI</option>
+                                        <option value="11-OTKP">11-OTKP</option>
+                                        <option value="11-AKUNTANSI">11-AKUNTANSI</option>
+                                        <option value="12-OTKP">12-OTKP</option>
+                                        <option value="12-AKUNTANSI">12-AKUNTANSI</option>
                                     @endif
                                 </select>
                             </div>

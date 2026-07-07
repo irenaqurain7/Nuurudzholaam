@@ -26,7 +26,7 @@
     if (!function_exists('dsSchoolLevel')) {
         function dsSchoolLevel(string $class): string {
             if (preg_match('/^(VII|VIII|IX|7|8|9)\b/i', $class)) return 'SMP';
-            if (preg_match('/^(X|XI|XII|10|11|12)\b|TKJ|RPL|AK\b/i', $class)) return 'SMK';
+            if (preg_match('/^(X|XI|XII|10|11|12)\b|OTKP|AKUNTANSI/i', $class)) return 'SMK';
             return 'SD';
         }
     }

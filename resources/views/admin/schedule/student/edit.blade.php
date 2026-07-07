@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'TK': ['TK-A', 'TK-B'],
         'SD': ['1', '2', '3', '4', '5', '6'],
         'SMP': ['7', '8', '9'],
-        'SMK': ['10-RPL', '10-TKJ', '11-RPL', '11-TKJ', '12-RPL', '12-TKJ']
+        'SMK': ['10-OTKP', '10-AKUNTANSI', '11-OTKP', '11-AKUNTANSI', '12-OTKP', '12-AKUNTANSI']
     };
 
     const educationLevelSelect = document.getElementById('education_level');
