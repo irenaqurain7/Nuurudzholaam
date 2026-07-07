@@ -354,24 +354,23 @@
                             <i class="fas fa-camera fa-2x"></i>
                         </div>
                     @endif
-                    <a href="{{ route('student.upload-photo') }}" class="btn btn-secondary">
-                        <i class="fas fa-upload"></i>Ubah Foto
-                    </a>
                 </div>
 
                 <!-- Keamanan -->
                 <div class="section">
                     <h5><i class="fas fa-lock"></i>Keamanan</h5>
                     <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Kelola keamanan akun Anda dengan mengubah password secara berkala.</p>
-                    <a href="{{ route('student.change-password') }}" class="btn btn-secondary">
-                        <i class="fas fa-key"></i>Ubah Password
-                    </a>
                 </div>
 
                 <!-- Info -->
                 <div class="info-box">
                     <h5><i class="fas fa-info-circle"></i>Tips</h5>
                     <p>Data pribadi Anda tersimpan dengan aman. Untuk perubahan data administratif, hubungi pihak sekolah.</p>
+                </div>
+
+                <div class="info-box">
+                    <h5><i class="fas fa-address-card"></i>Informasi Perubahan Data</h5>
+                    <p>Apabila terdapat data yang ingin diubah, silakan menghubungi Admin Sekolah.</p>
                 </div>
             </div>
         </div>
