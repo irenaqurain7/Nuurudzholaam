@@ -61,67 +61,7 @@
     </div>
 </div>
 
-<!-- PPDB Information Section -->
-@if($ppdbStatus === 'open' || $ppdbStatus === 'coming')
-<div class="section" style="background: linear-gradient(135deg, rgba(31, 127, 95, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%);">
-    <div class="container">
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px; margin-bottom: 40px;">
-            <!-- Info Card 1: Period -->
-            <div class="card" style="text-align: center; padding: 30px; background: white; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 36px; color: var(--hijau-islam); margin-bottom: 15px;">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 16px; margin-bottom: 10px; font-weight: bold;">Periode Pendaftaran</h3>
-                @if($school && $school->ppdb_start_date && $school->ppdb_end_date)
-                    <p style="color: var(--text-light); margin: 0; font-size: 14px; line-height: 1.6;">
-                        <strong style="color: var(--hijau-islam);">{{ $school->ppdb_start_date->format('d M Y') }}</strong>
-                        <br>hingga
-                        <br><strong style="color: var(--hijau-islam);">{{ $school->ppdb_end_date->format('d M Y') }}</strong>
-                    </p>
-                @endif
-            </div>
 
-            <!-- Info Card 2: Programs -->
-            <div class="card" style="text-align: center; padding: 30px; background: white; border-top: 4px solid var(--emas);">
-                <div style="font-size: 36px; color: var(--emas); margin-bottom: 15px;">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 16px; margin-bottom: 10px; font-weight: bold;">Program Tersedia</h3>
-                <p style="color: var(--text-light); margin: 0; font-size: 14px;">
-                    <strong style="color: var(--hijau-islam);">{{ $programs->count() }} Program</strong>
-                    <br><span style="font-size: 12px;">IPA, IPS, Keagamaan</span>
-                </p>
-            </div>
-
-            <!-- Info Card 3: Registration -->
-            <div class="card" style="text-align: center; padding: 30px; background: white; border-top: 4px solid var(--hijau-islam-light);">
-                <div style="font-size: 36px; color: var(--hijau-islam-light); margin-bottom: 15px;">
-                    <i class="fas fa-user-plus"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 16px; margin-bottom: 10px; font-weight: bold;">Cara Daftar</h3>
-                <p style="color: var(--text-light); margin: 0; font-size: 14px;">
-                    Online dan gratis
-                    <br><span style="font-size: 12px;">Proses cepat 3 langkah</span>
-                </p>
-            </div>
-        </div>
-
-        @if($ppdbStatus === 'open')
-        <div style="text-align: center;">
-            <a href="{{ route('ppdb') }}" style="background-color: var(--hijau-islam); color: white; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; font-size: 16px;">
-                <i class="fas fa-arrow-right" style="margin-right: 8px;"></i>Daftar Sekarang
-            </a>
-        </div>
-        @elseif($ppdbStatus === 'coming')
-        <div style="text-align: center;">
-            <button disabled style="background-color: #ccc; color: #666; padding: 14px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; font-size: 16px; border: none; cursor: not-allowed;">
-                <i class="fas fa-clock" style="margin-right: 8px;"></i>Pendaftaran Akan Dibuka {{ $school && $school->ppdb_start_date ? $school->ppdb_start_date->format('d F Y') : 'segera' }}
-            </button>
-        </div>
-        @endif
-    </div>
-</div>
-@endif
 
 <!-- Welcome Section -->
 <div class="section" style="background-color: white;">
