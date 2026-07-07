@@ -75,12 +75,15 @@ class StudentDashboardController extends Controller
             })
             ->values();
 
+        $semesterSummaries = $this->buildSemesterSummaries($student);
+
         return view('student.dashboard', [
             'user' => $user,
             'student' => $student,
             'announcements' => $announcements, // Kirim variabel ke view blade
             'todayLabel' => $todayLabel,
             'todayScheduleItems' => $todayScheduleItems,
+            'semesterSummaries' => $semesterSummaries,
         ]);
     }
 
@@ -90,6 +93,68 @@ class StudentDashboardController extends Controller
     public function schedule()
     {
         return redirect()->route('student.dashboard');
+    }
+
+    private function buildSemesterSummaries(Student $student)
+    {
+        $gradeGroups = $student->grades()
+            ->orderBy('created_at')
+            ->get()
+            ->filter(function (Grade $grade) {
+                return is_numeric($grade->grade);
+            })
+            ->groupBy(function (Grade $grade) {
+                $semesterValue = trim((string) data_get($grade, 'semester', ''));
+
+                if ($semesterValue !== '') {
+                    return 'semester:' . $semesterValue;
+                }
+
+                $createdAt = $grade->created_at;
+                if (!$createdAt) {
+                    return 'semester:unknown';
+                }
+
+                $academicYear = $createdAt->month >= 7
+                    ? $createdAt->year . '/' . ($createdAt->year + 1)
+                    : ($createdAt->year - 1) . '/' . $createdAt->year;
+                $term = $createdAt->month >= 7 ? 'ganjil' : 'genap';
+
+                return 'period:' . $academicYear . ':' . $term;
+            })
+            ->map(function ($grades, $groupKey) {
+                $firstGrade = $grades->sortBy('created_at')->first();
+
+                return [
+                    'group_key' => $groupKey,
+                    'period_key' => $firstGrade && $firstGrade->created_at ? $firstGrade->created_at->timestamp : PHP_INT_MAX,
+                    'average' => round((float) $grades->avg('grade'), 2),
+                    'total_subjects' => $grades->count(),
+                    'period_label' => $this->resolveSemesterPeriodLabel($firstGrade),
+                ];
+            })
+            ->sortBy('period_key')
+            ->values()
+            ->map(function (array $summary, int $index) {
+                $summary['label'] = 'Semester ' . ($index + 1);
+                return $summary;
+            });
+
+        return $gradeGroups;
+    }
+
+    private function resolveSemesterPeriodLabel(?Grade $grade): string
+    {
+        if (!$grade || !$grade->created_at) {
+            return '-';
+        }
+
+        $createdAt = $grade->created_at;
+        $academicYear = $createdAt->month >= 7
+            ? $createdAt->year . '/' . ($createdAt->year + 1)
+            : ($createdAt->year - 1) . '/' . $createdAt->year;
+
+        return $academicYear . ' ' . ($createdAt->month >= 7 ? 'Ganjil' : 'Genap');
     }
 
     /**

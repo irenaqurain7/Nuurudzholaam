@@ -130,6 +130,62 @@
         border-radius: 12px;
     }
 
+    .semester-widget {
+        grid-column: 1 / -1;
+        cursor: default;
+    }
+
+    .semester-widget:hover {
+        border-color: var(--border);
+        box-shadow: none;
+        transform: none;
+    }
+
+    .semester-widget-body {
+        margin-top: 0.9rem;
+    }
+
+    .semester-summary-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .semester-summary-table th,
+    .semester-summary-table td {
+        padding: 0.8rem 0;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        font-size: 0.94rem;
+    }
+
+    .semester-summary-table th {
+        color: var(--text-secondary);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .semester-summary-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .semester-label {
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .semester-meta {
+        display: block;
+        margin-top: 0.2rem;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+    }
+
+    .semester-average {
+        font-weight: 700;
+        color: var(--primary);
+    }
+
     .dashboard-card {
         background: white;
         border: 1px solid var(--border);
@@ -314,6 +370,38 @@
         <i class="fas fa-calendar-alt dashboard-card-icon"></i>
         <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
             {{ $todayLabel ?? 'Hari ini' }}
+        </div>
+    </div>
+
+    <div class="dashboard-card green semester-widget">
+        <h6>Akumulasi Nilai per Semester</h6>
+        <i class="fas fa-chart-line dashboard-card-icon"></i>
+        <div class="semester-widget-body">
+            @if(($semesterSummaries ?? collect())->isNotEmpty())
+                <table class="semester-summary-table">
+                    <thead>
+                        <tr>
+                            <th>Semester</th>
+                            <th>Ringkasan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($semesterSummaries as $summary)
+                            <tr>
+                                <td>
+                                    <span class="semester-label">{{ $summary['label'] }}</span>
+                                    <span class="semester-meta">{{ $summary['period_label'] }}</span>
+                                </td>
+                                <td>
+                                    <span class="semester-average">Rata-rata {{ number_format($summary['average'], 2) }}</span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="schedule-empty">Belum ada ringkasan nilai semester.</div>
+            @endif
         </div>
     </div>
 
