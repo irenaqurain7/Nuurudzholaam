@@ -25,7 +25,18 @@
                         @endif
                     </div>
                     <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">{{ $program->nama_program }}</h3>
-                    <p style="color: var(--text-light); line-height: 1.6;">{{ Str::limit($program->deskripsi, 150) }}</p>
+                    <div class="program-desc-container">
+                        <p class="desc-short" id="desc-short-{{ $program->id }}" style="color: var(--text-light); line-height: 1.6; margin-bottom: 0;">
+                            {{ Str::limit($program->deskripsi, 150) }}
+                            @if(strlen($program->deskripsi) > 150)
+                                <br><a href="javascript:void(0)" onclick="toggleDesc({{ $program->id }}, true)" style="color: var(--hijau-islam); font-weight: 600; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 5px;">Lihat detail <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 3px;"></i></a>
+                            @endif
+                        </p>
+                        <p class="desc-full" id="desc-full-{{ $program->id }}" style="color: var(--text-light); line-height: 1.6; margin-bottom: 0; display: none; text-align: left;">
+                            {{ $program->deskripsi }}
+                            <br><a href="javascript:void(0)" onclick="toggleDesc({{ $program->id }}, false)" style="color: var(--hijau-islam); font-weight: 600; text-decoration: none; font-size: 14px; display: inline-block; margin-top: 5px;"><i class="fas fa-chevron-up" style="font-size: 12px; margin-right: 3px;"></i> Tutup detail</a>
+                        </p>
+                    </div>
                 </div>
             @empty
                 <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--text-light); grid-column: 1 / -1;">
@@ -44,5 +55,22 @@
         <a href="{{ route('ppdb') }}" style="background-color: white; color: var(--hijau-islam); padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; font-size: 16px;">Daftar Sekarang →</a>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function toggleDesc(id, showFull) {
+        const shortDesc = document.getElementById('desc-short-' + id);
+        const fullDesc = document.getElementById('desc-full-' + id);
+        
+        if (showFull) {
+            shortDesc.style.display = 'none';
+            fullDesc.style.display = 'block';
+        } else {
+            fullDesc.style.display = 'none';
+            shortDesc.style.display = 'block';
+        }
+    }
+</script>
+@endpush
 
 @endsection
