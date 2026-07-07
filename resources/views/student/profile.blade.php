@@ -118,10 +118,15 @@
     }
 
     .form-control:disabled,
-    .form-control[disabled] {
+    .form-control[disabled],
+    .form-control[readonly] {
         background-color: var(--bg-light);
         color: var(--text-muted);
         cursor: not-allowed;
+    }
+
+    textarea.form-control[readonly] {
+        resize: none;
     }
 
     .read-only-value {
@@ -138,6 +143,16 @@
         font-size: 0.8rem;
         color: var(--text-muted);
         margin-top: 0.3rem;
+    }
+
+    .readonly-banner {
+        background: #f7fbf8;
+        border: 1px solid rgba(45, 80, 22, 0.12);
+        color: var(--primary);
+        border-radius: 8px;
+        padding: 0.9rem 1rem;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
     }
 
     .btn {
@@ -265,82 +280,65 @@
     <div class="row">
         <!-- Main Content -->
         <div class="col-lg-8">
-            <form action="{{ route('student.profile.update') }}" method="POST">
-                @csrf
-                @method('PUT')
+            <div class="readonly-banner">
+                <i class="fas fa-lock"></i> Seluruh data profil siswa bersifat read-only dan tidak dapat diedit.
+            </div>
 
-                <!-- Data Pribadi -->
-                <div class="section">
-                    <h5><i class="fas fa-user-circle"></i>Data Pribadi</h5>
+            <!-- Data Pribadi -->
+            <div class="section">
+                <h5><i class="fas fa-user-circle"></i>Data Pribadi</h5>
 
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label>Nama Lengkap</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ auth()->user()->name }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <div class="read-only-value">{{ auth()->user()->email }}</div>
-                            <span class="form-helper">Email tidak dapat diubah</span>
-                        </div>
-                        <div class="form-group">
-                            <label>No. Telepon</label>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ auth()->user()->phone }}">
-                            @error('phone')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>NISN</label>
-                            <div class="read-only-value">{{ auth()->user()->nisn ?? '-' }}</div>
-                            <span class="form-helper">NISN tidak dapat diubah</span>
-                        </div>
-                        <div class="form-group">
-                            <label>Kelas</label>
-                            <div class="read-only-value">{{ auth()->user()->class ?? '-' }}</div>
-                            <span class="form-helper">Kelas tidak dapat diubah</span>
-                        </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" class="form-control" value="{{ auth()->user()->name }}" readonly>
                     </div>
                 </div>
 
-                <!-- Alamat & Biodata -->
-                <div class="section">
-                    <h5><i class="fas fa-map-marker-alt"></i>Alamat & Informasi</h5>
-
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label>Alamat</label>
-                            <textarea class="form-control @error('address') is-invalid @enderror" name="address" rows="3" placeholder="Masukkan alamat lengkap Anda">{{ auth()->user()->address }}</textarea>
-                            @error('address')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" class="form-control" value="{{ auth()->user()->email }}" readonly>
+                        <span class="form-helper">Email tidak dapat diubah</span>
                     </div>
-
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label>Biodata Singkat</label>
-                            <textarea class="form-control @error('bio') is-invalid @enderror" name="bio" rows="3" placeholder="Ceritakan tentang diri Anda">{{ auth()->user()->bio }}</textarea>
-                            @error('bio')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div class="form-group">
+                        <label>No. Telepon</label>
+                        <input type="text" class="form-control" value="{{ auth()->user()->phone ?? '-' }}" readonly>
                     </div>
-
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check"></i>Simpan Perubahan
-                    </button>
                 </div>
-            </form>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>NISN</label>
+                        <input type="text" class="form-control" value="{{ auth()->user()->nisn ?? '-' }}" readonly>
+                        <span class="form-helper">NISN tidak dapat diubah</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <input type="text" class="form-control" value="{{ auth()->user()->class ?? '-' }}" readonly>
+                        <span class="form-helper">Kelas tidak dapat diubah</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alamat & Biodata -->
+            <div class="section">
+                <h5><i class="fas fa-map-marker-alt"></i>Alamat & Informasi</h5>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <textarea class="form-control" rows="3" readonly>{{ auth()->user()->address ?? '-' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Biodata Singkat</label>
+                        <textarea class="form-control" rows="3" readonly>{{ auth()->user()->bio ?? '-' }}</textarea>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar -->

@@ -123,22 +123,7 @@ class StudentDashboardController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'bio' => 'nullable|string|max:1000',
-        ]);
-
-        foreach ($validated as $key => $value) {
-            $user->$key = $value;
-        }
-        $user->save();
-
-        return redirect()->route('student.profile')->with('success', 'Profil berhasil diperbarui');
+        abort(403, 'Profil siswa bersifat read-only dan tidak dapat diperbarui.');
     }
 
     /**
@@ -187,12 +172,10 @@ class StudentDashboardController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        // Delete old photo if exists
         if ($user->profile_photo && Storage::exists('public/' . $user->profile_photo)) {
             Storage::delete('public/' . $user->profile_photo);
         }
 
-        // Store new photo
         $path = $request->file('photo')->store('profile-photos', 'public');
 
         $user->profile_photo = $path;
