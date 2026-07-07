@@ -519,6 +519,10 @@ class AdminController extends Controller
             'ppdb_active' => 'nullable|boolean',
             'ppdb_start_date' => 'nullable|date',
             'ppdb_end_date' => 'nullable|date|after_or_equal:ppdb_start_date',
+            'pilar_pendidikan' => 'nullable|array',
+            'pilar_pendidikan.*.icon' => 'nullable|string',
+            'pilar_pendidikan.*.judul' => 'nullable|string',
+            'pilar_pendidikan.*.deskripsi' => 'nullable|string',
         ]);
 
         $school = SchoolInfo::first() ?? new SchoolInfo();

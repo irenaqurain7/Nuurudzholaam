@@ -612,6 +612,9 @@
 
     <!-- Footer -->
     <footer class="footer">
+        @php
+            $footerSchool = \App\Models\SchoolInfo::first();
+        @endphp
         <div class="footer-content">
             <div class="footer-section">
                 <h3><i class="fas fa-info-circle"></i> Tentang Kami</h3>
@@ -619,13 +622,12 @@
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-map-marker-alt"></i> Alamat</h3>
-                <p id="footer-alamat">Kp, Jl. Sindangreret, Dangdeur, Kec. Bungursari, Kabupaten Purwakarta, Jawa Barat 41181</p>
+                <p id="footer-alamat">{{ $footerSchool->alamat ?? 'Kp, Jl. Sindangreret, Dangdeur, Kec. Bungursari, Kabupaten Purwakarta, Jawa Barat 41181' }}</p>
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-phone"></i> Hubungi Kami</h3>
-                <p style="margin-bottom: 5px;"><a href="tel:085714673916">085714673916 (Dede ali)</a></p>
-                <p style="margin-bottom: 5px;"><a href="tel:081958159264">081958159264 (Wiwi suherti)</a></p>
-                <p style="margin-bottom: 0;"><a href="mailto:Nuurudz@gmail.com">Nuurudz@gmail.com</a></p>
+                <p style="margin-bottom: 5px;"><a href="tel:{{ $footerSchool->no_telepon ?? '085714673916' }}">{{ $footerSchool->no_telepon ?? '085714673916' }}</a></p>
+                <p style="margin-bottom: 0;"><a href="mailto:{{ $footerSchool->email ?? 'Nuurudz@gmail.com' }}">{{ $footerSchool->email ?? 'Nuurudz@gmail.com' }}</a></p>
             </div>
             <div class="footer-section">
                 <h3><i class="fas fa-share-alt"></i> Media Sosial</h3>

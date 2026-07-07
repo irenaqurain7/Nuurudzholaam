@@ -254,15 +254,13 @@
         <div class="grid-2">
             <div>
                 <h2 style="text-align: left; margin-bottom: 24px;">Sejarah Singkat</h2>
-                <p class="history-text">
-                    Sekolah Nuurudzholaam didirikan dengan semangat untuk menghadirkan inovasi pendidikan yang tidak hanya akademis namun juga mengintegrasikan nilai-nilai keislaman. Kami percaya bahwa pendidikan adalah investasi terbaik untuk masa depan generasi bangsa.
-                </p>
-                <p class="history-text">
-                    Perjalanan kami dimulai dengan komitmen teguh terhadap kualitas pembelajaran dan pengembangan karakter. Fasilitas kami dibangun dengan konsistensi teguh terhadap kualitas pengajaran yang menghangatkan dan mempersiapkan setiap siswa untuk menjadi pemimpin masa depan yang berani, bijaksana, dan bermoral.
-                </p>
-                <p class="history-text">
-                    Saat ini, dengan ratusan siswa dari berbagai latar belakang keluarga, kami terus berinovasi dan berkembang guna memberikan pendidikan terbaik yang dapat membentuk generasi yang tidak hanya cerdas secara intelektual namun juga kuat dalam iman dan akhlak.
-                </p>
+                <div class="history-text">
+                    @if($school && $school->deskripsi)
+                        {!! nl2br(e($school->deskripsi)) !!}
+                    @else
+                        Sekolah Nuurudzholaam didirikan dengan semangat untuk menghadirkan inovasi pendidikan yang tidak hanya akademis namun juga mengintegrasikan nilai-nilai keislaman. Kami percaya bahwa pendidikan adalah investasi terbaik untuk masa depan generasi bangsa.
+                    @endif
+                </div>
             </div>
             <div>
                 @if($school && $school->gambar_utama)
@@ -289,7 +287,7 @@
                 <h3 class="visi-misi-title">Visi</h3>
                 <p class="visi-misi-content" style="text-align: center;">
                     @if($school && $school->visi)
-                        "{{ $school->visi }}"
+                        {!! nl2br(e($school->visi)) !!}
                     @else
                         Terwujudnya pribadi siswa siswi yang beriman bertaqwa. berakhlak mulia, kreatif, sehat, cerdas dan memiliki kesiapan fisik maupun mental dalam memasuki pendidikan lebih lanjut.
                     @endif
@@ -303,7 +301,7 @@
                 <h3 class="visi-misi-title">Misi</h3>
                 <div class="visi-misi-content">
                     @if($school && $school->misi)
-                        <p style="margin: 0;">{{ $school->misi }}</p>
+                        <div style="margin: 0;">{!! nl2br(e($school->misi)) !!}</div>
                     @else
                         <p style="margin-bottom: 12px;">Mewujudkan cita-cita luhur sekolah nuurudzholaam berupa :</p>
                         <ul>

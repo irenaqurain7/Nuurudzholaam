@@ -25,11 +25,13 @@ class SchoolInfo extends Model
         'ppdb_start_date',
         'ppdb_end_date',
         'ppdb_active',
+        'pilar_pendidikan',
     ];
 
     protected $casts = [
         'ppdb_start_date' => 'date',
         'ppdb_end_date' => 'date',
         'ppdb_active' => 'boolean',
+        'pilar_pendidikan' => 'array',
     ];
 }

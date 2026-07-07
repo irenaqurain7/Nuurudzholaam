@@ -37,7 +37,7 @@
                         <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Telepon / WhatsApp</h3>
                     </div>
                     <p style="color: var(--text-light); margin: 0 0 0 47px; font-size: 0.95rem;">
-                        <a href="tel:{{ $school->no_telepon }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 600; transition: color 0.3s;">{{ $school->no_telepon }}</a>
+                        <a href="tel:{{ $school->no_telepon ?? '085714673916' }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 600; transition: color 0.3s;">{{ $school->no_telepon ?? '085714673916' }}</a>
                     </p>
                     <p style="color: var(--text-light); margin: 8px 0 0 47px; font-size: 0.85rem; line-height: 1.6;">
                         085714673916 (Dede Ali)<br>
@@ -53,7 +53,7 @@
                         <h3 style="color: var(--hijau-islam); margin: 0; font-weight: 600; font-size: 1rem;">Email:</h3>
                     </div>
                     <p style="color: var(--text-light); margin: 0 0 0 47px; font-size: 0.95rem;">
-                        <a href="mailto:{{ $school->email }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 400; transition: color 0.3s;">{{ $school->email }}Nuurudz@gmail.com</a>
+                        <a href="mailto:{{ $school->email ?? 'Nuurudz@gmail.com' }}" style="color: var(--hijau-islam); text-decoration: none; font-weight: 400; transition: color 0.3s;">{{ $school->email ?? 'Nuurudz@gmail.com' }}</a>
                     </p>
                 </div>
 

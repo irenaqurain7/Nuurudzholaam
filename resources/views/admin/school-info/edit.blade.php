@@ -93,6 +93,44 @@
                     </p>
                 </div>
             </div>
+            </div>
+
+            <!-- Pilar Pendidikan Section -->
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid var(--emas); margin-top: 30px;">
+                <h3 style="color: var(--hijau-islam); margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-landmark"></i> Pilar Pendidikan Utama
+                </h3>
+                <p style="font-size: 13px; color: var(--text-light); margin-bottom: 20px;">Atur 4 Pilar Pendidikan Utama yang tampil di Halaman Depan.</p>
+
+                @php
+                    $pilars = old('pilar_pendidikan', $school->pilar_pendidikan ?? [
+                        ['icon' => 'fas fa-brain', 'judul' => 'Olah Pikir (Literasi)', 'deskripsi' => 'Mengasah daya pikir dan intelektual agar peserta didik memiliki pemikiran kritis, luas dan tajam.'],
+                        ['icon' => 'fas fa-heart', 'judul' => 'Olah Hati (Etika/Spiritual)', 'deskripsi' => 'Membina akhlak, moral dan budi pekerti luhur sehingga peserta didik menjadi individu yang berkarakter dan berintegritas.'],
+                        ['icon' => 'fas fa-palette', 'judul' => 'Olah Rasa (Estetika)', 'deskripsi' => 'Menumbuhkan kepekaan perasaan, welas asih dan apresiasi terhadap keindahan serta seni.'],
+                        ['icon' => 'fas fa-bolt', 'judul' => 'Olah Karsa (Kinestetik/Kemauan)', 'deskripsi' => 'Mengembangkan kemauan keras, semangat juang, kreativitas dan inovasi.']
+                    ]);
+                @endphp
+
+                @for($i = 0; $i < 4; $i++)
+                <div style="background-color: white; border: 1px solid #e2e8f0; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: var(--hijau-islam); font-size: 14px;">Pilar {{ $i + 1 }}</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>Icon (FontAwesome)</label>
+                            <input type="text" name="pilar_pendidikan[{{ $i }}][icon]" value="{{ $pilars[$i]['icon'] ?? '' }}" placeholder="Contoh: fas fa-brain">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>Judul Pilar</label>
+                            <input type="text" name="pilar_pendidikan[{{ $i }}][judul]" value="{{ $pilars[$i]['judul'] ?? '' }}" placeholder="Judul Pilar">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Deskripsi Pilar</label>
+                        <textarea name="pilar_pendidikan[{{ $i }}][deskripsi]" rows="2" style="min-height: unset; height: 60px;" placeholder="Deskripsi Pilar">{{ $pilars[$i]['deskripsi'] ?? '' }}</textarea>
+                    </div>
+                </div>
+                @endfor
+            </div>
         </div>
 
         <div>

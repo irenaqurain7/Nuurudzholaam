@@ -139,7 +139,11 @@
             <div>
                 <h2 style="font-size: 36px; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Selamat Datang di <br><span style="color: var(--emas);">Sekolah Nuurudzholaam</span></h2>
                 <p style="color: var(--text-light); line-height: 1.8; font-size: 16px; margin-bottom: 30px;">
-                    Nuurudzholaam didirikan oleh A Dede Ali Asy'ari, S.Pd. Pada tahun 2012 dengan menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.
+                    @if($school && $school->deskripsi)
+                        {!! nl2br(e($school->deskripsi)) !!}
+                    @else
+                        Nuurudzholaam didirikan oleh A Dede Ali Asy'ari, S.Pd. Pada tahun 2012 dengan menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.
+                    @endif
                 </p>
                 <a href="{{ route('profil') }}" style="background-color: var(--hijau-islam); color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s;">Pelajari Lebih Lanjut →</a>
             </div>
@@ -153,38 +157,25 @@
         <h2 style="font-size: 36px; text-align: center; color: var(--hijau-islam); margin-bottom: 15px; font-weight: bold;">Pilar Pendidikan Utama</h2>
         <p style="text-align: center; color: var(--text-light); margin-bottom: 25px; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">Kami mengintegrasikan empat pilar fundamental untuk menciptakan pendidikan yang seimbang dan holistik.</p>
 
+        @php
+            $pilars = $school && !empty($school->pilar_pendidikan) ? $school->pilar_pendidikan : [
+                ['icon' => 'fas fa-brain', 'judul' => 'Olah Pikir (Literasi)', 'deskripsi' => 'Mengasah daya pikir dan intelektual agar peserta didik memiliki pemikiran kritis, luas dan tajam.'],
+                ['icon' => 'fas fa-heart', 'judul' => 'Olah Hati (Etika/Spiritual)', 'deskripsi' => 'Membina akhlak, moral dan budi pekerti luhur sehingga peserta didik menjadi individu yang berkarakter dan berintegritas.'],
+                ['icon' => 'fas fa-palette', 'judul' => 'Olah Rasa (Estetika)', 'deskripsi' => 'Menumbuhkan kepekaan perasaan, welas asih dan apresiasi terhadap keindahan serta seni.'],
+                ['icon' => 'fas fa-bolt', 'judul' => 'Olah Karsa (Kinestetik/Kemauan)', 'deskripsi' => 'Mengembangkan kemauan keras, semangat juang, kreativitas dan inovasi.']
+            ];
+        @endphp
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+            @foreach($pilars as $pilar)
             <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
                 <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-brain"></i>
+                    <i class="{{ $pilar['icon'] ?? 'fas fa-star' }}"></i>
                 </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Pikir (Literasi)</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Mengasah daya pikir dan intelektual agar peserta didik memiliki pemikiran kritis, luas dan tajam.</p>
+                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">{{ $pilar['judul'] ?? '' }}</h3>
+                <p style="color: var(--text-light); line-height: 1.6;">{{ $pilar['deskripsi'] ?? '' }}</p>
             </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-heart"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Hati (Etika/Spiritual)</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Membina akhlak, moral dan budi pekerti luhur sehingga peserta didik menjadi individu yang berkarakter dan berintegritas.</p>
-            </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Rasa (Estetika)</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Menumbuhkan kepekaan perasaan, welas asih dan apresiasi terhadap keindahan serta seni.</p>
-            </div>
-
-            <div class="card" style="text-align: center; padding: 40px 30px; border-top: 4px solid var(--hijau-islam);">
-                <div style="font-size: 48px; color: var(--hijau-islam); margin-bottom: 20px;">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <h3 style="color: var(--hijau-islam); font-size: 20px; margin-bottom: 15px; font-weight: bold;">Olah Karsa (Kinestetik/Kemauan)</h3>
-                <p style="color: var(--text-light); line-height: 1.6;">Mengembangkan kemauan keras, semangat juang, kreativitas dan inovasi.</p>
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
