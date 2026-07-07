@@ -48,7 +48,7 @@ class PPDBController extends Controller
             'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'email' => 'required|email|unique:ppdb_registrations',
             'no_telepon' => 'required|string|max:20',
-            'asal_sekolah' => 'required|string|max:255',
+            'asal_sekolah' => 'nullable|required_unless:jenjang,tk|string|max:255',
             'nama_ayah' => 'required|string|max:255',
             'nama_ibu' => 'required|string|max:255',
             'nama_ortu' => 'nullable|string|max:255',

@@ -258,8 +258,8 @@
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                             <div>
-                                <label for="asal_sekolah" style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 6px;">Asal Sekolah <span style="color: red;">*</span></label>
-                                <input type="text" id="asal_sekolah" name="asal_sekolah" placeholder="Nama sekolah asal" value="{{ old('asal_sekolah') }}" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <label for="asal_sekolah" style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 6px;">Asal Sekolah <span style="color: red;" id="asal_sekolah_required_star">*</span></label>
+                                <input type="text" id="asal_sekolah" name="asal_sekolah" placeholder="Nama sekolah asal (kosongkan jika belum ada)" value="{{ old('asal_sekolah') }}" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
                                 <div class="field-error" id="error_asal_sekolah"></div>
                             </div>
                             <div>
@@ -422,7 +422,11 @@
         tanggal_lahir: () => document.getElementById('tanggal_lahir').value.trim().length > 0,
         jenis_kelamin: () => !!document.querySelector('input[name="jenis_kelamin"]:checked'),
         alamat: () => document.getElementById('alamat').value.trim().length > 0,
-        asal_sekolah: () => document.getElementById('asal_sekolah').value.trim().length > 0,
+        asal_sekolah: () => {
+            const jenjang = document.querySelector('input[name="jenjang"]:checked')?.value;
+            if (jenjang === 'tk') return true;
+            return document.getElementById('asal_sekolah').value.trim().length > 0;
+        },
         email: () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value.trim()),
         no_telepon: () => /^\+?\d{9,15}$/.test(document.getElementById('no_telepon').value.replace(/\s+/g, '')),
         nama_ayah: () => document.getElementById('nama_ayah').value.trim().length > 0,
@@ -643,6 +647,8 @@
         const nisnStar = document.getElementById('nisn_required_star');
         const indicatorStep4 = document.getElementById('indicator-step-4');
         const btnNextStep3 = document.getElementById('btn-next-step-3');
+        const asalSekolahInput = document.getElementById('asal_sekolah');
+        const asalSekolahStar = document.getElementById('asal_sekolah_required_star');
 
         if (jenjang === 'tk' || jenjang === 'sd') {
             nisnInput.removeAttribute('required');
@@ -650,6 +656,14 @@
         } else {
             nisnInput.setAttribute('required', 'required');
             nisnStar.style.display = 'inline';
+        }
+
+        if (jenjang === 'tk') {
+            if (asalSekolahInput) asalSekolahInput.removeAttribute('required');
+            if (asalSekolahStar) asalSekolahStar.style.display = 'none';
+        } else {
+            if (asalSekolahInput) asalSekolahInput.setAttribute('required', 'required');
+            if (asalSekolahStar) asalSekolahStar.style.display = 'inline';
         }
 
         if (jenjang === 'smk') {
