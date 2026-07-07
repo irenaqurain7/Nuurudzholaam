@@ -156,8 +156,8 @@
 
             <div class="form-grid two-col">
                 <div class="field-group">
-                    <label for="nip">NIP</label>
-                    <input type="text" id="nip" name="nip" value="{{ old('nip', $user->nip) }}">
+                    <label for="nip">Kode Guru <span style="color: red;">*</span></label>
+                    <input type="text" id="nip" name="nip" value="{{ old('nip', $user->nip) }}" placeholder="Kode Guru">
                     @error('nip')<small>{{ $message }}</small>@enderror
                 </div>
 
