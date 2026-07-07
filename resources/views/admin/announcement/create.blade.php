@@ -47,8 +47,6 @@
                 <div class="select-wrapper">
                     <select id="tipe" name="tipe" required>
                         <option value="">-- Pilih Tipe --</option>
-                        <option value="umum" @if(old('tipe') === 'umum') selected @endif>Umum</option>
-                        <option value="ppdb" @if(old('tipe') === 'ppdb') selected @endif>PPDB</option>
                         <option value="libur" @if(old('tipe') === 'libur') selected @endif>Libur</option>
                         <option value="penting" @if(old('tipe') === 'penting') selected @endif>Penting</option>
                     </select>

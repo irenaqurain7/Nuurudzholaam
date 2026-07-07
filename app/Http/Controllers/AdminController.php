@@ -394,7 +394,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string',
             'konten' => 'required|string',
-            'tipe' => 'required|in:umum,ppdb,libur,penting',
+            'tipe' => 'required|in:libur,penting',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'status' => 'required|in:aktif,arsip',
@@ -417,7 +417,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string',
             'konten' => 'required|string',
-            'tipe' => 'required|in:umum,ppdb,libur,penting',
+            'tipe' => 'required|in:libur,penting',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'status' => 'required|in:aktif,arsip',

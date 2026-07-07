@@ -48,8 +48,6 @@
                 <div class="select-wrapper">
                     <select id="tipe" name="tipe" required>
                         <option value="">-- Pilih Tipe --</option>
-                        <option value="umum" @if(old('tipe', $announcement->tipe) === 'umum') selected @endif>Umum</option>
-                        <option value="ppdb" @if(old('tipe', $announcement->tipe) === 'ppdb') selected @endif>PPDB</option>
                         <option value="libur" @if(old('tipe', $announcement->tipe) === 'libur') selected @endif>Libur</option>
                         <option value="penting" @if(old('tipe', $announcement->tipe) === 'penting') selected @endif>Penting</option>
                     </select>
