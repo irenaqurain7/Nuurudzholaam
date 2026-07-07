@@ -368,4 +368,21 @@
         }
     }
 </style>
+
+<form id="deleteAnnouncementForm" method="POST" style="display:none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<script>
+    function deleteAnnouncement(id) {
+        if (!confirm('Yakin ingin menghapus pengumuman ini?')) {
+            return;
+        }
+
+        const form = document.getElementById('deleteAnnouncementForm');
+        form.action = `/admin/announcement/${id}`;
+        form.submit();
+    }
+</script>
 @endsection
