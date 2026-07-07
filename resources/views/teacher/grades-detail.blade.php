@@ -379,10 +379,22 @@
 
         @if ($level === 'sd')
             <section class="panel-card mb-4">
-                <div class="card-header">
-                    <h2 class="panel-title">Pilih Mata Pelajaran</h2>
-                    <span class="badge text-bg-light border rounded-pill px-3 py-2">{{ $availableSubjects->count() }} mapel</span>
-                </div>
+                @if ($activeSubject)
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="panel-title">Mata Pelajaran Terpilih</h2>
+                            <div class="text-muted small">Hanya menampilkan mapel yang sedang dikelola</div>
+                        </div>
+                        <a href="{{ route('teacher.grades.detail', ['level' => $level, 'classSlug' => $classCard['slug']]) }}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                            <i class="bi bi-arrow-left-right me-1"></i> Ganti Mapel
+                        </a>
+                    </div>
+                @else
+                    <div class="card-header">
+                        <h2 class="panel-title">Pilih Mata Pelajaran</h2>
+                        <span class="badge text-bg-light border rounded-pill px-3 py-2">{{ $availableSubjects->count() }} mapel</span>
+                    </div>
+                @endif
                 <div class="card-body">
                     @if ($activeSubject)
                         <div class="alert alert-success border-0 mb-3" style="background: rgba(46, 125, 99, 0.08); color: #1F4D3B; border-radius: 14px;">
@@ -394,15 +406,21 @@
                         </div>
                     @endif
 
-                    <div class="subject-grid">
+                    <div class="subject-grid {{ $activeSubject ? 'd-flex justify-content-start' : '' }}">
                         @forelse ($subjectCards as $subjectCard)
-                            <a href="{{ $subjectCard['url'] }}" class="subject-card {{ $activeSubject === $subjectCard['name'] ? 'active' : '' }}">
-                                <div>
-                                    <p class="subject-name">{{ $subjectCard['name'] }}</p>
-                                    <p class="subject-note">Klik untuk membuka tabel nilai</p>
-                                </div>
-                                <i class="bi bi-arrow-right-circle fs-4 text-success"></i>
-                            </a>
+                            @if (!$activeSubject || $activeSubject === $subjectCard['name'])
+                                <a href="{{ $subjectCard['url'] }}" class="subject-card {{ $activeSubject === $subjectCard['name'] ? 'active' : '' }}" style="{{ $activeSubject ? 'max-width: 400px; width: 100%;' : '' }}">
+                                    <div>
+                                        <p class="subject-name">{{ $subjectCard['name'] }}</p>
+                                        <p class="subject-note">{{ $activeSubject ? 'Mata pelajaran aktif' : 'Klik untuk membuka tabel nilai' }}</p>
+                                    </div>
+                                    @if ($activeSubject)
+                                        <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+                                    @else
+                                        <i class="bi bi-arrow-right-circle fs-4 text-success"></i>
+                                    @endif
+                                </a>
+                            @endif
                         @empty
                             <div class="empty-state w-100">
                                 Belum ada mata pelajaran yang bisa ditampilkan untuk kelas ini.
