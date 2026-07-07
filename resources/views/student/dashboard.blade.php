@@ -52,6 +52,84 @@
         margin-bottom: 2rem;
     }
 
+    .schedule-preview {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    }
+
+    .schedule-preview-header {
+        padding: 1.1rem 1.25rem;
+        background: linear-gradient(135deg, rgba(45, 80, 22, 0.08), rgba(61, 107, 31, 0.16));
+        border-bottom: 1px solid rgba(45, 80, 22, 0.08);
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .schedule-preview-header h5 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .schedule-preview-header span {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .schedule-preview-body {
+        padding: 1.25rem;
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+        text-align: left;
+        padding: 0.85rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        font-size: 0.93rem;
+    }
+
+    .schedule-table th {
+        color: var(--text-secondary);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 700;
+    }
+
+    .schedule-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .schedule-table td:first-child {
+        width: 72px;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .schedule-empty {
+        padding: 1.25rem;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        background: #fafbfa;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+    }
+
     .dashboard-card {
         background: white;
         border: 1px solid var(--border);
@@ -92,6 +170,16 @@
     .dashboard-card.green .dashboard-card-icon { color: var(--green); }
     .dashboard-card.purple .dashboard-card-icon { color: var(--purple); }
     .dashboard-card.red .dashboard-card-icon { color: var(--red); }
+
+    .dashboard-card.is-schedule {
+        cursor: default;
+    }
+
+    .dashboard-card.is-schedule:hover {
+        border-color: var(--border);
+        box-shadow: none;
+        transform: none;
+    }
 
     .dashboard-card a {
         display: inline-flex;
@@ -221,13 +309,12 @@
 
 <!-- Dashboard Cards -->
 <div class="dashboard-grid">
-    <div class="dashboard-card blue">
-        <h6>Jadwal Sekolah</h6>
+    <div class="dashboard-card blue is-schedule">
+        <h6>Jadwal Sekolah Hari Ini</h6>
         <i class="fas fa-calendar-alt dashboard-card-icon"></i>
-        <a href="{{ route('student.schedule') }}">
-            <span>Lihat Jadwal</span>
-            <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
-        </a>
+        <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+            {{ $todayLabel ?? 'Hari ini' }}
+        </div>
     </div>
 
     <div class="dashboard-card green">
@@ -255,6 +342,36 @@
             <span>Ubah Password</span>
             <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
         </a>
+    </div>
+</div>
+
+<!-- Schedule Preview -->
+<div class="schedule-preview">
+    <div class="schedule-preview-header">
+        <h5>Preview Jadwal Pelajaran Hari Ini</h5>
+        <span>{{ $todayLabel ?? 'Hari ini' }}</span>
+    </div>
+    <div class="schedule-preview-body">
+        @if(($todayScheduleItems ?? collect())->isNotEmpty())
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Pelajaran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($todayScheduleItems as $index => $scheduleItem)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $scheduleItem }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="schedule-empty">Tidak ada jadwal pelajaran hari ini.</div>
+        @endif
     </div>
 </div>
 

@@ -9,6 +9,8 @@ use App\Models\Teacher;
 use App\Models\Announcement;
 use App\Models\Activity;
 use App\Models\SchoolInfo;
+use App\Models\StudentSchedule;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +35,16 @@ class StudentDashboardController extends Controller
     {
         $user = Auth::user();
         $student = Student::where('user_id', $user->id)->firstOrFail();
+        $todayName = Carbon::now()->format('l');
+        $todayLabel = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Minggu',
+        ][$todayName] ?? $todayName;
 
         // Tambahkan query ini untuk mengambil pengumuman aktif terbaru
         $announcements = Announcement::where('status', 'aktif')
@@ -40,10 +52,35 @@ class StudentDashboardController extends Controller
             ->take(5) // Mengambil 5 pengumuman terbaru untuk dashboard
             ->get();
 
+        $todaySchedules = StudentSchedule::query()
+            ->where('class', $student->class)
+            ->where('day', $todayName)
+            ->orderBy('created_at')
+            ->get();
+
+        if ($todaySchedules->isEmpty()) {
+            $todaySchedules = StudentSchedule::query()
+                ->where('class', $student->class)
+                ->where('day', $todayLabel)
+                ->orderBy('created_at')
+                ->get();
+        }
+
+        $todayScheduleItems = $todaySchedules
+            ->flatMap(function (StudentSchedule $schedule) {
+                return collect($schedule->activities ?? []);
+            })
+            ->filter(function ($activity) {
+                return is_string($activity) && trim($activity) !== '';
+            })
+            ->values();
+
         return view('student.dashboard', [
             'user' => $user,
             'student' => $student,
             'announcements' => $announcements, // Kirim variabel ke view blade
+            'todayLabel' => $todayLabel,
+            'todayScheduleItems' => $todayScheduleItems,
         ]);
     }
 
@@ -52,18 +89,7 @@ class StudentDashboardController extends Controller
      */
     public function schedule()
     {
-        $user = Auth::user();
-        $student = Student::where('user_id', $user->id)->firstOrFail();
-
-        $schedules = \App\Models\StudentSchedule::where('class', $student->class)
-            ->orderBy('day')
-            ->get()
-            ->groupBy('day');
-
-        return view('student.schedule', [
-            'schedules' => $schedules,
-            'student' => $student,
-        ]);
+        return redirect()->route('student.dashboard');
     }
 
     /**

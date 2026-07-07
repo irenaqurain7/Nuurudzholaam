@@ -280,11 +280,6 @@
                 </a>
             </li>
             <li>
-                <a class="@if(Route::currentRouteName() === 'student.schedule') active @endif" href="{{ route('student.schedule') }}">
-                    <i class="fas fa-calendar"></i> <span>Jadwal Sekolah</span>
-                </a>
-            </li>
-            <li>
                 <a class="@if(Route::currentRouteName() === 'student.grades') active @endif" href="{{ route('student.grades') }}">
                     <i class="fas fa-star"></i> <span>Nilai</span>
                 </a>
