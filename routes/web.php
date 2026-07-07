@@ -56,7 +56,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // PPDB Management
     Route::get('/ppdb', [AdminController::class, 'ppdbIndex'])->name('ppdb.index');
-    Route::get('/ppdb/{id}', [AdminController::class, 'ppdbShow'])->name('ppdb.show');
+    Route::get('/ppdb/{id}', [AdminController::class, 'ppdbShow'])->whereNumber('id')->name('ppdb.show');
     Route::patch('/ppdb/{id}/status/{status}', [AdminController::class, 'ppdbUpdateStatus'])->name('ppdb.updateStatus');
     Route::get('/ppdb/export/excel', [AdminController::class, 'ppdbExportExcel'])->name('ppdb.export.excel');
     Route::get('/ppdb/export/pdf', [AdminController::class, 'ppdbExportPdf'])->name('ppdb.export.pdf');
