@@ -62,7 +62,7 @@
                 <p style="color: var(--text-light); margin: 0; font-size: 16px;">
                     @if($registration->jenjang == 'smk' && $registration->jurusan)
                         <span style="background: rgba(31, 127, 95, 0.1); color: var(--hijau-islam); padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;">{{ $registration->jurusan }}</span>
-                    @elseif($registration->program)
+                    @elseif($registration->jenjang == 'sma' && $registration->program)
                         <span style="background: rgba(31, 127, 95, 0.1); color: var(--hijau-islam); padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;">{{ ucfirst($registration->program) }}</span>
                     @else
                         -

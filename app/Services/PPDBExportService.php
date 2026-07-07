@@ -82,12 +82,8 @@ class PPDBExportService
             return (string) $registration->jurusan;
         }
 
-        if (!empty($registration->program)) {
+        if (!empty($registration->jenjang) && strtolower((string) $registration->jenjang) === 'sma' && !empty($registration->program)) {
             return ucfirst((string) $registration->program);
-        }
-
-        if (!empty($registration->jurusan)) {
-            return (string) $registration->jurusan;
         }
 
         return '-';

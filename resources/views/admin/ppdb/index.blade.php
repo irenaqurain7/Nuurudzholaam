@@ -166,7 +166,7 @@
                         <td>
                             @if($reg->jenjang == 'smk' && $reg->jurusan)
                                 <span class="program-badge">{{ $reg->jurusan }}</span>
-                            @elseif($reg->program)
+                            @elseif($reg->jenjang == 'sma' && $reg->program)
                                 <span class="program-badge">{{ ucfirst($reg->program) }}</span>
                             @else
                                 <span class="text-muted">—</span>
