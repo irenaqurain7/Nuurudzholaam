@@ -557,12 +557,17 @@
 
     function toggleJenjangFields() {
         const jenjang = document.getElementById('jenjang').value;
-        const nisnGroup = document.getElementById('nisn-field-group');
+        const nisnLabel = document.querySelector('label[for="nisn"]');
+        const nisnInput = document.getElementById('nisn');
         
         if (jenjang === 'TK') {
-            nisnGroup.style.display = 'none';
+            nisnLabel.textContent = 'Kode Siswa';
+            nisnInput.placeholder = 'Dibuat otomatis oleh sistem';
+            nisnInput.readOnly = true;
         } else {
-            nisnGroup.style.display = 'flex';
+            nisnLabel.textContent = 'NISN';
+            nisnInput.placeholder = 'Nomor induk siswa';
+            nisnInput.readOnly = false;
         }
 
         populateClassOptions(jenjang);

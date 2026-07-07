@@ -725,6 +725,15 @@ class AdminController extends Controller
             $validated['profile_photo'] = $request->file('profile_photo')->store('profiles', 'public');
         }
 
+        if ($validated['role'] === 'siswa' && $validated['jenjang'] === 'TK' && empty($validated['nisn'])) {
+            $lastTkStudent = Student::where('jenjang', 'TK')->orderBy('id', 'desc')->first();
+            $nextNumber = 1;
+            if ($lastTkStudent && preg_match('/^TK\-(\d+)$/', $lastTkStudent->nisn, $matches)) {
+                $nextNumber = intval($matches[1]) + 1;
+            }
+            $validated['nisn'] = 'TK-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        }
+
         $user = User::create($validated);
 
         // Create related records
@@ -789,6 +798,15 @@ class AdminController extends Controller
             $validated['profile_photo'] = $request->file('profile_photo')->store('profiles', 'public');
         } else {
             unset($validated['profile_photo']);
+        }
+
+        if ($validated['role'] === 'siswa' && $validated['jenjang'] === 'TK' && empty($validated['nisn'])) {
+            $lastTkStudent = Student::where('jenjang', 'TK')->orderBy('id', 'desc')->first();
+            $nextNumber = 1;
+            if ($lastTkStudent && preg_match('/^TK\-(\d+)$/', $lastTkStudent->nisn, $matches)) {
+                $nextNumber = intval($matches[1]) + 1;
+            }
+            $validated['nisn'] = 'TK-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         }
 
         $user->update($validated);
