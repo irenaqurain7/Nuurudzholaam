@@ -1091,6 +1091,119 @@ class TeacherDashboardController extends Controller
     }
 
     /**
+     * Download rekap nilai kelas sebagai file CSV
+     */
+    public function rekapNilai(Request $request, string $level, string $classSlug)
+    {
+        $user    = Auth::user();
+        $teacher = $user->teacher;
+
+        $className      = $this->classNameFromSlug($classSlug);
+        $selectedSubject = trim((string) $request->query('subject', ''));
+
+        // Load all students in the class
+        $students = Student::with('user')
+            ->where('class', $className)
+            ->orderBy('nisn')
+            ->get();
+
+        // Determine which subjects to include
+        $subjectsQuery = Grade::where('teacher_id', $teacher->id)
+            ->whereHas('student', fn($q) => $q->where('class', $className))
+            ->pluck('subject')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        $subjects = $selectedSubject !== ''
+            ? collect([$selectedSubject])
+            : $subjectsQuery;
+
+        // Load all grades for this class and teacher
+        $allGrades = Grade::where('teacher_id', $teacher->id)
+            ->whereHas('student', fn($q) => $q->where('class', $className))
+            ->when($selectedSubject !== '', fn($q) => $q->where('subject', $selectedSubject))
+            ->get()
+            ->groupBy('student_id');
+
+        // Build CSV
+        $semester    = $this->resolveSemesterLabel();
+        $academicYear = $this->resolveAcademicYearLabel();
+        $filename    = 'Rekap_Nilai_' . str_replace(' ', '_', $className) . '_' . $academicYear . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        $callback = function () use ($students, $subjects, $allGrades, $className, $semester, $academicYear) {
+            $out = fopen('php://output', 'w');
+            // BOM for Excel UTF-8
+            fputs($out, "\xEF\xBB\xBF");
+
+            // Meta header rows
+            fputcsv($out, ['Rekap Nilai Siswa']);
+            fputcsv($out, ['Kelas', $className]);
+            fputcsv($out, ['Semester', $semester]);
+            fputcsv($out, ['Tahun Ajaran', $academicYear]);
+            fputcsv($out, ['Dicetak', now()->format('d/m/Y H:i')]);
+            fputcsv($out, []);
+
+            // Column header
+            $header = ['No', 'NISN', 'Nama Siswa'];
+            foreach ($subjects as $subj) {
+                $header[] = $subj;
+            }
+            $header[] = 'Rata-rata';
+            $header[] = 'Predikat';
+            fputcsv($out, $header);
+
+            // Data rows
+            foreach ($students as $index => $student) {
+                $studentGrades = $allGrades->get($student->id, collect());
+                $gradesBySubject = $studentGrades->keyBy('subject');
+
+                $row    = [$index + 1, $student->nisn ?? '-', $student->user->name ?? '-'];
+                $scores = [];
+
+                foreach ($subjects as $subj) {
+                    $g = $gradesBySubject->get($subj);
+                    $score = $g ? number_format((float) $g->grade, 0) : '-';
+                    $row[]  = $score;
+                    if ($g) {
+                        $scores[] = (float) $g->grade;
+                    }
+                }
+
+                // Average
+                if (count($scores) > 0) {
+                    $avg = array_sum($scores) / count($scores);
+                    $row[] = number_format($avg, 1);
+                    // Predikat
+                    if ($avg >= 90)      $row[] = 'A (Sangat Baik)';
+                    elseif ($avg >= 80)  $row[] = 'B (Baik)';
+                    elseif ($avg >= 70)  $row[] = 'C (Cukup)';
+                    elseif ($avg >= 60)  $row[] = 'D (Kurang)';
+                    else                 $row[] = 'E (Sangat Kurang)';
+                } else {
+                    $row[] = '-';
+                    $row[] = '-';
+                }
+
+                fputcsv($out, $row);
+            }
+
+            fclose($out);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
      * Delete grade
      */
     public function deleteGrade(Request $request, $id)

@@ -219,6 +219,10 @@ Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->g
     Route::get('/grades/export-excel', [TeacherDashboardController::class, 'exportGradesExcel'])->name('grades.export-excel');
     Route::get('/grades/export-proper', [TeacherDashboardController::class, 'exportGradesExcelProper'])->name('export-grades-excel');
     Route::get('/grades/students-by-class', [TeacherDashboardController::class, 'studentsByClass'])->name('grades.students-by-class');
+    Route::get('/grades/{level}/{classSlug}/rekap', [TeacherDashboardController::class, 'rekapNilai'])
+        ->whereIn('level', ['sd', 'smp', 'smk'])
+        ->name('grades.rekap');
+
 
     // Reports
     Route::get('/report-summary', [TeacherDashboardController::class, 'getReportSummary'])->name('report-summary');

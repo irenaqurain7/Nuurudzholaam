@@ -244,29 +244,80 @@
         color: #64748B;
     }
 
-    .subject-empty,
-    .table-empty {
-        border: 1px dashed rgba(100, 116, 139, 0.24);
-        border-radius: 16px;
-        background: rgba(248, 250, 249, 0.85);
-        padding: 28px 18px;
-        text-align: center;
-        color: #64748B;
+    /* ---- Rekap Nilai ---- */
+    .rekap-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
     }
 
-    .back-link {
-        display: inline-flex;
+    .rekap-stat-card {
+        display: flex;
         align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        color: #1F4D3B;
-        font-weight: 700;
-        font-size: 0.9rem;
+        gap: 14px;
+        background: #fff;
+        border: 1px solid rgba(31, 77, 59, 0.08);
+        border-radius: 16px;
+        padding: 16px 18px;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
     }
 
-    .back-link:hover {
-        color: #163827;
+    .rekap-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
     }
+
+    .rekap-stat-label {
+        font-size: 0.75rem;
+        color: #64748B;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .rekap-stat-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #163827;
+        line-height: 1.2;
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    .rekap-progress-track {
+        height: 10px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        overflow: hidden;
+    }
+
+    .rekap-progress-bar {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.6s ease;
+    }
+
+    /* Predikat badges */
+    .rekap-pred {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+    .rekap-pred-a    { background: #dcfce7; color: #15803d; }
+    .rekap-pred-b    { background: #dbeafe; color: #1d4ed8; }
+    .rekap-pred-c    { background: #fef9c3; color: #a16207; }
+    .rekap-pred-d    { background: #ffedd5; color: #c2410c; }
+    .rekap-pred-e    { background: #fee2e2; color: #b91c1c; }
+    .rekap-pred-none { background: #f1f5f9; color: #94a3b8; }
 
     @media (max-width: 991.98px) {
         .detail-shell {
@@ -278,11 +329,16 @@
         .subject-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+
+        .rekap-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     @media (max-width: 575.98px) {
         .info-grid,
-        .subject-grid {
+        .subject-grid,
+        .rekap-stats {
             grid-template-columns: 1fr;
         }
     }
@@ -457,6 +513,170 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </section>
+
+            {{-- ============================================================
+                 REKAP NILAI
+                 ============================================================ --}}
+            @php
+                $gradedRows = $rows->filter(fn($r) => $r['grade_id'] !== null);
+                $scores     = $gradedRows->map(fn($r) => (float) $r['grade']->grade)->values();
+                $avg        = $scores->isNotEmpty() ? round($scores->avg(), 1) : null;
+                $highest    = $scores->isNotEmpty() ? $scores->max() : null;
+                $lowest     = $scores->isNotEmpty() ? $scores->min() : null;
+                $passCount  = $scores->filter(fn($s) => $s >= 75)->count();
+                $passRate   = $scores->isNotEmpty() ? round($passCount / $scores->count() * 100) : null;
+
+                $rekapUrl = route('teacher.grades.rekap', [
+                    'level'      => $level,
+                    'classSlug'  => $classCard['slug'],
+                ]);
+                if ($activeSubject) {
+                    $rekapUrl .= '?subject=' . urlencode($activeSubject);
+                }
+            @endphp
+
+            <section class="panel-card mt-4" id="rekap-nilai">
+                <div class="card-header">
+                    <div>
+                        <h2 class="panel-title mb-1">
+                            <i class="bi bi-bar-chart-line me-2" style="color:#1F4D3B;"></i>Rekap Nilai
+                        </h2>
+                        <div class="text-muted small">Ringkasan statistik & unduh laporan nilai</div>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    {{-- Stat cards --}}
+                    @if ($scores->isNotEmpty())
+                    <div class="rekap-stats mb-4">
+                        <div class="rekap-stat-card">
+                            <div class="rekap-stat-icon" style="background:rgba(31,77,59,.1);color:#1F4D3B;">
+                                <i class="bi bi-calculator"></i>
+                            </div>
+                            <div>
+                                <div class="rekap-stat-label">Rata-rata Nilai</div>
+                                <div class="rekap-stat-value">{{ $avg }}</div>
+                            </div>
+                        </div>
+                        <div class="rekap-stat-card">
+                            <div class="rekap-stat-icon" style="background:rgba(34,197,94,.1);color:#16a34a;">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </div>
+                            <div>
+                                <div class="rekap-stat-label">Nilai Tertinggi</div>
+                                <div class="rekap-stat-value" style="color:#16a34a;">{{ $highest }}</div>
+                            </div>
+                        </div>
+                        <div class="rekap-stat-card">
+                            <div class="rekap-stat-icon" style="background:rgba(239,68,68,.1);color:#dc2626;">
+                                <i class="bi bi-arrow-down-circle"></i>
+                            </div>
+                            <div>
+                                <div class="rekap-stat-label">Nilai Terendah</div>
+                                <div class="rekap-stat-value" style="color:#dc2626;">{{ $lowest }}</div>
+                            </div>
+                        </div>
+                        <div class="rekap-stat-card">
+                            <div class="rekap-stat-icon" style="background:rgba(59,130,246,.1);color:#2563eb;">
+                                <i class="bi bi-patch-check"></i>
+                            </div>
+                            <div>
+                                <div class="rekap-stat-label">Tingkat Lulus (≥75)</div>
+                                <div class="rekap-stat-value" style="color:#2563eb;">{{ $passRate }}%
+                                    <small style="font-size:.7rem;font-weight:500;">{{ $passCount }}/{{ $scores->count() }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Progress bar rata-rata --}}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="fw-semibold" style="color:#334155;">Rata-rata Kelas</small>
+                            <small class="fw-bold" style="color:#1F4D3B;">{{ $avg }}/100</small>
+                        </div>
+                        <div class="rekap-progress-track">
+                            <div class="rekap-progress-bar"
+                                 style="width:{{ $avg }}%;
+                                        background: {{ $avg >= 80 ? 'linear-gradient(90deg,#22c55e,#16a34a)' : ($avg >= 70 ? 'linear-gradient(90deg,#f59e0b,#d97706)' : 'linear-gradient(90deg,#ef4444,#dc2626)') }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Rekap table --}}
+                    <div class="table-responsive table-wrap">
+                        <table class="table table-modern align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width:60px;">No</th>
+                                    <th>Nama Siswa</th>
+                                    <th style="width:130px;">NISN</th>
+                                    <th style="width:100px;">Nilai</th>
+                                    <th style="width:120px;">Predikat</th>
+                                    <th>Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($rows as $index => $row)
+                                    @php
+                                        $s = $row['grade'] ? (float) $row['grade']->grade : null;
+                                        if ($s === null) {
+                                            $predikat = '-'; $predClass = 'rekap-pred-none';
+                                        } elseif ($s >= 90) {
+                                            $predikat = 'A — Sangat Baik'; $predClass = 'rekap-pred-a';
+                                        } elseif ($s >= 80) {
+                                            $predikat = 'B — Baik'; $predClass = 'rekap-pred-b';
+                                        } elseif ($s >= 70) {
+                                            $predikat = 'C — Cukup'; $predClass = 'rekap-pred-c';
+                                        } elseif ($s >= 60) {
+                                            $predikat = 'D — Kurang'; $predClass = 'rekap-pred-d';
+                                        } else {
+                                            $predikat = 'E — Sangat Kurang'; $predClass = 'rekap-pred-e';
+                                        }
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td><div class="student-name">{{ $row['student']->user->name ?? '-' }}</div></td>
+                                        <td class="font-monospace" style="font-size:.88rem;">{{ $row['student']->nisn ?? '-' }}</td>
+                                        <td>
+                                            @if ($row['score'] !== '-')
+                                                <span class="score-pill">{{ $row['score'] }}</span>
+                                            @else
+                                                <span class="text-muted small">Belum dinilai</span>
+                                            @endif
+                                        </td>
+                                        <td><span class="rekap-pred {{ $predClass }}">{{ $predikat }}</span></td>
+                                        <td><span class="text-muted small">{{ $row['notes'] === '-' ? '' : $row['notes'] }}</span></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @else
+                    <div class="empty-state">
+                        <i class="bi bi-clipboard-x fs-2 d-block mb-2 opacity-50"></i>
+                        Belum ada nilai yang diinput. Rekap akan tampil setelah nilai siswa ditambahkan.
+                    </div>
+                    @endif
+
+                    {{-- Download hint --}}
+                    <div class="mt-4 p-3 rounded-3 d-flex align-items-center gap-3"
+                         style="background:linear-gradient(135deg,rgba(31,77,59,.05),rgba(46,125,99,.03));border:1px solid rgba(31,77,59,.1);">
+                        <div style="width:40px;height:40px;border-radius:12px;background:rgba(31,77,59,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-file-earmark-spreadsheet" style="color:#1F4D3B;font-size:1.2rem;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold" style="color:#163827;font-size:.93rem;">Unduh Rekap sebagai File CSV</div>
+                            <div class="text-muted" style="font-size:.82rem;">File dapat dibuka langsung di Microsoft Excel, Google Sheets, atau LibreOffice Calc.</div>
+                        </div>
+                        <a href="{{ $rekapUrl }}" class="btn btn-success btn-sm rounded-pill px-3 fw-semibold"
+                           style="background:#1F4D3B;border-color:#1F4D3B;white-space:nowrap;">
+                            <i class="bi bi-download me-1"></i> Unduh Sekarang
+                        </a>
                     </div>
                 </div>
             </section>
