@@ -317,15 +317,6 @@
         </div>
     </div>
 
-    <div class="dashboard-card green">
-        <h6>Nilai Saya</h6>
-        <i class="fas fa-star dashboard-card-icon"></i>
-        <a href="{{ route('student.grades') }}">
-            <span>Lihat Nilai</span>
-            <i class="fas fa-arrow-right" style="font-size: 0.7rem;"></i>
-        </a>
-    </div>
-
     <div class="dashboard-card purple">
         <h6>Data Saya</h6>
         <i class="fas fa-user dashboard-card-icon"></i>
