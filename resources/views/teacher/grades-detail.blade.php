@@ -390,9 +390,16 @@
                         </a>
                     </div>
                 @else
-                    <div class="card-header">
-                        <h2 class="panel-title">Pilih Mata Pelajaran</h2>
-                        <span class="badge text-bg-light border rounded-pill px-3 py-2">{{ $availableSubjects->count() }} mapel</span>
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h2 class="panel-title">Pilih Mata Pelajaran</h2>
+                            <span class="badge text-bg-light border rounded-pill px-3 py-2 mt-1">{{ $availableSubjects->count() }} mapel</span>
+                        </div>
+                        <a href="{{ route('teacher.grades.rekap', ['level' => $level, 'classSlug' => $classCard['slug']]) }}" 
+                           class="btn btn-sm btn-success rounded-pill px-3 d-flex align-items-center gap-1 fw-semibold"
+                           style="background: #1F4D3B; border-color: #1F4D3B;">
+                            <i class="bi bi-download"></i> Unduh Rekap Keseluruhan
+                        </a>
                     </div>
                 @endif
                 <div class="card-body">
