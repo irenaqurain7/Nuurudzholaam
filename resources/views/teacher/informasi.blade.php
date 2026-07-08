@@ -135,13 +135,13 @@
         @foreach($announcements as $announcement)
             <div class="announcement-card">
                 <div class="announcement-header">
-                    <h2 class="announcement-title">{{ $announcement->title }}</h2>
+                    <h2 class="announcement-title">{{ $announcement->judul }}</h2>
                     <span class="announcement-date">
                         <i class="far fa-calendar-alt"></i> {{ $announcement->created_at->format('d M Y') }}
                     </span>
                 </div>
                 <div class="announcement-body">
-                    {!! nl2br(e($announcement->content)) !!}
+                    {!! nl2br(e($announcement->konten)) !!}
                 </div>
             </div>
         @endforeach

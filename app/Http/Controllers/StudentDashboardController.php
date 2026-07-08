@@ -8,6 +8,7 @@ use App\Models\Grade;
 use App\Models\Teacher;
 use App\Models\StudentSchedule;
 use App\Models\Activity;
+use App\Models\Announcement;
 use App\Models\SchoolInfo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

@@ -720,8 +720,8 @@
                 </div>
                 @forelse($recentAnnouncements ?? collect() as $announcement)
                     <a href="{{ route('teacher.informasi') }}" class="notif-item">
-                        <div class="notif-item-title">{{ $announcement->title }}</div>
-                        <div class="notif-item-text">{{ Str::limit(strip_tags($announcement->content), 90) }}</div>
+                        <div class="notif-item-title">{{ $announcement->judul }}</div>
+                        <div class="notif-item-text">{{ Str::limit(strip_tags($announcement->konten), 90) }}</div>
                     </a>
                 @empty
                     <div class="notif-empty">Tidak ada informasi terbaru.</div>
