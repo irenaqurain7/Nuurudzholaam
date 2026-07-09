@@ -148,6 +148,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/create', [AdminController::class, 'usersCreate'])->name('create');
         Route::post('/', [AdminController::class, 'usersStore'])->name('store');
         Route::get('/{id}/edit', [AdminController::class, 'usersEdit'])->name('edit');
+        Route::get('/{id}/show', [AdminController::class, 'usersShow'])->name('show');
         Route::put('/{id}', [AdminController::class, 'usersUpdate'])->name('update');
         Route::delete('/{id}', [AdminController::class, 'usersDelete'])->name('delete');
         Route::post('/{id}/reset-password', [AdminController::class, 'usersResetPassword'])->name('reset-password');

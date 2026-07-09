@@ -159,7 +159,7 @@
                                                 Pulihkan
                                             </button>
                                         </form>
-                                        <a href="{{ route('admin.users.edit', $user->id) }}" class="action-pill view">
+                                        <a href="{{ route('admin.users.show', $user->id) }}" class="action-pill view">
                                             <i class="fas fa-eye"></i>
                                             Detail
                                         </a>

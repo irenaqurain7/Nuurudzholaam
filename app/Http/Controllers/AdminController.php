@@ -764,6 +764,15 @@ class AdminController extends Controller
         return view('admin.users.edit', compact('user'));
     }
 
+    public function usersShow($id)
+    {
+        $user = User::findOrFail($id);
+        if ($user->role === 'admin') {
+            abort(403);
+        }
+        return view('admin.users.show', compact('user'));
+    }
+
     public function usersUpdate(Request $request, $id)
     {
         $user = User::findOrFail($id);
