@@ -269,13 +269,13 @@
     <section class="quick-actions-section">
         <h4 class="section-title"><i class="fas fa-bolt mr-2 text-amber-500"></i> Pintasan Cepat</h4>
         <div class="quick-actions-grid">
-            <a href="{{ route('admin.users.index') }}" class="action-btn-card">
+            <a href="{{ route('admin.users.create') }}" class="action-btn-card">
                 <div class="action-icon bg-emerald-50 text-emerald-700">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-user-plus"></i>
                 </div>
                 <div class="action-details">
-                    <h5>Manajer User</h5>
-                    <p>Kelola data akun siswa dan guru</p>
+                    <h5>Tambah User</h5>
+                    <p>Registrasikan guru atau siswa baru</p>
                 </div>
                 <i class="fas fa-chevron-right action-arrow"></i>
             </a>
