@@ -12,10 +12,6 @@
                 Kelola akun siswa, guru, dan orang tua dengan tampilan yang lebih jelas dan ringkas.
             </p>
         </div>
-        <a href="{{ route('admin.users.create') }}" class="users-create-btn">
-            <i class="fas fa-plus"></i>
-            Tambah Siswa & Guru
-        </a>
     </section>
 
     <section class="stats-grid">
@@ -192,12 +188,8 @@
         @else
             <div class="empty-state">
                 <div class="empty-icon"><i class="fas fa-users"></i></div>
-                <h3>Belum ada user yang dibuat</h3>
-                <p>Mulai dengan menambahkan akun siswa atau guru pertama.</p>
-                <a href="{{ route('admin.users.create') }}" class="users-create-btn compact">
-                    <i class="fas fa-plus"></i>
-                    Tambah Sekarang
-                </a>
+                <h3>Belum ada user terdaftar</h3>
+                <p>Tidak ada akun siswa, guru, atau orang tua yang ditemukan.</p>
             </div>
         @endif
     </section>
