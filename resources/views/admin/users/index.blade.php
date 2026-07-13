@@ -12,10 +12,6 @@
                 Kelola akun siswa, guru, dan orang tua dengan tampilan yang lebih jelas dan ringkas.
             </p>
         </div>
-        <a href="{{ route('admin.users.create') }}" class="users-create-btn">
-            <i class="fas fa-plus"></i>
-            Tambah Siswa & Guru
-        </a>
     </section>
 
     <section class="stats-grid">

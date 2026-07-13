@@ -16,10 +16,6 @@
                 Buat akun baru untuk siswa atau guru beserta data profil dasar yang dibutuhkan untuk login dan pendataan.
             </p>
         </div>
-        <a href="{{ route('admin.users.index') }}" class="form-back-link">
-            <i class="fas fa-arrow-left"></i>
-            Kembali ke daftar
-        </a>
     </section>
 
     @if ($errors->any())
