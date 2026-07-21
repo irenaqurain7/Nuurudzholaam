@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Arsip User')
+@section('title', 'Arsip')
 
 @section('content')
 <div class="users-page">
     <section class="users-hero">
         <div>
-            <p class="users-kicker">Manajemen Akun</p>
-            <h1>Arsip User</h1>
-            <p class="users-subtitle">Kelola akun yang sudah diarsipkan dengan tampilan yang ringkas dan mudah dilihat.</p>
+            <p class="users-kicker">Arsip</p>
+            <h1>Arsip</h1>
+            <p class="users-subtitle">Kelola file arsip dengan kategori seperti Google Drive.</p>
         </div>
     </section>
 
@@ -18,24 +18,24 @@
                 <span class="stat-label">Total Arsip</span>
                 <i class="fas fa-archive"></i>
             </div>
-            <strong>{{ \App\Models\User::where('is_archived', true)->where('role','!=','admin')->count() }}</strong>
-            <small>Akun yang diarsipkan</small>
+            <strong>{{ $stats['total'] ?? 0 }}</strong>
+            <small>Total file arsip</small>
         </article>
         <article class="stat-card green">
             <div class="stat-card-header">
-                <span class="stat-label">Siswa</span>
-                <i class="fas fa-user-graduate"></i>
+                <span class="stat-label">Dokumen Pribadi</span>
+                <i class="fas fa-file-alt"></i>
             </div>
-            <strong>{{ \App\Models\User::where('is_archived', true)->where('role','siswa')->count() }}</strong>
-            <small>Arsip siswa</small>
+            <strong>{{ $stats['documents'] ?? 0 }}</strong>
+            <small>File kategori pribadi</small>
         </article>
         <article class="stat-card blue">
             <div class="stat-card-header">
-                <span class="stat-label">Guru</span>
-                <i class="fas fa-chalkboard-user"></i>
+                <span class="stat-label">Nilai & Raport</span>
+                <i class="fas fa-file-excel"></i>
             </div>
-            <strong>{{ \App\Models\User::where('is_archived', true)->where('role','guru')->count() }}</strong>
-            <small>Arsip guru</small>
+            <strong>{{ $stats['reports'] ?? 0 }}</strong>
+            <small>File kategori raport</small>
         </article>
     </section>
 
@@ -46,8 +46,8 @@
                 <h2>Daftar Arsip</h2>
             </div>
             <div class="panel-meta">
-                <span>{{ $users->count() }} ditampilkan</span>
-                <span>{{ $users->total() }} total arsip</span>
+                <span>{{ $archiveFiles->count() }} ditampilkan</span>
+                <span>{{ $archiveFiles->total() }} total arsip</span>
             </div>
         </div>
 
@@ -55,130 +55,94 @@
             <form action="{{ route('admin.users.archive') }}" method="GET" class="filter-form">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..." class="search-input">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama arsip, kategori, atau file..." class="search-input">
                 </div>
                 <div class="filter-group">
-                    <select name="jenjang" class="filter-select">
-                        <option value="">Semua Jenjang</option>
-                        <option value="tk" @selected(request('jenjang') === 'tk')>TK</option>
-                        <option value="sd" @selected(request('jenjang') === 'sd')>SD</option>
-                        <option value="smp" @selected(request('jenjang') === 'smp')>SMP</option>
-                        <option value="smk" @selected(request('jenjang') === 'smk')>SMK</option>
+                    <select name="category" class="filter-select">
+                        <option value="">Semua Kategori</option>
+                        <option value="Dokumen Pribadi" @selected(request('category') === 'Dokumen Pribadi')>Dokumen Pribadi</option>
+                        <option value="Nilai & Raport" @selected(request('category') === 'Nilai & Raport')>Nilai & Raport</option>
+                        <option value="Sertifikat" @selected(request('category') === 'Sertifikat')>Sertifikat</option>
+                        <option value="Surat" @selected(request('category') === 'Surat')>Surat</option>
+                        <option value="Lainnya" @selected(request('category') === 'Lainnya')>Lainnya</option>
                     </select>
-                    <select name="graduation_year" class="filter-select">
+                    <select name="year" class="filter-select">
                         <option value="">Semua Tahun</option>
                         @foreach(range(now()->year, now()->year - 5) as $year)
-                            <option value="{{ $year }}" @selected(request('graduation_year') == $year)>{{ $year }}</option>
+                            <option value="{{ $year }}" @selected(request('year') == $year)>{{ $year }}</option>
                         @endforeach
                     </select>
                     <button type="submit" class="btn-filter"><i class="fas fa-search"></i> Cari</button>
-                    @if(request()->hasAny(['search', 'jenjang', 'graduation_year']))
+                    @if(request()->hasAny(['search', 'category', 'year']))
                         <a href="{{ route('admin.users.archive') }}" class="btn-reset">
                             <i class="fas fa-times"></i> Reset
                         </a>
                     @endif
                     <button type="button" class="btn-tambah-file" onclick="openUploadModal()">
-                        <i class="fas fa-plus"></i> Tambah File
+                        <i class="fas fa-plus"></i> Unggah Arsip
                     </button>
                 </div>
             </form>
         </div>
 
-        @if($users->count() > 0)
+        @if($archiveFiles->count() > 0)
             <div class="table-wrap">
                 <table class="users-table">
                     <thead>
                         <tr>
-                            <th>Pengguna</th>
-                            <th>Peran</th>
-                            <th>Tahun Kelulusan</th>
-                            <th>File Arsip</th>
+                            <th>Nama Arsip</th>
+                            <th>Kategori</th>
+                            <th>File</th>
+                            <th>Upload</th>
                             <th class="action-col">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($users as $user)
+                        @foreach($archiveFiles as $file)
                             <tr>
                                 <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar role-{{ $user->role }}">{{ strtoupper(substr($user->name,0,1)) }}</div>
-                                        <div>
-                                            <strong>{{ $user->name }}</strong>
-                                            <span class="email-cell">{{ $user->email }}</span>
-                                        </div>
+                                    <strong>{{ $file->archive_name }}</strong>
+                                    <div class="email-cell">
+                                        {{ $file->user?->name ?? 'Tanpa pengguna' }}
                                     </div>
                                 </td>
+                                <td>{{ $file->category ?? 'Lainnya' }}</td>
                                 <td>
-                                    <div style="display:flex;flex-direction:column;gap:6px;">
-                                        <span class="role-badge role-{{ $user->role }}">
-                                            {{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'guru' ? 'Guru' : 'Orang Tua') }}
-                                        </span>
-                                        @if($user->role === 'siswa' && $user->student)
-                                            <span class="jenjang-badge"><i class="fas fa-graduation-cap"></i> {{ $user->student->jenjang }}</span>
-                                        @endif
-                                    </div>
+                                    <a href="{{ Storage::url($file->file_path) }}" target="_blank" class="archive-file-link" title="{{ $file->file_name }}">
+                                        @php
+                                            $ext = strtolower(pathinfo($file->file_name, PATHINFO_EXTENSION));
+                                            $icon = match($ext) {
+                                                'pdf' => 'fas fa-file-pdf',
+                                                'doc','docx' => 'fas fa-file-word',
+                                                'xls','xlsx' => 'fas fa-file-excel',
+                                                'jpg','jpeg','png' => 'fas fa-file-image',
+                                                default => 'fas fa-file'
+                                            };
+                                        @endphp
+                                        <i class="{{ $icon }}"></i>
+                                        <span>{{ Str::limit($file->file_name, 40) }}</span>
+                                    </a>
                                 </td>
-                                <td>{{ $user->graduation_year ?? '—' }}</td>
+                                <td>{{ $file->created_at->format('d M Y') }}</td>
                                 <td>
-                                    @php $archiveFiles = $user->archiveFiles ?? collect(); @endphp
-                                    @if($archiveFiles->count() > 0)
-                                        <ul class="archive-file-list">
-                                            @foreach($archiveFiles as $af)
-                                                <li class="archive-file-item">
-                                                    <a href="{{ Storage::url($af->file_path) }}" target="_blank" class="archive-file-link" title="{{ $af->file_name }}">
-                                                        @php
-                                                            $ext = strtolower(pathinfo($af->file_name, PATHINFO_EXTENSION));
-                                                            $icon = match($ext) {
-                                                                'pdf' => 'fas fa-file-pdf',
-                                                                'doc','docx' => 'fas fa-file-word',
-                                                                'xls','xlsx' => 'fas fa-file-excel',
-                                                                'jpg','jpeg','png' => 'fas fa-file-image',
-                                                                default => 'fas fa-file'
-                                                            };
-                                                        @endphp
-                                                        <i class="{{ $icon }}"></i>
-                                                        <span>{{ Str::limit($af->file_name, 22) }}</span>
-                                                    </a>
-                                                    <form action="{{ route('admin.users.archive.file.delete', $af->id) }}" method="POST" class="inline-form">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="btn-del-file" title="Hapus" onclick="return confirm('Hapus file ini?')"><i class="fas fa-trash-alt"></i></button>
-                                                    </form>
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        <span class="no-file-text"><i class="fas fa-paperclip"></i> Belum ada file</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="action-group" style="justify-content:flex-end; gap:8px;">
-                                        <form action="{{ route('admin.users.restore', $user->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="action-pill restore" onclick="return confirm('Kembalikan akun ini ke daftar aktif?')">
-                                                <i class="fas fa-undo"></i>
-                                                Pulihkan
-                                            </button>
-                                        </form>
-                                        <a href="{{ route('admin.users.show', $user->id) }}" class="action-pill view">
-                                            <i class="fas fa-eye"></i>
-                                            Detail
-                                        </a>
-                                    </div>
+                                    <form action="{{ route('admin.users.archive.file.delete', $file->id) }}" method="POST" class="inline-form">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn-del-file" title="Hapus" onclick="return confirm('Hapus file ini?')"><i class="fas fa-trash-alt"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-
             <div class="pagination-wrap">
-                {{ $users->links('partials.pagination') }}
+                {{ $archiveFiles->links('partials.pagination') }}
             </div>
         @else
             <div class="empty-state">
-                <div class="empty-icon"><i class="fas fa-archive"></i></div>
+                <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
                 <h3>Belum ada arsip</h3>
-                <p>Tidak ada data yang diarsipkan.</p>
+                <p>Unggah file arsip dan pilih kategori untuk mengorganisirnya.</p>
             </div>
         @endif
     </section>
@@ -194,23 +158,33 @@
             </div>
             <button type="button" class="modal-close-btn" onclick="closeUploadModal()"><i class="fas fa-times"></i></button>
         </div>
-        <form id="uploadFileForm" method="POST" enctype="multipart/form-data">
+        <form id="uploadFileForm" method="POST" enctype="multipart/form-data" action="{{ route('admin.users.archive.file.store') }}">
             @csrf
             <div class="modal-body">
                 @if(session('success'))
                     <div class="alert-success"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+                @endif
+                @if($errors->has('archive_name'))
+                    <div class="alert-error"><i class="fas fa-exclamation-circle"></i> {{ $errors->first('archive_name') }}</div>
                 @endif
                 @if($errors->has('archive_file'))
                     <div class="alert-error"><i class="fas fa-exclamation-circle"></i> {{ $errors->first('archive_file') }}</div>
                 @endif
 
                 <div class="form-group">
-                    <label class="form-label">Pilih Pengguna Arsip</label>
-                    <select id="modal-user-select" class="modal-select" required onchange="setUploadAction(this.value)">
-                        <option value="">-- Pilih user --</option>
-                        @foreach($users as $u)
-                            <option value="{{ $u->id }}">{{ $u->name }} ({{ ucfirst($u->role) }})</option>
-                        @endforeach
+                    <label class="form-label">Nama Arsip</label>
+                    <input id="modal-archive-name" type="text" name="archive_name" class="modal-select" placeholder="Masukkan nama arsip" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Kategori Arsip</label>
+                    <select name="category" class="modal-select" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Dokumen Pribadi">Dokumen Pribadi</option>
+                        <option value="Nilai & Raport">Nilai & Raport</option>
+                        <option value="Sertifikat">Sertifikat</option>
+                        <option value="Surat">Surat</option>
+                        <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
 
@@ -578,7 +552,7 @@
 
 <script>
     function openUploadModal() {
-        document.getElementById('modal-user-select').value = '';
+        document.getElementById('modal-archive-name').value = '';
         document.getElementById('archive_file_input').value = '';
         document.getElementById('uploadFileName').textContent = 'Belum ada file dipilih';
         document.getElementById('uploadFileModal').style.display = 'flex';
@@ -588,12 +562,6 @@
     function closeUploadModal() {
         document.getElementById('uploadFileModal').style.display = 'none';
         document.body.style.overflow = '';
-    }
-
-    function setUploadAction(userId) {
-        if (userId) {
-            document.getElementById('uploadFileForm').action = '/admin/users/' + userId + '/archive-files';
-        }
     }
 
     document.getElementById('uploadFileModal').addEventListener('click', function(e) {

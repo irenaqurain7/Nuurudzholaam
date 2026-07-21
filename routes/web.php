@@ -89,6 +89,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Archive routes (User)
     Route::get('/users/archive', [AdminController::class, 'usersArchiveIndex'])->name('users.archive');
     Route::post('/users/{id}/archive', [AdminController::class, 'usersArchive'])->name('users.archive.store');
+    Route::post('/users/archive-files', [AdminController::class, 'usersArchiveFileStore'])->name('users.archive.file.store');
+    Route::delete('/users/archive-files/{id}', [AdminController::class, 'usersArchiveFileDelete'])->name('users.archive.file.delete');
     Route::post('/users/{id}/restore', [AdminController::class, 'usersRestore'])->name('users.restore');
     // School Info Management
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');

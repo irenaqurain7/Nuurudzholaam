@@ -650,7 +650,7 @@
 
 
                 <div class="nav-label">ARSIP</div>
-                <li><a href="{{ route('admin.users.archive') }}" class="{{ request()->routeIs('admin.users.archive') ? 'active' : '' }}"><i class="fas fa-archive"></i> Arsip User</a></li>
+                <li><a href="{{ route('admin.users.archive') }}" class="{{ request()->routeIs('admin.users.archive') ? 'active' : '' }}"><i class="fas fa-archive"></i> Arsip</a></li>
 
 
                 <div class="nav-label">JADWAL</div>

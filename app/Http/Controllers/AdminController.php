@@ -12,10 +12,12 @@ use App\Models\Teacher;
 use App\Models\Schedule;
 use App\Models\User;
 use App\Models\Student;
+use App\Models\UserArchiveFile;
 use App\Services\BulkUserValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -747,30 +749,32 @@ class AdminController extends Controller
     // --- User Archive ---
     public function usersArchiveIndex(Request $request)
     {
-        $query = User::with(['student', 'teacher'])->where('is_archived', true)->where('role', '!=', 'admin');
+        $query = UserArchiveFile::with('user');
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
+            $query->where('archive_name', 'like', "%{$search}%")
+                  ->orWhere('file_name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
         }
 
-        if ($request->filled('jenjang')) {
-            $jenjang = $request->jenjang;
-            $query->whereHas('student', function ($q) use ($jenjang) {
-                $q->where('jenjang', $jenjang);
-            });
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
         }
 
-        if ($request->filled('graduation_year')) {
-            $query->where('graduation_year', $request->graduation_year);
+        if ($request->filled('year')) {
+            $query->whereYear('created_at', $request->year);
         }
 
-        $users = $query->orderBy('graduation_year', 'desc')->paginate(15)->withQueryString();
+        $archiveFiles = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
-        return view('admin.users.archive', compact('users'));
+        $stats = [
+            'total' => UserArchiveFile::count(),
+            'documents' => UserArchiveFile::where('category', 'Dokumen Pribadi')->count(),
+            'reports' => UserArchiveFile::where('category', 'Nilai & Raport')->count(),
+        ];
+
+        return view('admin.users.archive', compact('archiveFiles', 'stats'));
     }
 
     public function usersArchive(Request $request, $id)
@@ -784,6 +788,43 @@ class AdminController extends Controller
         $user->save();
 
         return redirect()->back()->with('success', 'User berhasil diarsipkan.');
+    }
+
+    public function usersArchiveFileStore(Request $request)
+    {
+        $validated = $request->validate([
+            'archive_name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'archive_file' => ['required', 'file', 'mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png', 'max:5120'],
+        ]);
+
+        $file = $request->file('archive_file');
+        $path = $file->store('archive-files', 'public');
+
+        $archiveFile = UserArchiveFile::create([
+            'user_id' => null,
+            'archive_name' => $validated['archive_name'],
+            'category' => $validated['category'],
+            'file_name' => $file->getClientOriginalName(),
+            'file_path' => $path,
+            'mime_type' => $file->getClientMimeType(),
+            'file_size' => $file->getSize(),
+        ]);
+
+        return redirect()->back()->with('success', 'File arsip berhasil diunggah.');
+    }
+
+    public function usersArchiveFileDelete($id)
+    {
+        $archiveFile = UserArchiveFile::findOrFail($id);
+
+        if ($archiveFile->file_path && Storage::disk('public')->exists($archiveFile->file_path)) {
+            Storage::disk('public')->delete($archiveFile->file_path);
+        }
+
+        $archiveFile->delete();
+
+        return redirect()->back()->with('success', 'File arsip berhasil dihapus.');
     }
 
     public function usersRestore($id)
