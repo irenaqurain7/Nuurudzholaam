@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Recap Jadwal Guru')
+@section('page-title', 'Recap Jadwal Guru')
 
 @section('content')
 <div class="admin-page">
@@ -16,7 +17,7 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Stats Cards Grid -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon bg-blue">
@@ -56,16 +57,16 @@
         </div>
     </div>
 
-    <!-- Search & Filter -->
-    <div class="filter-section">
-        <form method="GET" action="{{ route('admin.schedule.teacher.index') }}" class="filter-form">
+    <!-- Toolbar Filter (Ditingkatkan Visualnya) -->
+    <div class="management-toolbar">
+        <form method="GET" action="{{ route('admin.schedule.teacher.index') }}" class="filter-form-wrapper">
             <div class="search-box">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" name="search_guru" value="{{ request('search_guru') }}" placeholder="Cari nama guru..." class="form-control">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search_guru" value="{{ request('search_guru') }}" placeholder="Cari nama guru..." class="search-input">
             </div>
             
-            <div class="filter-controls">
-                <select name="day" class="form-control">
+            <div class="filter-group">
+                <select name="day" class="filter-select">
                     <option value="">Semua Hari</option>
                     <option value="Monday" {{ request('day') == 'Monday' ? 'selected' : '' }}>Senin</option>
                     <option value="Tuesday" {{ request('day') == 'Tuesday' ? 'selected' : '' }}>Selasa</option>
@@ -75,7 +76,7 @@
                     <option value="Saturday" {{ request('day') == 'Saturday' ? 'selected' : '' }}>Sabtu</option>
                 </select>
 
-                <select name="level" class="form-control">
+                <select name="level" class="filter-select">
                     <option value="">Semua Jenjang</option>
                     <option value="TK" {{ request('level') == 'TK' ? 'selected' : '' }}>TK</option>
                     <option value="SD" {{ request('level') == 'SD' ? 'selected' : '' }}>SD</option>
@@ -83,53 +84,68 @@
                     <option value="SMK" {{ request('level') == 'SMK' ? 'selected' : '' }}>SMK</option>
                 </select>
 
-                <button type="submit" class="btn btn-primary">Cari</button>
+                <button type="submit" class="btn-filter-submit">
+                    <i class="fas fa-filter"></i> Cari
+                </button>
                 @if(request()->hasAny(['search_guru', 'day', 'level']))
-                    <a href="{{ route('admin.schedule.teacher.index') }}" class="btn btn-outline">Reset</a>
+                    <a href="{{ route('admin.schedule.teacher.index') }}" class="btn-filter-reset">Reset</a>
                 @endif
             </div>
         </form>
     </div>
 
-    <!-- Main Table -->
-    <div class="table-container">
+    <!-- Main Table (Fitur & Struktur Tetap Sama, Tampilan Ditingkatkan) -->
+    <div class="table-card">
         <div class="table-responsive">
-            <table class="admin-table">
+            <table class="data-table">
                 <thead>
                     <tr>
-                        <th width="5%">NO</th>
-                        <th width="20%">NAMA GURU</th>
-                        <th width="25%">MATA PELAJARAN</th>
-                        <th width="15%">TOTAL KELAS</th>
-                        <th width="15%">TOTAL JAM</th>
-                        <th width="10%">STATUS</th>
-                        <th width="10%">AKSI</th>
+                        <th style="width: 60px; text-align: center;">No</th>
+                        <th>Nama Guru</th>
+                        <th>Mata Pelajaran</th>
+                        <th style="text-align: center;">Total Kelas</th>
+                        <th style="text-align: center;">Total Jam</th>
+                        <th style="text-align: center;">Status</th>
+                        <th style="text-align: center; width: 140px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($groupedSchedulesPaginated as $index => $data)
                         <tr>
-                            <td>{{ ($groupedSchedulesPaginated->currentPage() - 1) * $groupedSchedulesPaginated->perPage() + $index + 1 }}</td>
-                            <td class="fw-bold text-dark">{{ $data['name'] }}</td>
-                            <td>{{ $data['subjects_str'] ?: '-' }}</td>
-                            <td>{{ $data['total_classes'] }} Kelas</td>
-                            <td>{{ $data['formatted_duration'] }}</td>
+                            <td style="text-align: center; font-weight: 600; color: #6C8B7C;">
+                                {{ $groupedSchedulesPaginated->firstItem() + $index }}
+                            </td>
                             <td>
+                                <div class="guru-profile">
+                                    <div class="blue-bar"></div>
+                                    <div class="guru-name-text">{{ $data['name'] }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="subject-text">{{ $data['subjects_str'] ?: '-' }}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="count-badge">{{ $data['total_classes'] }} Kelas</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="time-text"><i class="far fa-clock"></i> {{ $data['formatted_duration'] }}</span>
+                            </td>
+                            <td style="text-align: center;">
                                 @if($data['has_conflict'])
-                                    <span class="status-badge error"><i class="fas fa-times-circle"></i> Konflik Jadwal</span>
+                                    <span class="status-badge error"><i class="fas fa-times-circle"></i> Konflik</span>
                                 @else
                                     <span class="status-badge success"><i class="fas fa-check-circle"></i> Normal</span>
                                 @endif
                             </td>
-                            <td>
-                                <a href="{{ route('admin.schedule.teacher.show', $data['teacher_id']) }}" class="btn-lihat-jadwal">
-                                    <i class="fas fa-eye"></i> Lihat Jadwal
+                            <td style="text-align: center;">
+                                <a href="{{ route('admin.schedule.teacher.show', $data['teacher_id']) }}" class="btn-lihat-jadwal" title="Lihat Detail Jadwal">
+                                    <i class="fas fa-eye"></i> Detail
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="empty-state">
+                            <td colspan="7" class="no-data">
                                 <i class="fas fa-inbox"></i>
                                 <p>Belum ada data guru</p>
                             </td>
@@ -138,321 +154,90 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Pagination -->
         @if($groupedSchedulesPaginated->hasPages())
-            <div class="pagination-wrapper">
+            <div class="pagination-container">
                 {{ $groupedSchedulesPaginated->links('partials.pagination') }}
             </div>
         @endif
     </div>
-
 </div>
 
 <style>
-/* CSS VARIABLES MATCHING ADMIN LAYOUT */
-:root {
-    --primary: #2D4438;
-    --primary-light: #486E5A;
-    --secondary: #709D88;
-    --bg-light: #F4F7F5;
-    --border: #E2ECE8;
-    --text-dark: #1C2D25;
-    --text-muted: #6C8B7C;
-    --white: #ffffff;
-    --danger: #ef4444;
-    --danger-bg: #fef2f2;
-    --success: #10b981;
-    --success-bg: #ecfdf5;
-}
+/* Layout Base */
+.admin-page { padding: 2rem; background: #f8f9fa; min-height: 100vh; }
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(45,68,56,0.06); }
+.page-header h1 { margin: 0 0 0.25rem 0; color: #2D4438; font-size: 1.6rem; font-weight: 700; }
+.subtitle { color: #7f8c8d; margin: 0; font-size: 0.95rem; }
 
-/* LAYOUT & SPACING */
-.admin-page {
-    padding: 2rem;
-    background: var(--bg-light);
-    min-height: 100vh;
-}
+.sync-badge { background: #E2ECE8; color: #2D4438; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid #709D88; }
 
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-}
-
-.page-header h1 {
-    margin: 0 0 0.5rem 0;
-    color: var(--primary);
-    font-size: 1.8rem;
-    font-weight: 700;
-}
-
-.subtitle {
-    color: var(--text-muted);
-    margin: 0;
-}
-
-.sync-badge {
-    background: var(--border);
-    color: var(--primary);
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid var(--secondary);
-}
-
-/* STATS CARDS */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: var(--white);
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
-
+/* Stats Cards Grid */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.stat-card { background: white; padding: 1.25rem; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1.25rem; transition: all 0.2s; border: 1px solid #E2ECE8; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(45,68,56,0.1); }
+.stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
 .stat-icon.bg-blue { background: #eff6ff; color: #3b82f6; }
 .stat-icon.bg-green { background: #ecfdf5; color: #10b981; }
 .stat-icon.bg-purple { background: #f5f3ff; color: #8b5cf6; }
-.stat-icon.bg-red { background: var(--danger-bg); color: var(--danger); }
+.stat-icon.bg-red { background: #fef2f2; color: #ef4444; }
+.stat-content h3 { margin: 0 0 0.2rem 0; font-size: 1.5rem; font-weight: 700; color: #1C2D25; }
+.stat-content p { margin: 0; color: #6C8B7C; font-size: 0.85rem; font-weight: 600; }
 
-.stat-content h3 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-dark);
+/* Filter & Search Bar */
+.management-toolbar { background: white; padding: 1rem; border-radius: 12px; border: 1px solid #E2ECE8; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 1.5rem; }
+.filter-form-wrapper { display: flex; gap: 1rem; flex-wrap: wrap; width: 100%; }
+.search-box { flex: 1; min-width: 250px; position: relative; display: flex; align-items: center; }
+.search-box i { position: absolute; left: 1rem; color: #9ca3af; }
+.search-input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; background: #f9fafb; outline: none; transition: border-color 0.2s; }
+.search-input:focus { border-color: #2D4438; background: #ffffff; }
+.filter-group { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.filter-select { padding: 0.6rem 0.9rem; border: 1px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; min-width: 130px; font-size: 0.88rem; outline: none; color: #374151; }
+.filter-select:focus { border-color: #2D4438; }
+.btn-filter-submit { background: #2D4438; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.2s; }
+.btn-filter-submit:hover { background: #23362b; }
+.btn-filter-reset { background: transparent; color: #6b7280; padding: 0.6rem 1rem; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: all 0.2s; }
+.btn-filter-reset:hover { background: #f3f4f6; color: #111827; }
+
+/* Table Styling */
+.table-card { background: white; border-radius: 12px; border: 1px solid #E2ECE8; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
+.table-responsive { width: 100%; overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th { background: #f8faf9; padding: 1rem 1.25rem; font-size: 0.85rem; font-weight: 700; color: #2D4438; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2ECE8; }
+.data-table td { padding: 1.1rem 1.25rem; border-bottom: 1px solid #f0f4f2; vertical-align: middle; color: #374151; font-size: 0.92rem; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background-color: #fbfdfb; }
+
+/* Table Inner Elements */
+.guru-profile { display: flex; align-items: center; gap: 0.75rem; }
+.blue-bar { width: 4px; height: 20px; background: #3b82f6; border-radius: 4px; flex-shrink: 0; }
+.guru-name-text { font-weight: 700; color: #1C2D25; }
+.subject-text { color: #4b5563; font-weight: 500; }
+.count-badge { background: #f3f4f6; color: #374151; padding: 0.3rem 0.65rem; border-radius: 6px; font-weight: 600; font-size: 0.82rem; }
+.time-text { font-size: 0.88rem; color: #6b7280; display: inline-flex; align-items: center; gap: 0.35rem; }
+
+/* Badges & Action Buttons */
+.status-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+.status-badge.success { background: #ecfdf5; color: #10b981; }
+.status-badge.error { background: #fef2f2; color: #ef4444; }
+
+.btn-lihat-jadwal { background: #2D4438; color: #ffffff; padding: 0.45rem 0.85rem; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none; }
+.btn-lihat-jadwal:hover { background: #23362b; transform: translateY(-1px); }
+
+.no-data { padding: 3rem 1rem !important; text-align: center; color: #9ca3af; }
+.no-data i { font-size: 2.2rem; margin-bottom: 0.5rem; opacity: 0.7; }
+.no-data p { margin: 0; font-size: 0.95rem; }
+
+.pagination-container { padding: 1rem 1.25rem; border-top: 1px solid #E2ECE8; display: flex; justify-content: center; }
+
+@media (max-width: 768px) {
+    .admin-page { padding: 1rem; }
+    .page-header { flex-direction: column; gap: 1rem; }
+    .filter-form-wrapper { flex-direction: column; }
+    .search-box { width: 100%; }
+    .filter-group { width: 100%; justify-content: flex-start; }
+    .filter-select { flex: 1; }
 }
-
-.stat-content p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-/* FILTER SECTION */
-.filter-section {
-    background: var(--white);
-    padding: 1.25rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    margin-bottom: 2rem;
-}
-
-.filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-}
-
-.search-box {
-    flex: 1;
-    min-width: 250px;
-    position: relative;
-}
-
-.search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-}
-
-.search-box .form-control {
-    padding-left: 2.5rem;
-    width: 100%;
-}
-
-.filter-controls {
-    display: flex;
-    gap: 1rem;
-}
-
-.form-control {
-    padding: 0.6rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-light);
-    color: var(--text-dark);
-    outline: none;
-}
-
-.form-control:focus {
-    border-color: var(--secondary);
-}
-
-.btn {
-    padding: 0.6rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: var(--white);
-}
-
-.btn-primary:hover {
-    background: var(--primary-light);
-}
-
-.btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dark);
-}
-
-.btn-outline:hover {
-    background: var(--bg-light);
-}
-
-/* TABLES */
-.table-container {
-    background: var(--white);
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    margin-bottom: 2rem;
-}
-
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.admin-table th {
-    background: var(--primary);
-    color: var(--white);
-    padding: 1rem 1.5rem;
-    text-align: left;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.admin-table td {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-dark);
-    vertical-align: middle;
-}
-
-.admin-table tbody tr:hover {
-    background-color: var(--bg-light);
-}
-
-.admin-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.fw-bold { font-weight: 700; }
-.text-dark { color: var(--text-dark); }
-
-/* STATUS BADGES */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.status-badge.success {
-    background: var(--success-bg);
-    color: var(--success);
-}
-
-.status-badge.error {
-    background: var(--danger-bg);
-    color: var(--danger);
-}
-
-/* ACTION BUTTON */
-.btn-lihat-jadwal {
-    background: transparent;
-    border: 1px solid var(--success);
-    color: var(--success);
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: none;
-}
-
-.btn-lihat-jadwal:hover {
-    background: var(--success);
-    color: var(--white);
-}
-
-/* PAGINATION */
-.pagination-wrapper {
-    padding: 1.5rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: center;
-}
-
-/* EMPTY STATE */
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-
 </style>
 @endsection

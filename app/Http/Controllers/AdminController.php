@@ -843,6 +843,13 @@ class AdminController extends Controller
             if ($data['formatted_duration'] == '') $data['formatted_duration'] = '0 Menit';
         }
 
+        // Jika user memfilter berdasarkan hari atau jenjang, sembunyikan guru yang tidak memiliki jadwal terkait
+        if ($request->filled('day') || $request->filled('level')) {
+            $groupedSchedules = array_filter($groupedSchedules, function($data) {
+                return count($data['schedules']) > 0;
+            });
+        }
+
         // Sort by teacher name
         usort($groupedSchedules, function($a, $b) {
             return strcmp($a['name'], $b['name']);
