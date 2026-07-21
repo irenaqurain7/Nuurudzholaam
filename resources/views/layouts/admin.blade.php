@@ -660,7 +660,7 @@
                 <div class="nav-label">BERITA & INFORMASI</div>
                 <li><a href="{{ route('admin.announcement.index') }}" class="{{ request()->routeIs('admin.announcement.*') ? 'active' : '' }}"><i class="fas fa-bullhorn"></i> Pengumuman</a></li>
 
-                <div class="nav-label">PANTAU WEBSITE</div>
+                <div class="nav-label">MANAJEMEN WEBSITE</div>
                 <li>
                     <a href="{{ route('admin.activity.index') }}" class="{{ request()->routeIs('admin.activity.*') ? 'active' : '' }}">
                         <i class="fas fa-calendar-alt"></i> Kegiatan

@@ -88,7 +88,7 @@
                             </div>
                             <div class="sched-info">
                                 <strong>{{ $todayStudentSchedule }}</strong>
-                                <span>Jadwal Siswa</span>
+                                <span>Jadwal Kelas</span>
                             </div>
                         </div>
                     </div>
