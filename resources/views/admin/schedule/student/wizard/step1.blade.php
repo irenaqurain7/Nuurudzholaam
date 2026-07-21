@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="form-row-3">
+            <div class="form-row-2">
                 <div class="form-group">
                     <label class="form-label">Semester <span class="required">*</span></label>
                     <select name="semester" class="form-control">
@@ -72,13 +72,7 @@
                     </select>
                     <input type="text" name="academic_year" id="academic_year_manual" class="form-control mt-2" placeholder="Contoh: 2024/2025" style="{{ $isOther ? 'display: block;' : 'display: none;' }}" {{ $isOther ? '' : 'disabled' }} value="{{ $isOther ? $oldYear : '' }}">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Metode Unggah <span class="required">*</span></label>
-                    <select name="upload_method" class="form-control">
-                        <option value="bulk">Bulk Upload (Excel/CSV)</option>
-                        <option value="manual">Manual Input</option>
-                    </select>
-                </div>
+                <input type="hidden" name="upload_method" value="manual">
             </div>
 
             <div class="form-actions mt-4">
@@ -128,7 +122,7 @@
 .level-card.selected { border-color: #2D4438; background: rgba(45,68,56,0.03); }
 .level-card.selected .level-icon { color: #2D4438; }
 
-.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.form-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 .mt-2 { margin-top: 0.5rem; }
 .mt-4 { margin-top: 1.5rem; }
 
@@ -140,7 +134,7 @@
 .btn-cancel:hover { background: #F4F7F5; color: #2D4438; border-color: #6C8B7C; }
 
 @media (max-width: 768px) {
-    .form-row-3 { grid-template-columns: 1fr; }
+    .form-row-2 { grid-template-columns: 1fr; }
     .education-levels { grid-template-columns: 1fr 1fr; }
     .wizard-stepper { display: none; }
 }

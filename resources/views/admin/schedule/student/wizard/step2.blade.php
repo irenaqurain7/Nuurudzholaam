@@ -4,6 +4,45 @@
 @section('page-title', 'Wizard Upload Jadwal - Langkah 2 dari 3')
 
 @section('content')
+<!-- Tom Select CSS for searchable dropdown -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<style>
+    /* Custom Tom Select styling to match admin theme */
+    .ts-control {
+        padding: 0.75rem 1rem !important;
+        border: 1px solid #E2ECE8 !important;
+        border-radius: 8px !important;
+        font-size: 0.95rem !important;
+        font-family: inherit !important;
+        color: #1C2D25 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+    .ts-control.focus {
+        border-color: #709D88 !important;
+        box-shadow: 0 0 0 3px rgba(112,157,136,0.15) !important;
+    }
+    .ts-wrapper.form-control {
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: auto !important;
+    }
+    .ts-dropdown {
+        border-radius: 8px !important;
+        border: 1px solid #E2ECE8 !important;
+        box-shadow: 0 4px 12px rgba(45,68,56,0.1) !important;
+    }
+    .ts-dropdown .option {
+        padding: 10px 16px !important;
+    }
+    .ts-dropdown .active {
+        background-color: #F4F7F5 !important;
+        color: #2D4438 !important;
+    }
+</style>
+
 @php
     $classOptions = [];
     if ($educationLevel === 'TK') {
@@ -59,36 +98,10 @@
             <div class="form-container mb-4">
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
                     <h2 class="section-title mb-0 border-0 pb-0">Data Jadwal</h2>
-                    <span class="badge badge-primary">{{ session('wizard_upload_method', 'bulk') == 'bulk' ? 'Bulk Upload (Excel/CSV)' : 'Manual Input' }}</span>
+                    <span class="badge badge-primary">Manual Input</span>
                 </div>
 
-                @if(session('wizard_upload_method') == 'bulk')
-                    <div class="upload-area">
-                        <a href="{{ asset('templates/Template_' . $educationLevel . '.csv') }}" class="btn-download-template">
-                            <i class="fas fa-file-csv"></i> Download Template CSV ({{ $educationLevel }})
-                        </a>
-
-                        <form method="POST" action="{{ route('admin.schedule.student.wizard.step2.store') }}" enctype="multipart/form-data" class="mt-4">
-                            @csrf
-                            <div class="form-group">
-                                <label class="form-label">Pilih berkas (.xlsx, .xls, .csv) <span class="required">*</span></label>
-                                <div class="file-input-wrapper">
-                                    <input type="file" name="file" id="file-upload" class="file-input" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required onchange="updateFileName(this)">
-                                    <label for="file-upload" class="file-input-label">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <span id="file-name">Pilih berkas atau tarik ke sini</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="mt-4 text-center">
-                                <button type="submit" class="btn-submit w-100 justify-content-center">
-                                    <i class="fas fa-magic"></i> Unggah & Parse Data
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                @else
-                    <form method="POST" action="{{ route('admin.schedule.student.wizard.step2.store') }}" class="manual-input-form">
+                <form method="POST" action="{{ route('admin.schedule.student.wizard.step2.store') }}" class="manual-input-form">
                         @csrf
                         <div class="form-row-3 mb-3">
                             <div class="form-group">
@@ -160,7 +173,6 @@
                             </button>
                         </div>
                     </form>
-                @endif
             </div>
 
             <!-- Preview Card -->
@@ -330,10 +342,10 @@
                 <div class="info-icon"><i class="fas fa-lightbulb"></i></div>
                 <h3 class="info-title">Tips Pengisian</h3>
                 <ul class="info-list">
-                    <li>Gunakan format template yang telah disediakan sesuai jenjang pendidikan.</li>
-                    <li>Pastikan penulisan Hari menggunakan Bahasa Inggris (Monday, Tuesday, dll) jika menggunakan file CSV.</li>
                     <li>Format jam menggunakan standar 24-jam (contoh: 08:00, 14:30).</li>
-                    <li>Kolom kelas harus persis sama dengan data kelas yang ada di sistem.</li>
+                    <li>Pastikan Anda memilih kelas dan mata pelajaran yang tepat.</li>
+                    <li>Pilih hari dan tentukan jam masuk serta keluar sesuai jadwal sekolah.</li>
+                    <li>Pilih guru yang bersangkutan dari daftar yang tersedia.</li>
                 </ul>
             </div>
         </div>
@@ -442,7 +454,24 @@
 }
 </style>
 
+<!-- Tom Select JS -->
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Initialize Tom Select on all teacher_id select elements
+    document.querySelectorAll('select[name="teacher_id"]').forEach(function(el) {
+        new TomSelect(el, {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            placeholder: "Pilih Guru (ketik untuk mencari...)",
+            maxOptions: 50
+        });
+    });
+});
+
 function updateFileName(input) {
     const fileName = input.files[0] ? input.files[0].name : 'Pilih berkas atau tarik ke sini';
     document.getElementById('file-name').textContent = fileName;

@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Jadwal Guru')
+@section('title', 'Recap Jadwal Guru')
 
 @section('content')
 <div class="admin-page">
     <div class="page-header">
         <div>
-            <h1>Kelola Jadwal Guru</h1>
-            <p class="subtitle">Jadwal guru tersinkron otomatis dari Jadwal Siswa.</p>
+            <h1>Recap Jadwal Guru</h1>
+            <p class="subtitle">Data pada halaman ini diperbarui secara otomatis berdasarkan Jadwal Kelas.</p>
         </div>
         <div>
             <span class="sync-badge">

@@ -1016,14 +1016,14 @@ class AdminController extends Controller
             'end_time' => $validated['end_time'],
         ]);
 
-        return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal siswa berhasil diperbarui.');
+        return redirect()->route('admin.schedule.student.index')->with('success', 'Jadwal Kelas berhasil diperbarui.');
     }
 
     public function scheduleStudentDestroy($id)
     {
         $schedule = \App\Models\Schedule::findOrFail($id);
         $schedule->delete();
-        return redirect()->back()->with('success', 'Jadwal siswa berhasil dihapus.');
+        return redirect()->back()->with('success', 'Jadwal Kelas berhasil dihapus.');
     }
 
     // WIZARD STEP 1: Select education level, semester, academic year, upload method
