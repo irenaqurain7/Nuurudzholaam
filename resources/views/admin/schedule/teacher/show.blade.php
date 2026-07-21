@@ -137,11 +137,12 @@
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
 }
 
+/* Menggunakan font bawaan dari layout admin utama */
 .admin-page {
     padding: 2.5rem;
     background: var(--bg-main);
     min-height: 100vh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: inherit;
 }
 
 .text-muted { color: var(--text-muted); }
