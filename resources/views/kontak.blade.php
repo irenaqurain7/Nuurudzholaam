@@ -130,7 +130,6 @@
                         <label for="subjek" style="display: block; color: var(--hijau-islam); font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">Pilih Subjek <span style="color: #d32f2f;">*</span></label>
                         <select id="subjek" name="subjek" required style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; transition: border-color 0.3s;">
                             <option value="">-- Pilih Subjek --</option>
-                            <option value="Pertanyaan PPDB" @selected(old('subjek') === 'Pertanyaan PPDB')>Pertanyaan PPDB</option>
                             <option value="Informasi Program" @selected(old('subjek') === 'Informasi Program')>Informasi Program</option>
                             <option value="Pertanyaan Umum" @selected(old('subjek') === 'Pertanyaan Umum')>Pertanyaan Umum</option>
                             <option value="Kerjasama" @selected(old('subjek') === 'Kerjasama')>Kerjasama</option>

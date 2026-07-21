@@ -31,7 +31,6 @@
                 <select id="kategori" name="kategori" required>
                     <option value="">-- Pilih Kategori --</option>
                     <option value="umum" @if(old('kategori', $faq->kategori) === 'umum') selected @endif>Umum</option>
-                    <option value="ppdb" @if(old('kategori', $faq->kategori) === 'ppdb') selected @endif>PPDB</option>
                     <option value="akademik" @if(old('kategori', $faq->kategori) === 'akademik') selected @endif>Akademik</option>
                     <option value="fasilitas" @if(old('kategori', $faq->kategori) === 'fasilitas') selected @endif>Fasilitas</option>
                 </select>

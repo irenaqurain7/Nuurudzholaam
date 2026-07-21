@@ -38,7 +38,7 @@ class AuthController extends Controller
             'username' => 'required|string|max:50|alpha_dash|unique:users,username',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,guru,orangtua,siswa',
+            'role' => 'required|in:admin,guru',
             'phone' => 'nullable|string|max:20',
         ]);
 
@@ -110,14 +110,10 @@ class AuthController extends Controller
      */
     private function redirectByRole($user)
     {
-        if ($user->role === 'siswa') {
-            return route('student.dashboard');
-        } elseif ($user->role === 'guru') {
+        if ($user->role === 'guru') {
             return route('teacher.dashboard');
         } elseif ($user->role === 'admin') {
             return route('admin.dashboard');
-        } elseif ($user->role === 'orangtua') {
-            return route('parent.dashboard');
         }
         return route('login');
     }

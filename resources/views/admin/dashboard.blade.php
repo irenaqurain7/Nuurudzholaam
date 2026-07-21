@@ -58,78 +58,18 @@
             </div>
         </article>
 
-        <article class="admin-stat-card">
-            <div class="stat-icon-wrapper amber">
-                <i class="fas fa-file-signature"></i>
-            </div>
-            <div class="stat-info">
-                <p class="stat-label">Pendaftar PPDB</p>
-                <h3 class="stat-value">{{ $totalPPDB }}</h3>
-                <span class="stat-meta">Seluruh jenjang</span>
-            </div>
-        </article>
     </section>
 
-    <!-- Jenjang & Progress/Jadwal Row -->
+    <!-- Progress/Jadwal Row -->
     <div class="dashboard-double-row">
-        <!-- PPDB Per Jenjang Card -->
-        <div class="dashboard-card card-half">
-            <div class="card-header">
-                <h4><i class="fas fa-chart-pie mr-2"></i> Pendaftar per Jenjang</h4>
-                <span class="header-badge">PPDB</span>
-            </div>
-            <div class="jenjang-grid">
-                <div class="jenjang-item tk">
-                    <span class="jenjang-label">TK</span>
-                    <span class="jenjang-count">{{ $ppdbTK }}</span>
-                    <span class="jenjang-sub">Pendaftar</span>
-                </div>
-                <div class="jenjang-item sd">
-                    <span class="jenjang-label">SD</span>
-                    <span class="jenjang-count">{{ $ppdbSD }}</span>
-                    <span class="jenjang-sub">Pendaftar</span>
-                </div>
-                <div class="jenjang-item smp">
-                    <span class="jenjang-label">SMP</span>
-                    <span class="jenjang-count">{{ $ppdbSMP }}</span>
-                    <span class="jenjang-sub">Pendaftar</span>
-                </div>
-                <div class="jenjang-item smk">
-                    <span class="jenjang-label">SMK</span>
-                    <span class="jenjang-count">{{ $ppdbSMK }}</span>
-                    <span class="jenjang-sub">Pendaftar</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- PPDB Progress & Jadwal Hari Ini Card -->
-        <div class="dashboard-card card-half">
+        <!-- Jadwal Hari Ini Card -->
+        <div class="dashboard-card" style="grid-column: span 2;">
             <div class="card-header">
-                <h4><i class="fas fa-sync-alt mr-2"></i> Monitor Harian & Progress</h4>
+                <h4><i class="fas fa-sync-alt mr-2"></i> Monitor Harian</h4>
                 <span class="header-badge bg-emerald-500">Live</span>
             </div>
-            <div class="split-card-body">
-                <div class="split-section">
-                    <p class="split-title">Progress PPDB</p>
-                    <div class="progress-stats">
-                        <div class="prog-item pending">
-                            <span class="prog-dot"></span>
-                            <span class="prog-label">Menunggu</span>
-                            <strong class="prog-val">{{ $ppdbPending }}</strong>
-                        </div>
-                        <div class="prog-item approved">
-                            <span class="prog-dot"></span>
-                            <span class="prog-label">Diterima</span>
-                            <strong class="prog-val">{{ $ppdbApproved }}</strong>
-                        </div>
-                        <div class="prog-item rejected">
-                            <span class="prog-dot"></span>
-                            <span class="prog-label">Ditolak</span>
-                            <strong class="prog-val">{{ $ppdbRejected }}</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="split-divider"></div>
+            <div class="split-card-body" style="grid-template-columns: 1fr;">
                 <div class="split-section">
                     <p class="split-title">Jadwal Hari Ini</p>
                     <div class="today-schedules">
@@ -157,59 +97,10 @@
         </div>
     </div>
 
-    <!-- Pendaftaran Terbaru & Aktivitas/Pengumuman -->
-    <div class="dashboard-split-layout">
-        <!-- Pendaftaran Terbaru -->
+    <!-- Aktivitas & Pengumuman -->
+    <div class="dashboard-split-layout" style="grid-template-columns: 1fr 1fr;">
+        <!-- Left Side: Aktivitas Terbaru -->
         <div class="dashboard-card main-col">
-            <div class="card-header flex-between">
-                <h4><i class="fas fa-list-ul mr-2"></i> Pendaftaran Terbaru</h4>
-                <a href="{{ route('admin.ppdb.index') }}" class="btn-text">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
-            </div>
-            <div class="table-responsive">
-                <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Nama</th>
-                            <th>Jenjang</th>
-                            <th>Tanggal Daftar</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($latestRegistrations as $reg)
-                            <tr>
-                                <td class="font-bold text-dark">{{ $reg->nama_lengkap }}</td>
-                                <td>
-                                    <span class="badge badge-level {{ strtolower($reg->jenjang) }}">
-                                        {{ strtoupper($reg->jenjang) }}
-                                    </span>
-                                </td>
-                                <td>{{ $reg->tgl_daftar ? $reg->tgl_daftar->format('d M Y') : ($reg->created_at ? $reg->created_at->format('d M Y') : '-') }}</td>
-                                <td>
-                                    @if($reg->status === 'pending')
-                                        <span class="badge-status pending">Menunggu</span>
-                                    @elseif($reg->status === 'approved')
-                                        <span class="badge-status approved">Diterima</span>
-                                    @else
-                                        <span class="badge-status rejected">Ditolak</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="empty-state">
-                                    <i class="fas fa-user-clock" style="font-size: 24px;"></i>
-                                    <p>Belum ada pendaftaran terbaru.</p>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Right Side: Aktivitas Terbaru & Pengumuman -->
-        <div class="dashboard-card side-col">
             <!-- Aktivitas Terbaru -->
             <div class="activities-section mb-6">
                 <div class="card-header mb-3">
@@ -302,16 +193,7 @@
                 <i class="fas fa-chevron-right action-arrow"></i>
             </a>
 
-            <a href="{{ route('admin.ppdb.settings') }}" class="action-btn-card">
-                <div class="action-icon bg-amber-50 text-amber-700">
-                    <i class="fas fa-sliders-h"></i>
-                </div>
-                <div class="action-details">
-                    <h5>Buka PPDB</h5>
-                    <p>Konfigurasi status pembukaan pendaftaran</p>
-                </div>
-                <i class="fas fa-chevron-right action-arrow"></i>
-            </a>
+
         </div>
     </section>
 </div>

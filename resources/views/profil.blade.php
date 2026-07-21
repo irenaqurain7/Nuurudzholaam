@@ -388,7 +388,7 @@
     <div class="profil-container">
         <h2>Siap Bergabung dengan Sekolah Nuurudzholaam?</h2>
         <p>Jadilah bagian dari komunitas pembelajar yang dinamis dan bermimpi besar untuk masa depan</p>
-        <a href="{{ route('ppdb') }}" class="cta-btn">Daftar Sekarang →</a>
+        <a href="{{ route('kontak') }}" class="cta-btn">Hubungi Kami →</a>
     </div>
 </div>
 

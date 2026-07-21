@@ -410,8 +410,6 @@
                     <div class="input-wrapper">
                         <select id="role" name="role" class="@error('role') is-invalid @enderror" required>
                             <option value="" disabled {{ old('role') ? '' : 'selected' }}>Pilih tipe akun</option>
-                            <option value="siswa" {{ old('role') === 'siswa' ? 'selected' : '' }}>Siswa</option>
-                            <option value="orangtua" {{ old('role') === 'orangtua' ? 'selected' : '' }}>Orang Tua</option>
                             <option value="guru" {{ old('role') === 'guru' ? 'selected' : '' }}>Guru</option>
                             <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                         </select>

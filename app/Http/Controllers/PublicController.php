@@ -31,33 +31,10 @@ class PublicController extends Controller
         $programs = Program::all();
         $galleries = Gallery::orderBy('tanggal', 'desc')->take(8)->get();
 
-        // PPDB Status
-        $today = now();
-        $ppdbStatus = 'inactive'; // inactive, coming, open, closed
-
-        if ($school && $school->ppdb_active) {
-            if ($school->ppdb_start_date && $school->ppdb_end_date) {
-                if ($today < $school->ppdb_start_date) {
-                    $ppdbStatus = 'coming';
-                } elseif ($today >= $school->ppdb_start_date && $today <= $school->ppdb_end_date) {
-                    $ppdbStatus = 'open';
-                } else {
-                    $ppdbStatus = 'closed';
-                }
-            }
-        }
-
-        return view('index', compact('school', 'announcements', 'activities', 'programs', 'galleries', 'ppdbStatus'));
+        return view('index', compact('school', 'announcements', 'activities', 'programs', 'galleries'));
     }
 
-    public function ppdb()
-    {
-        $school = $this->schoolInfo();
-        $programs = Program::all();
-        $announcements = Announcement::where('status', 'aktif')->where('tipe', 'ppdb')->first();
 
-        return view('ppdb', compact('school', 'programs', 'announcements'));
-    }
 
     public function kegiatan()
     {
@@ -239,7 +216,7 @@ class PublicController extends Controller
 
     public function getInformasi($tipe)
     {
-        $validTypes = ['umum', 'ppdb', 'libur', 'penting'];
+        $validTypes = ['umum', 'libur', 'penting'];
 
         if (!in_array($tipe, $validTypes)) {
             abort(404);

@@ -1,10 +1,8 @@
 <?php
 
 use App\Http\Controllers\PublicController;
-use App\Http\Controllers\PPDBController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\TeacherDashboardController;
 use App\Http\Controllers\ParentDashboardController;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +28,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // PUBLIC ROUTES
 Route::get('/', [PublicController::class, 'index'])->name('home');
 Route::get('/ppdb', [PublicController::class, 'ppdb'])->name('ppdb');
-Route::post('/ppdb', [PPDBController::class, 'store'])->name('ppdb.store');
 Route::get('/kegiatan', [PublicController::class, 'kegiatan'])->name('kegiatan');
 Route::get('/kegiatan/{id}', [PublicController::class, 'showActivity'])->name('kegiatan.show');
 Route::get('/program', [PublicController::class, 'program'])->name('program');
@@ -43,7 +40,6 @@ Route::get('/informasi/{tipe}', [PublicController::class, 'getInformasi'])->name
 
 // DEMO ROUTES - Remove these before production (for testing without authentication)
 Route::get('/admin/demo-dashboard', [AdminController::class, 'dashboard'])->name('admin-demo.dashboard');
-Route::get('/admin/demo-ppdb', [AdminController::class, 'ppdbIndex'])->name('admin-demo.ppdb.index');
 Route::get('/admin/demo-program', [AdminController::class, 'programIndex'])->name('admin-demo.program.index');
 Route::get('/admin/demo-activity', [AdminController::class, 'activityIndex'])->name('admin-demo.activity.index');
 Route::get('/admin/demo-announcement', [AdminController::class, 'announcementIndex'])->name('admin-demo.announcement.index');
@@ -54,12 +50,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // PPDB Management
-    Route::get('/ppdb', [AdminController::class, 'ppdbIndex'])->name('ppdb.index');
-    Route::get('/ppdb/{id}', [AdminController::class, 'ppdbShow'])->whereNumber('id')->name('ppdb.show');
-    Route::patch('/ppdb/{id}/status/{status}', [AdminController::class, 'ppdbUpdateStatus'])->name('ppdb.updateStatus');
-    Route::get('/ppdb/export/excel', [AdminController::class, 'ppdbExportExcel'])->name('ppdb.export.excel');
-    Route::get('/ppdb/export/pdf', [AdminController::class, 'ppdbExportPdf'])->name('ppdb.export.pdf');
 
     // Program Management
 
@@ -95,19 +85,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/faq/{id}', [AdminController::class, 'faqUpdate'])->name('faq.update');
     Route::delete('/faq/{id}', [AdminController::class, 'faqDestroy'])->name('faq.destroy');
 
-    // PPDB Settings Management
-    Route::get('/ppdb-settings', [AdminController::class, 'ppdbSettingsEdit'])->name('ppdb.settings');
-    Route::put('/ppdb-settings', [AdminController::class, 'ppdbSettingsUpdate'])->name('ppdb.settings.update');
 
-    // Archive routes (User & PPDB)
+    // Archive routes (User)
     Route::get('/users/archive', [AdminController::class, 'usersArchiveIndex'])->name('users.archive');
     Route::post('/users/{id}/archive', [AdminController::class, 'usersArchive'])->name('users.archive.store');
     Route::post('/users/{id}/restore', [AdminController::class, 'usersRestore'])->name('users.restore');
-
-    Route::get('/ppdb/archive', [AdminController::class, 'ppdbArchiveIndex'])->name('ppdb.archive');
-    Route::post('/ppdb/archive-year', [AdminController::class, 'ppdbArchiveByYear'])->name('ppdb.archive.year');
-    Route::post('/ppdb/{id}/archive', [AdminController::class, 'ppdbArchive'])->name('ppdb.archive.store');
-    Route::post('/ppdb/{id}/restore', [AdminController::class, 'ppdbRestore'])->name('ppdb.restore');
     // School Info Management
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');
@@ -160,34 +142,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     });
 });
 
-// STUDENT ROUTES
-Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-
-    // Schedule
-    Route::get('/schedule', [StudentDashboardController::class, 'schedule'])->name('schedule');
-
-    // Grades
-    Route::get('/grades', [StudentDashboardController::class, 'grades'])->name('grades');
-
-    // Profile
-    Route::get('/profile', [StudentDashboardController::class, 'profile'])->name('profile');
-    Route::put('/profile', [StudentDashboardController::class, 'updateProfile'])->name('profile.update');
-
-    // Password
-    Route::get('/change-password', [StudentDashboardController::class, 'showChangePassword'])->name('change-password');
-    Route::put('/change-password', [StudentDashboardController::class, 'updatePassword'])->name('change-password.update');
-
-    // Photo
-    Route::get('/upload-photo', [StudentDashboardController::class, 'showUploadPhoto'])->name('upload-photo');
-    Route::post('/upload-photo', [StudentDashboardController::class, 'uploadPhoto'])->name('upload-photo.store');
-
-    // Informasi, Kegiatan, Kontak
-    Route::get('/informasi', [StudentDashboardController::class, 'informasi'])->name('informasi');
-    Route::get('/kegiatan', [StudentDashboardController::class, 'kegiatan'])->name('kegiatan');
-    Route::get('/kontak', [StudentDashboardController::class, 'kontak'])->name('kontak');
-});
 
 // TEACHER ROUTES
 Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->group(function () {

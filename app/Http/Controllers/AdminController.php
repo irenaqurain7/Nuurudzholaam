@@ -8,12 +8,10 @@ use App\Models\FAQ;
 use App\Models\PPDBRegistration;
 use App\Models\Program;
 use App\Models\SchoolInfo;
-use App\Models\User;
-use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Schedule;
-use App\Exports\PPDBExcelExport;
-use App\Services\PPDBExportService;
+use App\Models\User;
+use App\Models\Student;
 use App\Services\BulkUserValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -32,21 +30,6 @@ class AdminController extends Controller
         $totalUsers = \App\Models\User::count();
         $totalSiswa = \App\Models\User::where('role', 'siswa')->count();
         $totalGuru = \App\Models\User::where('role', 'guru')->count();
-        $totalPPDB = \App\Models\PPDBRegistration::count();
-
-        // PPDB registrations by level (case-insensitive check)
-        $ppdbTK = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['tk'])->count();
-        $ppdbSD = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['sd'])->count();
-        $ppdbSMP = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['smp'])->count();
-        $ppdbSMK = \App\Models\PPDBRegistration::whereRaw('LOWER(jenjang) = ?', ['smk'])->count();
-
-        // PPDB progress statistics
-        $ppdbPending = \App\Models\PPDBRegistration::where('status', 'pending')->count();
-        $ppdbApproved = \App\Models\PPDBRegistration::where('status', 'diterima')->count();
-        $ppdbRejected = \App\Models\PPDBRegistration::where('status', 'ditolak')->count();
-
-        // Latest registrations (max 5)
-        $latestRegistrations = \App\Models\PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(5)->get();
 
         // Latest announcements (max 3)
         $latestAnnouncements = \App\Models\Announcement::orderBy('created_at', 'desc')->limit(3)->get();
@@ -101,166 +84,19 @@ class AdminController extends Controller
             ]);
         }
 
-        // 3. Fetch recent PPDB registrations
-        $recentPPDB = \App\Models\PPDBRegistration::orderBy('tgl_daftar', 'desc')->limit(5)->get();
-        foreach ($recentPPDB as $p) {
-            $recentActivities->push([
-                'time' => $p->tgl_daftar ?: $p->created_at ?: now(),
-                'icon' => 'fas fa-file-signature',
-                'color' => 'bg-amber-100 text-amber-800 border-amber-200',
-                'message' => "Pendaftar PPDB baru masuk: <strong>{$p->nama_lengkap}</strong> (" . strtoupper($p->jenjang) . ")"
-            ]);
-        }
+
 
         // Sort all activities by time descending and take 5
         $recentActivities = $recentActivities->sortByDesc('time')->take(5);
 
         return view('admin.dashboard', compact(
-            'totalUsers', 'totalSiswa', 'totalGuru', 'totalPPDB',
-            'ppdbTK', 'ppdbSD', 'ppdbSMP', 'ppdbSMK',
-            'ppdbPending', 'ppdbApproved', 'ppdbRejected',
-            'latestRegistrations', 'latestAnnouncements',
+            'totalUsers', 'totalSiswa', 'totalGuru',
+            'latestAnnouncements',
             'todayTeacherSchedule', 'todayStudentSchedule',
             'recentActivities'
         ));
     }
 
-    // PPDB REGISTRATIONS
-    public function ppdbIndex(Request $request, PPDBExportService $ppdbExportService)
-    {
-        $registrations = $ppdbExportService->filteredQuery($request)
-            ->where('is_archived', false)
-            ->orderBy('tgl_daftar', 'desc')
-            ->orderByDesc('id')
-            ->paginate(15)
-            ->withQueryString();
-
-        return view('admin.ppdb.index', compact('registrations'));
-    }
-
-    // --- PPDB Archive ---
-    public function ppdbArchiveIndex(Request $request)
-    {
-        $query = PPDBRegistration::where('is_archived', true);
-
-        if ($request->filled('jenjang')) {
-            $query->where('jenjang', $request->jenjang);
-        }
-
-        if ($request->filled('archive_year')) {
-            $query->where('archive_year', $request->archive_year);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $registrations = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
-        return view('admin.ppdb.archive', compact('registrations'));
-    }
-
-    public function ppdbArchiveByYear(Request $request)
-    {
-        $year = $request->input('year');
-        if (!$year) return redirect()->back()->with('error', 'Tahun harus dipilih.');
-
-        PPDBRegistration::whereYear('created_at', $year)->update(['is_archived' => true, 'archive_year' => $year]);
-        return redirect()->back()->with('success', 'Semua pendaftar tahun ' . $year . ' berhasil diarsipkan.');
-    }
-
-    public function ppdbArchive(Request $request, $id)
-    {
-        $reg = PPDBRegistration::findOrFail($id);
-        $reg->is_archived = true;
-        $reg->archive_year = $request->input('archive_year', now()->year);
-        $reg->save();
-        return redirect()->back()->with('success', 'Data PPDB berhasil diarsipkan.');
-    }
-
-    public function ppdbRestore($id)
-    {
-        $reg = PPDBRegistration::findOrFail($id);
-        $reg->is_archived = false;
-        $reg->archive_year = null;
-        $reg->save();
-        return redirect()->back()->with('success', 'Data PPDB berhasil dikembalikan.');
-    }
-
-    public function ppdbShow($id)
-    {
-        $registration = PPDBRegistration::findOrFail($id);
-        return view('admin.ppdb.show', compact('registration'));
-    }
-
-    public function ppdbUpdateStatus($id, $status)
-    {
-        $registration = PPDBRegistration::findOrFail($id);
-        $registration->update(['status' => $status]);
-        return redirect()->back()->with('success', 'Status pendaftar diperbarui.');
-    }
-
-    public function ppdbExport(Request $request, PPDBExportService $ppdbExportService)
-    {
-        return $this->ppdbExportExcel($request, $ppdbExportService);
-    }
-
-    public function ppdbExportExcel(Request $request, PPDBExportService $ppdbExportService)
-    {
-        $registrations = $ppdbExportService->filteredQuery($request)
-            ->orderBy('tgl_daftar', 'desc')
-            ->orderByDesc('id')
-            ->get();
-
-        $rows = $ppdbExportService->mapExportRows($registrations);
-
-        $school = SchoolInfo::first();
-        $export = new PPDBExcelExport(
-            $rows,
-            $school?->nama_sekolah ?? config('app.name', 'Sekolah Nururudzholam'),
-            now()->format('d-m-Y')
-        );
-
-        $filename = 'data_pendaftar_ppdb_' . now()->format('Y-m-d_His') . '.xlsx';
-
-        return response()->streamDownload(function () use ($export) {
-            $export->output();
-        }, $filename, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
-    }
-
-    public function ppdbExportPdf(Request $request, PPDBExportService $ppdbExportService)
-    {
-        $registrations = $ppdbExportService->filteredQuery($request)
-            ->orderBy('tgl_daftar', 'desc')
-            ->orderByDesc('id')
-            ->get();
-
-        $school = SchoolInfo::first();
-
-        $logoBase64 = null;
-        if ($school && $school->logo) {
-            $logoPath = storage_path('app/public/' . $school->logo);
-
-            if (file_exists($logoPath)) {
-            $logoBase64 = 'data:' . mime_content_type($logoPath) . ';base64,' . base64_encode(file_get_contents($logoPath));
-            }
-        }
-
-        $rows = $ppdbExportService->mapExportRows($registrations);
-
-        $pdf = Pdf::loadView('admin.ppdb.export-pdf', [
-            'school' => $school,
-            'logoBase64' => $logoBase64,
-            'rows' => $rows,
-            'totalData' => $rows->count(),
-            'exportDate' => now()->format('d-m-Y H:i'),
-        ])->setPaper('a4', 'landscape');
-
-        $filename = 'data_pendaftar_ppdb_' . now()->format('Y-m-d_His') . '.pdf';
-
-        return $pdf->download($filename);
-    }
 
     // PROGRAMS
     public function programIndex(Request $request)
@@ -596,7 +432,7 @@ class AdminController extends Controller
         }
 
         // Checkbox: always set based on presence
-        $updates['ppdb_active'] = $request->has('ppdb_active');
+        $updates['ppdb_active'] = false;
 
         if ($school->exists) {
             if (!empty($updates)) {
@@ -604,47 +440,13 @@ class AdminController extends Controller
             }
         } else {
             // For create, use validated values (some may be null)
-            $createData = array_merge($validated, ['ppdb_active' => $request->has('ppdb_active')]);
+            $createData = array_merge($validated, ['ppdb_active' => false]);
             SchoolInfo::create($createData);
         }
 
         return redirect()->back()->with('success', 'Informasi sekolah berhasil diperbarui.');
     }
 
-    // PPDB SETTINGS
-    public function ppdbSettingsEdit()
-    {
-        $school = SchoolInfo::first() ?? new SchoolInfo();
-        return view('admin.ppdb.settings', compact('school'));
-    }
-
-    public function ppdbSettingsUpdate(Request $request)
-    {
-        $school = SchoolInfo::first();
-
-        // Jika belum ada school info, buat baru dengan data minimal
-        if (!$school) {
-            $school = SchoolInfo::create([
-                'nama_sekolah' => 'Sekolah Nuurudzholaam',
-                'deskripsi' => 'Deskripsi sekolah belum diisi. Silakan update di halaman Informasi Sekolah.',
-                'alamat' => 'Alamat belum diisi',
-                'no_telepon' => '-',
-                'email' => 'info@nuurudzholaam.sch.id',
-            ]);
-        }
-
-        $validated = $request->validate([
-            'ppdb_active' => 'nullable|boolean',
-            'ppdb_start_date' => 'nullable|date',
-            'ppdb_end_date' => 'nullable|date|after_or_equal:ppdb_start_date',
-        ]);
-
-        // Handle checkbox conversion
-        $validated['ppdb_active'] = $request->has('ppdb_active');
-
-        $school->update($validated);
-        return redirect()->back()->with('success', 'Pengaturan PPDB berhasil diperbarui.');
-    }
 
     // USER MANAGEMENT
     public function usersIndex(Request $request)
@@ -672,22 +474,15 @@ class AdminController extends Controller
             $query->where('role', $request->role);
         }
 
-        // Jenjang filter (only applies to siswa)
-        if ($request->filled('jenjang')) {
-            $jenjang = $request->jenjang;
-            $query->whereHas('student', function ($q) use ($jenjang) {
-                $q->where('jenjang', $jenjang);
-            });
-        }
+
 
         $users = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         // Global stats (unfiltered)
-        $totalSiswa = User::where('role', 'siswa')->count();
-        $totalGuru = User::where('role', 'guru')->count();
-        $totalOrangtua = User::where('role', 'orangtua')->count();
-
-        return view('admin.users.index', compact('users', 'totalSiswa', 'totalGuru', 'totalOrangtua'));
+        $totalSiswa = User::where('role', 'siswa')->where('is_archived', false)->count();
+        $totalGuru = User::where('role', 'guru')->where('is_archived', false)->count();
+        
+        return view('admin.users.index', compact('users', 'totalSiswa', 'totalGuru'));
     }
 
     public function usersCreate()
@@ -701,14 +496,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:siswa,guru',
-            'jenjang' => 'required_if:role,siswa|in:TK,SD,SMP,SMK|nullable',
-            'nisn' => [
-                Rule::requiredIf(fn () => $request->role == 'siswa' && $request->jenjang != 'TK'),
-                'nullable',
-                'unique:users'
-            ],
-            'class' => 'required_if:role,siswa|nullable|string',
+            'role' => 'required|in:admin,guru,siswa',
             'nip' => 'required_if:role,guru|nullable|unique:users',
             'specialization' => 'required_if:role,guru|nullable|string',
             'phone' => 'nullable|string|max:20',
@@ -725,26 +513,11 @@ class AdminController extends Controller
             $validated['profile_photo'] = $request->file('profile_photo')->store('profiles', 'public');
         }
 
-        if ($validated['role'] === 'siswa' && $validated['jenjang'] === 'TK' && empty($validated['nisn'])) {
-            $lastTkStudent = Student::where('jenjang', 'TK')->orderBy('id', 'desc')->first();
-            $nextNumber = 1;
-            if ($lastTkStudent && preg_match('/^TK\-(\d+)$/', $lastTkStudent->nisn, $matches)) {
-                $nextNumber = intval($matches[1]) + 1;
-            }
-            $validated['nisn'] = 'TK-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-        }
 
         $user = User::create($validated);
 
         // Create related records
-        if ($user->role === 'siswa') {
-            Student::create([
-                'user_id' => $user->id,
-                'jenjang' => $validated['jenjang'] ?? 'SD',
-                'nisn' => $validated['nisn'],
-                'class' => $validated['class'],
-            ]);
-        } elseif ($user->role === 'guru') {
+        if ($user->role === 'guru') {
             Teacher::create([
                 'user_id' => $user->id,
                 'nip' => $validated['nip'],
@@ -784,14 +557,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required|in:siswa,guru',
-            'jenjang' => 'required_if:role,siswa|in:TK,SD,SMP,SMK|nullable',
-            'nisn' => [
-                Rule::requiredIf(fn () => $request->role == 'siswa' && $request->jenjang != 'TK'),
-                'nullable',
-                'unique:users,nisn,' . $user->id
-            ],
-            'class' => 'required_if:role,siswa|nullable|string',
+            'role' => 'required|in:admin,guru,siswa',
             'nip' => 'required_if:role,guru|nullable|unique:users,nip,' . $user->id,
             'specialization' => 'required_if:role,guru|nullable|string',
             'phone' => 'nullable|string|max:20',
@@ -1561,15 +1327,13 @@ public function usersDownloadTemplate()
     ];
 
     // Updated columns dengan NISN/NIP, Jenjang, Kelas
-    $columns = ['Nama Lengkap', 'Email', 'Password', 'Role (siswa/guru)', 'NISN/NIP', 'Jenjang (Siswa) / Spesialisasi (Guru)', 'Kelas / -', 'No Telepon', 'Alamat'];
+    $columns = ['Nama Lengkap', 'Email', 'Password', 'Role (admin/guru/orangtua)', 'NIP', 'Spesialisasi (Guru)', 'No Telepon', 'Alamat'];
 
     $callback = function() use($columns) {
         $file = fopen('php://output', 'w');
         fputcsv($file, $columns);
-        // Contoh data siswa: NISN 13 digit, Jenjang: TK/SD/SMP/SMA/SMK, Kelas: sesuai
-        fputcsv($file, ['Ahmad Fauzi', 'ahmad@nuurudzholaam.sch.id', 'rahasia123', 'siswa', '0012345678901', 'SD', '5A', '08123456789', 'Purwakarta']);
-        // Contoh data guru: NIP 18 digit, Spesialisasi, Kelas: -
-        fputcsv($file, ['Siti Aminah', 'siti@nuurudzholaam.sch.id', 'passwordguru', 'guru', '123456789012345678', 'Matematika', '-', '08987654321', 'Bungursari']);
+        // Contoh data guru: NIP 18 digit, Spesialisasi
+        fputcsv($file, ['Siti Aminah', 'siti@nuurudzholaam.sch.id', 'passwordguru', 'guru', '123456789012345678', 'Matematika', '08987654321', 'Bungursari']);
         fclose($file);
     };
 
@@ -1619,19 +1383,11 @@ public function usersDownloadTemplate()
                     'role'     => $row['role'],
                     'phone'    => $row['phone'],
                     'address'  => $row['address'],
-                    'nisn'     => $row['role'] === 'siswa' ? $row['nisn_nip'] : null,
                     'nip'      => $row['role'] === 'guru' ? $row['nisn_nip'] : null,
-                    'class'    => $row['role'] === 'siswa' ? $row['kelas'] : null,
                     'is_active' => true,
                 ]);
 
-                if ($row['role'] === 'siswa') {
-                    Student::create([
-                        'user_id' => $user->id,
-                        'nisn' => $row['nisn_nip'],
-                        'class' => $row['kelas'] ?? '-'
-                    ]);
-                } elseif ($row['role'] === 'guru') {
+                if ($row['role'] === 'guru') {
                     Teacher::create([
                         'user_id' => $user->id,
                         'nip' => $row['nisn_nip'],

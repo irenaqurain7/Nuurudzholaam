@@ -577,7 +577,7 @@
             </button>
             <ul class="navbar-nav" id="navbar-menu" style="flex: 1;">
                 <li><a href="{{ route('home') }}" class="@if(Route::current()->getName() === 'home') active @endif">Beranda</a></li>
-                <li><a href="{{ route('ppdb') }}" class="@if(Route::current()->getName() === 'ppdb') active @endif">PPDB</a></li>
+
                 <li><a href="{{ route('program') }}" class="@if(Route::current()->getName() === 'program') active @endif">Program</a></li>
                 <li><a href="{{ route('kegiatan') }}" class="@if(Route::current()->getName() === 'kegiatan') active @endif">Kegiatan</a></li>
                 <li class="nav-item-dropdown">

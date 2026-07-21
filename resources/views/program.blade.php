@@ -52,7 +52,7 @@
     <div class="container">
         <h2 style="font-size: 36px; margin-bottom: 15px; font-weight: bold;">Mulai Perjalanan Mulia Anda</h2>
         <p style="font-size: 16px; margin-bottom: 30px; opacity: 0.95;">Bergabunglah dengan ribuan siswa yang telah merasakan pendidikan berkualitas di Sekolah Nuurudzholaam</p>
-        <a href="{{ route('ppdb') }}" style="background-color: white; color: var(--hijau-islam); padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; font-size: 16px;">Daftar Sekarang →</a>
+        <a href="{{ route('kontak') }}" style="background-color: white; color: var(--hijau-islam); padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; font-size: 16px;">Hubungi Kami →</a>
     </div>
 </div>
 

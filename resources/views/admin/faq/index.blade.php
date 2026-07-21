@@ -25,7 +25,6 @@
                 <select name="kategori" class="filter-select" onchange="this.form.submit()">
                     <option value="">Semua Kategori</option>
                     <option value="umum" {{ request('kategori') == 'umum' ? 'selected' : '' }}>Umum</option>
-                    <option value="ppdb" {{ request('kategori') == 'ppdb' ? 'selected' : '' }}>PPDB</option>
                     <option value="akademik" {{ request('kategori') == 'akademik' ? 'selected' : '' }}>Akademik</option>
                     <option value="fasilitas" {{ request('kategori') == 'fasilitas' ? 'selected' : '' }}>Fasilitas</option>
                 </select>

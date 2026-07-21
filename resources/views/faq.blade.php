@@ -38,24 +38,6 @@
                             'urutan' => 3
                         ],
                         (object)[
-                            'pertanyaan' => 'Bagaimana cara mendaftar sebagai siswa baru (PPDB)?',
-                            'jawaban' => 'Pendaftaran dapat dilakukan secara online melalui menu PPDB di website resmi ini dengan mengisi formulir pendaftaran serta mengunggah dokumen persyaratan, atau datang langsung ke sekretariat pendaftaran di sekolah.',
-                            'kategori' => 'ppdb',
-                            'urutan' => 1
-                        ],
-                        (object)[
-                            'pertanyaan' => 'Apa saja dokumen persyaratan untuk pendaftaran PPDB?',
-                            'jawaban' => 'Dokumen yang diperlukan meliputi: Akta Kelahiran, Kartu Keluarga, KTP Orang Tua/Wali, Ijazah terakhir/Surat Keterangan Lulus (SKL), dan pas foto terbaru ukuran 3x4.',
-                            'kategori' => 'ppdb',
-                            'urutan' => 2
-                        ],
-                        (object)[
-                            'pertanyaan' => 'Kapan pendaftaran PPDB dibuka dan ditutup?',
-                            'jawaban' => 'Periode pendaftaran PPDB biasanya dibuka mulai awal tahun ajaran baru (sekitar Januari) hingga kuota kelas terpenuhi. Tanggal aktif pendaftaran saat ini dapat Anda lihat langsung di dashboard halaman utama website ini atau menu PPDB.',
-                            'kategori' => 'ppdb',
-                            'urutan' => 3
-                        ],
-                        (object)[
                             'pertanyaan' => 'Apa saja jenjang pendidikan yang tersedia di Nuurudzholaam?',
                             'jawaban' => 'Kami menyelenggarakan pendidikan terpadu untuk jenjang TK (Taman Kanak-Kanak), SD (Sekolah Dasar), SMP (Sekolah Menengah Pertama), dan SMK (Sekolah Menengah Kejuruan) dengan berbagai pilihan kompetensi keahlian.',
                             'kategori' => 'akademik',
@@ -100,7 +82,6 @@
                 <div class="category-tabs" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                     <button class="tab-btn active" data-target="all" onclick="filterCategory('all')" style="padding: 10px 22px; border: none; border-radius: 25px; background-color: var(--hijau-islam); color: white; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: inherit;">Semua</button>
                     <button class="tab-btn" data-target="umum" onclick="filterCategory('umum')" style="padding: 10px 22px; border: 1px solid #e2e8f0; border-radius: 25px; background-color: white; color: var(--text-light); cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-family: inherit;">Umum</button>
-                    <button class="tab-btn" data-target="ppdb" onclick="filterCategory('ppdb')" style="padding: 10px 22px; border: 1px solid #e2e8f0; border-radius: 25px; background-color: white; color: var(--text-light); cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-family: inherit;">PPDB</button>
                     <button class="tab-btn" data-target="akademik" onclick="filterCategory('akademik')" style="padding: 10px 22px; border: 1px solid #e2e8f0; border-radius: 25px; background-color: white; color: var(--text-light); cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-family: inherit;">Akademik</button>
                     <button class="tab-btn" data-target="fasilitas" onclick="filterCategory('fasilitas')" style="padding: 10px 22px; border: 1px solid #e2e8f0; border-radius: 25px; background-color: white; color: var(--text-light); cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-family: inherit;">Fasilitas</button>
                 </div>
@@ -111,8 +92,8 @@
                 @foreach($categories as $category => $categoryFaqs)
                 <div class="category-container" data-cat="{{ $category }}" style="margin-bottom: 50px;">
                     <h2 style="color: var(--hijau-islam); font-size: 22px; margin-bottom: 25px; padding-bottom: 12px; border-bottom: 3px solid var(--emas); font-weight: bold; display: flex; align-items: center; text-transform: capitalize;">
-                        <i class="fas @if($category == 'umum') fa-info-circle @elseif($category == 'ppdb') fa-user-plus @elseif($category == 'akademik') fa-graduation-cap @else fa-building @endif" style="color: var(--emas); margin-right: 12px;"></i>
-                        {{ $category == 'ppdb' ? 'PPDB' : $category }}
+                        <i class="fas @if($category == 'umum') fa-info-circle @elseif($category == 'akademik') fa-graduation-cap @else fa-building @endif" style="color: var(--emas); margin-right: 12px;"></i>
+                        {{ $category }}
                     </h2>
 
                     <div class="accordion">

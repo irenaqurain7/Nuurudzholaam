@@ -644,16 +644,14 @@
                 <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
 
                 <div class="nav-label">MANAJEMEN AKUN</div>
-                <li><a href="{{ route('admin.users.create') ?? '#' }}" class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"><i class="fas fa-user-plus"></i> Tambah Siswa & Guru</a></li>
+                <li><a href="{{ route('admin.users.create') ?? '#' }}" class="{{ request()->routeIs('admin.users.create') ? 'active' : '' }}"><i class="fas fa-user-plus"></i> Tambah User</a></li>
                 <li><a href="{{ route('admin.users.index') ?? '#' }}" class="{{ request()->routeIs('admin.users.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Manajer User</a></li>
 
-                <div class="nav-label">PPDB</div>
-                <li><a href="{{ route('admin.ppdb.index') }}" class="{{ request()->routeIs('admin.ppdb.index') ? 'active' : '' }}"><i class="fas fa-users"></i> Formulir PPDB</a></li>
-                <li><a href="{{ route('admin.ppdb.settings') }}" class="{{ request()->routeIs('admin.ppdb.settings') ? 'active' : '' }}"><i class="fas fa-cog"></i> Pengaturan PPDB</a></li>
+
 
                 <div class="nav-label">ARSIP</div>
                 <li><a href="{{ route('admin.users.archive') }}" class="{{ request()->routeIs('admin.users.archive') ? 'active' : '' }}"><i class="fas fa-archive"></i> Arsip User</a></li>
-                <li><a href="{{ route('admin.ppdb.archive') }}" class="{{ request()->routeIs('admin.ppdb.archive') ? 'active' : '' }}"><i class="fas fa-archive"></i> Arsip PPDB</a></li>
+
 
                 <div class="nav-label">JADWAL</div>
                 <li><a href="{{ route('admin.schedule.teacher.index') }}" class="{{ request()->routeIs('admin.schedule.teacher.*') ? 'active' : '' }}"><i class="fas fa-chalkboard-user"></i> Jadwal Guru</a></li>

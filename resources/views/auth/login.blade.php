@@ -367,7 +367,7 @@
                 <div class="form-group">
                     <label for="login">Username</label>
                     <div class="input-wrapper">
-                        <input type="text" id="login" name="login" class="@error('login') is-invalid @enderror" placeholder="Masukkan username, email, NISN, atau NIP" value="{{ old('login') }}" required autofocus>
+                        <input type="text" id="login" name="login" class="@error('login') is-invalid @enderror" placeholder="Masukkan username, email, atau NIP" value="{{ old('login') }}" required autofocus>
                     </div>
                     <span class="field-help">Gunakan username yang dibuat saat registrasi.</span>
                     @error('login')
@@ -393,7 +393,7 @@
                 <button type="submit" class="btn-login">Login</button>
 
                 <div style="text-align: center; font-size: 11px; color: #6C8B7C; margin-bottom: 30px; line-height: 1.5; padding: 0 10px;">
-                    *Hanya siswa dan guru yang sudah terdaftar dan berstatus aktif di sekolah yang dapat mengakses sistem ini.
+                    *Hanya guru dan pengurus sekolah yang berstatus aktif yang dapat mengakses sistem ini.
                 </div>
             </form>
 

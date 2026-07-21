@@ -10,52 +10,13 @@
     <div style="position: absolute; bottom: -30%; left: 0; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; z-index: 0;"></div>
 
     <div class="container" style="text-align: center; z-index: 10; position: relative;">
-        <!-- Dynamic PPDB Status Badge -->
-        @if($ppdbStatus === 'open')
-            <div style="display: inline-block; background: rgba(46, 125, 50, 0.2); padding: 8px 20px; border-radius: 20px; margin-bottom: 30px; border: 2px solid rgba(46, 125, 50, 0.4);">
-                <span style="color: #66bb6a; font-weight: 600; font-size: 14px;">
-                    <i class="fas fa-check-circle" style="margin-right: 8px;"></i>PENDAFTARAN DIBUKA
-                </span>
-            </div>
-        @elseif($ppdbStatus === 'coming')
-            <div style="display: inline-block; background: rgba(25, 118, 210, 0.2); padding: 8px 20px; border-radius: 20px; margin-bottom: 30px; border: 2px solid rgba(25, 118, 210, 0.4);">
-                <span style="color: #64b5f6; font-weight: 600; font-size: 14px;">
-                    <i class="fas fa-hourglass-start" style="margin-right: 8px;"></i>PENDAFTARAN AKAN DIBUKA
-                </span>
-            </div>
-        @elseif($ppdbStatus === 'closed')
-            <div style="display: inline-block; background: rgba(211, 47, 47, 0.2); padding: 8px 20px; border-radius: 20px; margin-bottom: 30px; border: 2px solid rgba(211, 47, 47, 0.4);">
-                <span style="color: #ef5350; font-weight: 600; font-size: 14px;">
-                    <i class="fas fa-times-circle" style="margin-right: 8px;"></i>PENDAFTARAN TELAH DITUTUP
-                </span>
-            </div>
-        @else
-            <div style="display: inline-block; background: rgba(212, 175, 55, 0.2); padding: 8px 20px; border-radius: 20px; margin-bottom: 30px;">
-                <span style="color: var(--emas); font-weight: 600; font-size: 14px;">PENDAFTARAN PESERTA DIDIK BARU 2024/2025</span>
-            </div>
-        @endif
+
 
         <h1 style="font-size: 52px; color: white; margin-bottom: 20px; font-weight: bold; line-height: 1.3;">Membentuk Generasi Qurani dan Berakhlak Mulia</h1>
         <p style="font-size: 18px; color: rgba(255, 255, 255, 0.95); margin-bottom: 40px; line-height: 1.6;">SekolahNuurudzholaam menerapkan kurikulum berbasis alam sekitar yang memadukan pendikan formal sebagai pilihan strategis untuk menjawab kebutuhan masyarakat menghadapi tantangan zaman.</p>
         
         <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-            @if($ppdbStatus === 'open')
-                <a href="{{ route('ppdb') }}" style="background-color: white; color: var(--hijau-islam); padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; border: 2px solid white;">
-                    <i class="fas fa-edit" style="margin-right: 8px;"></i>Daftar Sekarang
-                </a>
-            @elseif($ppdbStatus === 'coming')
-                <button disabled style="background-color: rgba(255,255,255,0.3); color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; border: 2px solid white; cursor: not-allowed; opacity: 0.6;">
-                    <i class="fas fa-clock" style="margin-right: 8px;"></i>Pendaftaran Segera Dibuka
-                </button>
-            @elseif($ppdbStatus === 'closed')
-                <button disabled style="background-color: rgba(255,255,255,0.3); color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; border: 2px solid white; cursor: not-allowed; opacity: 0.6;">
-                    <i class="fas fa-lock" style="margin-right: 8px;"></i>Pendaftaran Ditutup
-                </button>
-            @else
-                <button disabled style="background-color: rgba(255,255,255,0.3); color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; border: 2px solid white; cursor: not-allowed; opacity: 0.6;">
-                    <i class="fas fa-ban" style="margin-right: 8px;"></i>Pendaftaran Tidak Aktif
-                </button>
-            @endif
+
             <a href="{{ route('profil') }}" style="background-color: transparent; color: white; padding: 12px 35px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; border: 2px solid white;">Lihat Program</a>
         </div>
     </div>
@@ -175,14 +136,7 @@
 </style>
 @endif
 
-<!-- CTA Section -->
-<div style="background: linear-gradient(135deg, var(--hijau-islam) 0%, var(--hijau-islam-light) 100%); color: white; padding: 80px 20px; text-align: center;">
-    <div class="container">
-        <h2 style="font-size: 40px; margin-bottom: 20px; font-weight: bold;">Mulai Perjalanan Mulia Anda Bersama Kami</h2>
-        <p style="font-size: 18px; margin-bottom: 30px; opacity: 0.95; line-height: 1.6;">Pendaftaran untuk tahun ajaran baru telah dibuka. Kuota terbatas untuk memastikan kualitas pembelajaran yang optimal</p>
-        <a href="{{ route('ppdb') }}" style="background-color: white; color: var(--hijau-islam); padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block; transition: all 0.3s; font-size: 16px;">Daftar Sekarang →</a>
-    </div>
-</div>
+
 
 @endsection
 

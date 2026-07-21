@@ -9,7 +9,7 @@
             <p class="users-kicker">Manajemen Akun</p>
             <h1>Manajer User</h1>
             <p class="users-subtitle">
-                Kelola akun siswa, guru, dan orang tua dengan tampilan yang lebih jelas dan ringkas.
+                Kelola akun siswa dan guru dengan tampilan yang lebih jelas dan ringkas.
             </p>
         </div>
     </section>
@@ -117,7 +117,7 @@
                                 <td>
                                     <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
                                         <span class="role-badge role-{{ $user->role }}">
-                                            {{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'guru' ? 'Guru' : 'Orang Tua') }}
+                                            {{ $user->role === 'siswa' ? 'Siswa' : ($user->role === 'guru' ? 'Guru' : 'Admin') }}
                                         </span>
                                         @if($user->role === 'siswa' && $user->student)
                                             <span class="jenjang-badge"><i class="fas fa-graduation-cap"></i> {{ $user->student->jenjang }}</span>
@@ -573,9 +573,6 @@
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
 
-    .user-avatar.role-orangtua {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    }
 
     .user-cell strong {
         display: block;
@@ -621,10 +618,6 @@
         color: #166534;
     }
 
-    .role-orangtua {
-        background: #fef3c7;
-        color: #92400e;
-    }
 
     .status-badge.active {
         background: #d1fae5;

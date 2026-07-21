@@ -30,7 +30,6 @@
                 <select id="kategori" name="kategori" required>
                     <option value="">-- Pilih Kategori --</option>
                     <option value="umum" @if(old('kategori') === 'umum') selected @endif>Umum</option>
-                    <option value="ppdb" @if(old('kategori') === 'ppdb') selected @endif>PPDB</option>
                     <option value="akademik" @if(old('kategori') === 'akademik') selected @endif>Akademik</option>
                     <option value="fasilitas" @if(old('kategori') === 'fasilitas') selected @endif>Fasilitas</option>
                 </select>
