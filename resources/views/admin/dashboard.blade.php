@@ -91,6 +91,39 @@
                                 <span>Jadwal Kelas</span>
                             </div>
                         </div>
+
+                        {{-- Detailed list from schedules table --}}
+                        @if(isset($todaysSchedules) && $todaysSchedules->isNotEmpty())
+                            <div class="table-responsive mt-4">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Jam</th>
+                                            <th>Mata Pelajaran</th>
+                                            <th>Guru</th>
+                                            <th>Kelas</th>
+                                            <th>Ruang</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($todaysSchedules as $s)
+                                            <tr>
+                                                <td class="font-bold">{{ \Carbon\Carbon::parse($s->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->end_time)->format('H:i') }}</td>
+                                                <td>{{ $s->subject }}</td>
+                                                <td>{{ optional($s->teacher)->name ?? '-' }}</td>
+                                                <td>{{ $s->class }}</td>
+                                                <td>{{ $s->room }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="empty-state mt-4">
+                                <i class="fas fa-calendar-times"></i>
+                                <p class="mt-2">Belum ada jadwal untuk hari ini.</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -98,67 +131,60 @@
     </div>
 
     <!-- Aktivitas & Pengumuman -->
-    <div class="dashboard-split-layout" style="grid-template-columns: 1fr 1fr;">
-        <!-- Left Side: Aktivitas Terbaru -->
-        <div class="dashboard-card main-col">
-            <!-- Aktivitas Terbaru -->
-            <div class="activities-section mb-6">
-                <div class="card-header mb-3">
-                    <h4><i class="fas fa-history mr-2"></i> Aktivitas Terbaru</h4>
-                </div>
-                <ul class="activity-timeline">
-                    @forelse($recentActivities as $act)
-                        <li class="activity-item">
-                            <span class="activity-icon-container {{ $act['color'] }}">
-                                <i class="{{ $act['icon'] }}"></i>
-                            </span>
-                            <div class="activity-body">
-                                <p class="activity-text">{!! $act['message'] !!}</p>
-                                <span class="activity-time">{{ $act['time']->diffForHumans() }}</span>
-                            </div>
-                        </li>
-                    @empty
-                        <li class="empty-state py-4">
-                            <i class="fas fa-tasks text-muted"></i>
-                            <p class="text-sm mt-1">Belum ada aktivitas terekam.</p>
-                        </li>
-                    @endforelse
-                </ul>
+    <div class="dashboard-split-layout">
+        <!-- Aktivitas Terbaru -->
+        <div class="dashboard-card">
+            <div class="card-header mb-3">
+                <h4><i class="fas fa-history mr-2"></i> Aktivitas Terbaru</h4>
             </div>
-
-            <hr class="section-divider my-4" />
-
-            <!-- Pengumuman Terbaru -->
-            <div class="announcements-section">
-                <div class="card-header mb-3 flex-between">
-                    <h4><i class="fas fa-bullhorn mr-2"></i> Pengumuman Terbaru</h4>
-                    <a href="{{ route('admin.announcement.index') }}" class="btn-text">Kelola</a>
-                </div>
-                <div class="announcement-list">
-                    @forelse($latestAnnouncements as $ann)
-                        <div class="announcement-pill">
-                            <div class="ann-header">
-                                <span class="ann-title">{{ $ann->judul }}</span>
-                                <span class="ann-date">{{ $ann->created_at->format('d M Y') }}</span>
-                            </div>
-                            <p class="ann-excerpt">
-                                {{ Str::limit(strip_tags($ann->konten), 80) }}
-                            </p>
+            <ul class="activity-timeline">
+                @forelse($recentActivities as $act)
+                    <li class="activity-item">
+                        <span class="activity-icon-container {{ $act['color'] }}">
+                            <i class="{{ $act['icon'] }}"></i>
+                        </span>
+                        <div class="activity-body">
+                            <p class="activity-text">{!! $act['message'] !!}</p>
+                            <span class="activity-time">{{ $act['time']->diffForHumans() }}</span>
                         </div>
-                    @empty
-                        <div class="empty-state">
-                            <i class="fas fa-comment-slash" style="font-size: 24px;"></i>
-                            <p>Belum ada pengumuman.</p>
+                    </li>
+                @empty
+                    <li class="empty-state py-4">
+                        <i class="fas fa-tasks text-muted"></i>
+                        <p class="text-sm mt-1">Belum ada aktivitas terekam.</p>
+                    </li>
+                @endforelse
+            </ul>
+        </div>
+
+        <!-- Pengumuman Terbaru -->
+        <div class="dashboard-card">
+            <div class="card-header mb-3 flex-between">
+                <h4><i class="fas fa-bullhorn mr-2"></i> Pengumuman Terbaru</h4>
+                <a href="{{ route('admin.announcement.index') }}" class="btn-text">Kelola</a>
+            </div>
+            <div class="announcement-list">
+                @forelse($latestAnnouncements as $ann)
+                    <div class="announcement-pill">
+                        <div class="ann-header">
+                            <span class="ann-title">{{ $ann->judul }}</span>
+                            <span class="ann-date">{{ $ann->created_at->format('d M Y') }}</span>
                         </div>
-                    @endforelse
-                </div>
+                        <p class="ann-excerpt">
+                            {{ Str::limit(strip_tags($ann->konten), 80) }}
+                        </p>
+                    </div>
+                @empty
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash" style="font-size: 24px;"></i>
+                        <p>Belum ada pengumuman.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <section class="quick-actions-section">
-        <h4 class="section-title"><i class="fas fa-bolt mr-2 text-amber-500"></i> Pintasan Cepat</h4>
         <div class="quick-actions-grid">
             <a href="{{ route('admin.users.create') }}" class="action-btn-card">
                 <div class="action-icon bg-emerald-50 text-emerald-700">
@@ -171,24 +197,46 @@
                 <i class="fas fa-chevron-right action-arrow"></i>
             </a>
 
-            <a href="{{ route('admin.schedule.student.wizard.step1') }}" class="action-btn-card">
-                <div class="action-icon bg-blue-50 text-blue-700">
-                    <i class="fas fa-calendar-plus"></i>
+            <a href="{{ route('admin.users.index') }}" class="action-btn-card">
+                <div class="action-icon bg-emerald-50 text-emerald-700">
+                    <i class="fas fa-users"></i>
                 </div>
                 <div class="action-details">
-                    <h5>Tambah Jadwal</h5>
-                    <p>Buat jadwal kelas melalui wizard</p>
+                    <h5>Manajer User</h5>
+                    <p>Kelola akun guru & siswa</p>
                 </div>
                 <i class="fas fa-chevron-right action-arrow"></i>
             </a>
 
-            <a href="{{ route('admin.announcement.create') }}" class="action-btn-card">
+            <a href="{{ route('admin.schedule.student.index') }}" class="action-btn-card">
+                <div class="action-icon bg-blue-50 text-blue-700">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="action-details">
+                    <h5>Jadwal Kelas</h5>
+                    <p>Daftar dan kelola jadwal kelas</p>
+                </div>
+                <i class="fas fa-chevron-right action-arrow"></i>
+            </a>
+
+            <a href="{{ route('admin.schedule.teacher.index') }}" class="action-btn-card">
+                <div class="action-icon bg-emerald-50 text-emerald-700">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="action-details">
+                    <h5>Recap Jadwal Guru</h5>
+                    <p>Ringkasan jadwal per pengajar</p>
+                </div>
+                <i class="fas fa-chevron-right action-arrow"></i>
+            </a>
+
+            <a href="{{ route('admin.announcement.index') }}" class="action-btn-card">
                 <div class="action-icon bg-purple-50 text-purple-700">
                     <i class="fas fa-bullhorn"></i>
                 </div>
                 <div class="action-details">
-                    <h5>Tambah Pengumuman</h5>
-                    <p>Publikasikan info penting sekolah</p>
+                    <h5>Pengumuman</h5>
+                    <p>Kelola pengumuman sekolah</p>
                 </div>
                 <i class="fas fa-chevron-right action-arrow"></i>
             </a>
@@ -282,7 +330,7 @@
     /* Stat Grid */
     .admin-stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
 

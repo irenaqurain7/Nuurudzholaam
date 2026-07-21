@@ -24,6 +24,25 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AdminController extends Controller
 {
+    /**
+     * Log a simple admin activity into the Activity model.
+     * Use kategori and visibility values that exist on the activities table.
+     */
+    protected function logAdminActivity(string $judul, string $deskripsi, string $kategori = 'kegiatan', string $visibility = 'publik')
+    {
+        try {
+            Activity::create([
+                'judul' => $judul,
+                'deskripsi' => $deskripsi,
+                'tanggal' => now(),
+                'kategori' => $kategori,
+                'visibility' => $visibility,
+            ]);
+        } catch (\Exception $e) {
+            // Swallow errors to avoid breaking admin flows if logging fails
+            Log::warning('Failed to log admin activity: ' . $e->getMessage());
+        }
+    }
     // DASHBOARD
     public function dashboard()
     {
@@ -58,7 +77,7 @@ class AdminController extends Controller
             $todayStudentSchedule = \App\Models\Schedule::whereNotNull('class')->whereIn('day', [$todayEnglish, $todayIndonesian])->count();
         }
 
-        // Recent Activities feed
+        // Recent Activities feed (original): combine recent users and recent announcements
         $recentActivities = collect();
 
         // 1. Fetch recent users
@@ -84,16 +103,20 @@ class AdminController extends Controller
             ]);
         }
 
-
-
         // Sort all activities by time descending and take 5
         $recentActivities = $recentActivities->sortByDesc('time')->take(5);
+
+        // Today's full schedules (single source of truth)
+        $todaysSchedules = Schedule::with('teacher')
+            ->whereIn('day', [$todayEnglish, $todayIndonesian])
+            ->orderBy('start_time')
+            ->get();
 
         return view('admin.dashboard', compact(
             'totalUsers', 'totalSiswa', 'totalGuru',
             'latestAnnouncements',
             'todayTeacherSchedule', 'todayStudentSchedule',
-            'recentActivities'
+            'recentActivities', 'todaysSchedules'
         ));
     }
 
@@ -205,6 +228,13 @@ class AdminController extends Controller
         }
 
         Activity::create($validated);
+        // Log admin action (separate system log)
+        $this->logAdminActivity(
+            'Kegiatan dibuat: ' . $validated['judul'],
+            'Admin ' . (auth()->user()->name ?? 'System') . ' menambahkan kegiatan: ' . $validated['judul'],
+            'kegiatan',
+            'publik'
+        );
         return redirect()->route('admin.activity.index')->with('success', 'Kegiatan berhasil ditambahkan.');
     }
 
@@ -232,12 +262,29 @@ class AdminController extends Controller
         }
 
         $activity->update($validated);
+        // Log admin action
+        $this->logAdminActivity(
+            'Kegiatan diperbarui: ' . $activity->judul,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' memperbarui kegiatan: ' . $activity->judul,
+            'kegiatan',
+            'publik'
+        );
         return redirect()->route('admin.activity.index')->with('success', 'Kegiatan berhasil diperbarui.');
     }
 
     public function activityDestroy($id)
     {
-        Activity::findOrFail($id)->delete();
+        $act = Activity::findOrFail($id);
+        $title = $act->judul;
+        $act->delete();
+        // Log admin action
+        $this->logAdminActivity(
+            'Kegiatan dihapus: ' . $title,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' menghapus kegiatan: ' . $title,
+            'kegiatan',
+            'publik'
+        );
+
         return redirect()->back()->with('success', 'Kegiatan berhasil dihapus.');
     }
 
@@ -286,6 +333,11 @@ class AdminController extends Controller
         ]);
 
         Announcement::create($validated);
+        // Log admin activity
+        $this->logAdminActivity(
+            'Pengumuman dibuat: ' . $validated['judul'],
+            'Admin ' . (auth()->user()->name ?? 'System') . ' menambahkan pengumuman: ' . $validated['judul']
+        );
         return redirect()->route('admin.announcement.index')->with('success', 'Pengumuman berhasil ditambahkan.');
     }
 
@@ -309,12 +361,25 @@ class AdminController extends Controller
         ]);
 
         $announcement->update($validated);
+        // Log admin activity
+        $this->logAdminActivity(
+            'Pengumuman diperbarui: ' . $announcement->judul,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' memperbarui pengumuman: ' . $announcement->judul
+        );
         return redirect()->route('admin.announcement.index')->with('success', 'Pengumuman berhasil diperbarui.');
     }
 
     public function announcementDestroy($id)
     {
-        Announcement::findOrFail($id)->delete();
+        $ann = Announcement::findOrFail($id);
+        $title = $ann->judul;
+        $ann->delete();
+        // Log admin activity
+        $this->logAdminActivity(
+            'Pengumuman dihapus: ' . $title,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' menghapus pengumuman: ' . $title
+        );
+
         return redirect()->back()->with('success', 'Pengumuman berhasil dihapus.');
     }
 
@@ -481,7 +546,7 @@ class AdminController extends Controller
         // Global stats (unfiltered)
         $totalSiswa = User::where('role', 'siswa')->where('is_archived', false)->count();
         $totalGuru = User::where('role', 'guru')->where('is_archived', false)->count();
-        
+
         return view('admin.users.index', compact('users', 'totalSiswa', 'totalGuru'));
     }
 
@@ -524,6 +589,12 @@ class AdminController extends Controller
                 'specialization' => $validated['specialization'],
             ]);
         }
+
+        // Log admin activity
+        $this->logAdminActivity(
+            'User dibuat: ' . $user->name,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' membuat user ' . $user->email . ' (role: ' . $user->role . ')'
+        );
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dibuat.');
     }
@@ -624,6 +695,12 @@ class AdminController extends Controller
             }
         }
 
+        // Log admin activity
+        $this->logAdminActivity(
+            'User diperbarui: ' . $user->name,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' memperbarui user ' . $user->email . ' (role: ' . $user->role . ')'
+        );
+
         return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
     }
 
@@ -636,6 +713,12 @@ class AdminController extends Controller
         }
 
         $user->delete();
+
+        // Log admin activity
+        $this->logAdminActivity(
+            'User dihapus: ' . $user->name,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' menghapus user ' . $user->email . ' (role: ' . $user->role . ')'
+        );
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
     }
@@ -651,6 +734,12 @@ class AdminController extends Controller
         // Generate temporary password
         $tempPassword = 'Sekolah@' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
         $user->update(['password' => Hash::make($tempPassword)]);
+
+        // Log admin activity
+        $this->logAdminActivity(
+            'Reset password: ' . $user->name,
+            'Admin ' . (auth()->user()->name ?? 'System') . ' mereset password user ' . $user->email
+        );
 
         return redirect()->back()->with('success', 'Password telah direset ke: ' . $tempPassword . ' (harap segera ubah password saat login pertama)');
     }
