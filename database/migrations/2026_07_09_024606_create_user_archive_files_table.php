@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('archive_name');
             $table->string('category')->nullable();
-            $table->string('file_name');
-            $table->string('file_path');
+            $table->string('file_name')->nullable();
+            $table->string('file_path')->nullable();
             $table->string('mime_type')->nullable();
             $table->unsignedBigInteger('file_size')->nullable();
             $table->integer('graduation_year')->nullable();
