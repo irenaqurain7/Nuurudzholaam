@@ -32,4 +32,9 @@ class Student extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function educationHistories()
+    {
+        return $this->hasMany(StudentEducationHistory::class);
+    }
 }

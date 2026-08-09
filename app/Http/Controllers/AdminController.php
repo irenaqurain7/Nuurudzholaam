@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\UserArchiveFile;
 use App\Models\ContactMessage;
+use App\Models\StudentEducationHistory;
 use App\Services\BulkUserValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -548,6 +549,107 @@ class AdminController extends Controller
         return redirect()->route('admin.contact-messages.index')->with('success', 'Pesan berhasil dihapus.');
     }
 
+    // Education promotion / continuation
+    public function educationPromotionIndex(Request $request)
+    {
+        $school = SchoolInfo::first() ?? new SchoolInfo();
+
+        // build academic year options from existing histories if any
+        $years = StudentEducationHistory::select('academic_year')->distinct()->orderBy('academic_year', 'desc')->pluck('academic_year')->toArray();
+
+        // add current and next year as defaults
+        $current = date('Y');
+        $defaultA = ($current-1) . '/' . $current;
+        $defaultB = $current . '/' . ($current+1);
+        if (!in_array($defaultA, $years)) array_unshift($years, $defaultA);
+        if (!in_array($defaultB, $years)) array_unshift($years, $defaultB);
+
+        $students = collect();
+        // Allow filtering by any combination: jenjang and/or class_from (don't require all three)
+        if ($request->filled('academic_year_from') || $request->filled('jenjang') || $request->filled('class_from')) {
+            $jenjang = $request->jenjang;
+            $classFrom = $request->class_from;
+
+            $query = Student::with('user');
+            if (!empty($jenjang)) {
+                $query->where('jenjang', $jenjang);
+            }
+            if (!empty($classFrom)) {
+                $query->where('class', $classFrom);
+            }
+
+            $students = $query->get();
+        }
+
+        // build available classes per jenjang from existing students
+        $jenjangList = ['TK','SD','SMP','SMK'];
+        $classesByJenjang = [];
+        foreach ($jenjangList as $j) {
+            $list = Student::where('jenjang', $j)->distinct()->orderBy('class')->pluck('class')->toArray();
+            $classesByJenjang[$j] = $list;
+        }
+
+        return view('admin.education.promotion', compact('years', 'students', 'classesByJenjang'));
+    }
+
+    public function educationPromotionApply(Request $request)
+    {
+        $validated = $request->validate([
+            'academic_year_from' => 'required|string',
+            'academic_year_to' => 'required|string',
+            'students' => 'required|array',
+            'students.*.student_id' => 'required|integer',
+            'students.*.status' => 'required|string',
+            'students.*.target_jenjang' => 'nullable|string',
+            'students.*.target_class' => 'nullable|string',
+            'students.*.note' => 'nullable|string',
+        ]);
+
+        $processedBy = auth()->id();
+
+        $summary = ['processed' => 0];
+
+        foreach ($validated['students'] as $s) {
+            $student = Student::find($s['student_id']);
+            if (!$student) continue;
+
+            $user = $student->user;
+
+            $history = StudentEducationHistory::create([
+                'student_id' => $student->id,
+                'user_id' => $user->id,
+                'academic_year' => $validated['academic_year_to'],
+                'jenjang' => $s['target_jenjang'] ?? $student->jenjang,
+                'class' => $s['target_class'] ?? $student->class,
+                'status' => $s['status'],
+                'note' => $s['note'] ?? null,
+                'processed_by' => $processedBy,
+            ]);
+
+            // Apply changes to students/users depending on status
+            if (in_array($s['status'], ['Naik Kelas','Lanjut'])) {
+                $student->jenjang = $s['target_jenjang'] ?? $student->jenjang;
+                $student->class = $s['target_class'] ?? $student->class;
+                $student->save();
+            } elseif (in_array($s['status'], ['Pindah Sekolah','Tidak Lanjut'])) {
+                // mark user non-active
+                $user->is_active = false;
+                $user->save();
+            }
+
+            $summary['processed']++;
+        }
+
+        return redirect()->route('admin.education.promotion.index')->with('success', "Proses selesai. {$summary['processed']} siswa diproses.");
+    }
+
+    public function educationHistory($userId)
+    {
+        $user = User::with('student.educationHistories')->findOrFail($userId);
+        $histories = $user->student ? $user->student->educationHistories()->orderBy('academic_year')->get() : collect();
+        return view('admin.education.history', compact('user','histories'));
+    }
+
 
     // USER MANAGEMENT
     public function usersIndex(Request $request)
@@ -682,7 +784,7 @@ class AdminController extends Controller
             unset($validated['profile_photo']);
         }
 
-        if ($validated['role'] === 'siswa' && $validated['jenjang'] === 'TK' && empty($validated['nisn'])) {
+        if (($validated['role'] ?? null) === 'siswa' && (($validated['jenjang'] ?? null) === 'TK') && empty($validated['nisn'] ?? null)) {
             $lastTkStudent = Student::where('jenjang', 'TK')->orderBy('id', 'desc')->first();
             $nextNumber = 1;
             if ($lastTkStudent && preg_match('/^TK\-(\d+)$/', $lastTkStudent->nisn, $matches)) {
@@ -693,23 +795,23 @@ class AdminController extends Controller
 
         $user->update($validated);
 
-        if ($validated['role'] === 'siswa') {
+        if (($validated['role'] ?? null) === 'siswa') {
             if ($user->teacher) {
                 $user->teacher()->delete();
             }
 
             if ($user->student) {
                 $user->student->update([
-                    'jenjang' => $validated['jenjang'] ?? 'SD',
-                    'nisn' => $validated['nisn'],
-                    'class' => $validated['class'],
+                    'jenjang' => $validated['jenjang'] ?? $user->student->jenjang ?? 'SD',
+                    'nisn' => $validated['nisn'] ?? $user->student->nisn ?? null,
+                    'class' => $validated['class'] ?? $user->student->class ?? null,
                 ]);
             } else {
                 Student::create([
                     'user_id' => $user->id,
                     'jenjang' => $validated['jenjang'] ?? 'SD',
-                    'nisn' => $validated['nisn'],
-                    'class' => $validated['class'],
+                    'nisn' => $validated['nisn'] ?? null,
+                    'class' => $validated['class'] ?? null,
                 ]);
             }
         } else {

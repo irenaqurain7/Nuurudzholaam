@@ -96,6 +96,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');
 
+    // Education management: promotion & continuation
+    Route::get('/education/promotion', [AdminController::class, 'educationPromotionIndex'])->name('education.promotion.index');
+    Route::post('/education/promotion/apply', [AdminController::class, 'educationPromotionApply'])->name('education.promotion.apply');
+    Route::get('/users/{id}/education-history', [AdminController::class, 'educationHistory'])->name('users.education-history');
+
     // Contact Messages (from public contact form)
     Route::get('/contact-messages', [AdminController::class, 'contactMessagesIndex'])->name('contact-messages.index');
     Route::get('/contact-messages/{id}', [AdminController::class, 'contactMessagesShow'])->name('contact-messages.show');

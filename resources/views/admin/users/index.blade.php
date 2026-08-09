@@ -152,6 +152,17 @@
                                                     <i class="fas fa-pen-to-square"></i>
                                                     Edit
                                                 </a>
+                                                    @if($user->role === 'siswa')
+                                                    <a href="{{ route('admin.education.promotion.index', ['jenjang' => $user->student->jenjang ?? '', 'class_from' => $user->student->class ?? '']) }}" class="dropdown-item">
+                                                        <i class="fas fa-arrow-up-right-dots"></i>
+                                                        Ubah Kelas
+                                                    </a>
+                                                    <a href="{{ route('admin.users.education-history', $user->id) }}" class="dropdown-item">
+                                                        <i class="fas fa-history"></i>
+                                                        Riwayat Pendidikan
+                                                    </a>
+                                                    <hr class="dropdown-divider">
+                                                    @endif
                                                 <form action="{{ route('admin.users.reset-password', $user->id) }}" method="POST" style="display: contents;">
                                                     @csrf
                                                     <button type="submit" class="dropdown-item reset" onclick="return confirm('Reset password user ini?')">
