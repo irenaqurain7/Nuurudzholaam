@@ -5,10 +5,15 @@
 @section('content')
 <div class="users-page">
     <section class="users-hero">
-        <div>
+        <div class="hero-content">
             <p class="users-kicker">Arsip</p>
             <h1>Arsip</h1>
             <p class="users-subtitle">Kelola file arsip dengan kategori seperti Google Drive.</p>
+        </div>
+        <div class="hero-actions">
+            <button type="button" class="btn-tambah-file" onclick="openUploadModal()">
+                <i class="fas fa-plus"></i> Unggah Arsip
+            </button>
         </div>
     </section>
 
@@ -78,9 +83,7 @@
                             <i class="fas fa-times"></i> Reset
                         </a>
                     @endif
-                    <button type="button" class="btn-tambah-file" onclick="openUploadModal()">
-                        <i class="fas fa-plus"></i> Unggah Arsip
-                    </button>
+                    <!-- Upload button moved to banner -->
                 </div>
             </form>
         </div>
@@ -212,8 +215,9 @@
     }
 
     .users-hero {
+        position: relative;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: flex-start;
         gap: 20px;
         padding: 28px;
@@ -221,6 +225,31 @@
         border-radius: 24px;
         color: #ffffff;
         margin-bottom: 24px;
+        overflow: visible;
+    }
+
+    .users-hero .hero-actions { display:flex; align-items:center; position: absolute; right: 8%; top: 50%; transform: translateY(-50%); }
+    .users-hero .hero-actions .btn-tambah-file {
+        background: #ffffff;
+        color: #1c2d25;
+        padding: 16px 28px;
+        font-size: 16px;
+        font-weight: 800;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(28,45,37,0.16);
+        min-width: 260px;
+        text-align: center;
+    }
+    .users-hero .hero-actions .btn-tambah-file i { color: #1c2d25; font-size: 16px; }
+
+    @media (max-width: 920px) {
+        .users-hero .hero-actions { right: 4%; }
+    }
+
+    @media (max-width: 720px) {
+        .users-hero { flex-direction: column; align-items: stretch; }
+        .users-hero .hero-actions { position: static; margin-top: 12px; justify-content: flex-end; transform: none; }
+        .users-hero .hero-actions .btn-tambah-file { width: 100%; padding: 14px; font-size: 15px; min-width: unset; }
     }
 
     .users-kicker,
