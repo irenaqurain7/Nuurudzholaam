@@ -96,6 +96,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/school-info/edit', [AdminController::class, 'schoolInfoEdit'])->name('school-info.edit');
     Route::put('/school-info', [AdminController::class, 'schoolInfoUpdate'])->name('school-info.update');
 
+    // Contact Messages (from public contact form)
+    Route::get('/contact-messages', [AdminController::class, 'contactMessagesIndex'])->name('contact-messages.index');
+    Route::get('/contact-messages/{id}', [AdminController::class, 'contactMessagesShow'])->name('contact-messages.show');
+    Route::delete('/contact-messages/{id}', [AdminController::class, 'contactMessagesDestroy'])->name('contact-messages.destroy');
+
     // Teacher Schedule Management (Monitoring Dashboard)
     Route::prefix('schedule/teacher')->name('schedule.teacher.')->group(function () {
         Route::get('/', [AdminController::class, 'scheduleTeacherIndex'])->name('index');

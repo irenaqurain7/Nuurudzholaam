@@ -681,6 +681,11 @@
                         <i class="fas fa-question-circle"></i> FAQ
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.contact-messages.index') }}" class="{{ request()->routeIs('admin.contact-messages.*') ? 'active' : '' }}">
+                        <i class="fas fa-inbox"></i> Pesan Kontak
+                    </a>
+                </li>
             </ul>
         </nav>
     </aside>

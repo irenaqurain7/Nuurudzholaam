@@ -13,6 +13,7 @@ use App\Models\Schedule;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\UserArchiveFile;
+use App\Models\ContactMessage;
 use App\Services\BulkUserValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -512,6 +513,39 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('success', 'Informasi sekolah berhasil diperbarui.');
+    }
+
+    // Contact messages from public site
+    public function contactMessagesIndex(Request $request)
+    {
+        $query = ContactMessage::query();
+
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
+                    ->orWhere('subjek', 'like', "%{$q}%")
+                    ->orWhere('pesan', 'like', "%{$q}%");
+            });
+        }
+
+        $messages = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+
+        return view('admin.contact_messages.index', compact('messages'));
+    }
+
+    public function contactMessagesShow($id)
+    {
+        $message = ContactMessage::findOrFail($id);
+        return view('admin.contact_messages.show', compact('message'));
+    }
+
+    public function contactMessagesDestroy($id)
+    {
+        $m = ContactMessage::findOrFail($id);
+        $m->delete();
+        return redirect()->route('admin.contact-messages.index')->with('success', 'Pesan berhasil dihapus.');
     }
 
 

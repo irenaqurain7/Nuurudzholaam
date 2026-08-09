@@ -11,6 +11,7 @@ use App\Models\SchoolInfo;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\ContactMessage;
 
 class PublicController extends Controller
 {
@@ -243,8 +244,16 @@ class PublicController extends Controller
             'pesan' => 'required|string',
         ]);
 
-        // TODO: Simpan pesan kontak ke database atau kirim email
-        // Untuk sekarang, hanya redirect dengan pesan sukses
+        // Simpan ke database
+        try {
+            ContactMessage::create(array_merge($validated, [
+                'ip' => $request->ip(),
+            ]));
+        } catch (\Exception $e) {
+            // Jika gagal menyimpan, log dan tetap beri respon ke user
+            \Log::error('Failed to save contact message: ' . $e->getMessage());
+            return redirect()->back()->with('success', 'Pesan Anda telah dikirim. Terima kasih!');
+        }
 
         return redirect()->back()->with('success', 'Pesan Anda telah dikirim. Terima kasih!');
     }
